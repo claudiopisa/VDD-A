@@ -1,0 +1,22 @@
+{
+    "vdd_type": "vital",
+    "kernel_mode": "internal",
+    "input_mode" : "localSource",
+    "roots": {
+        "internal" : ["NSPC"],
+        "external" : ["NSPC", "NS_KERNEL"]
+    },
+    "paths": {
+        "stream_root": "C:/Users/cpisa/Desktop/stream/DEVRASTA",
+        "components": {
+            "NSPC": "NSPC",
+            "NS_KERNEL": "NS_KERNEL",
+            "SWNV": "SWNV",
+            "TOOLS": "NS_TOOLS"
+        }
+    },
+    "metadata": {
+        "doc_name": "VDD Test"
+    }
+    
+}
