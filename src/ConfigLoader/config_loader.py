@@ -2,8 +2,7 @@ import json
 from pathlib import Path
 from enum import Enum
 from types import SimpleNamespace
-
-from pyparsing import abstractmethod
+from abc import abstractmethod
 
 
 

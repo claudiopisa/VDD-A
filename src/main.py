@@ -3,9 +3,8 @@ from ConfigLoader.loaders.global_config import ConfigLoaderGlobal
 from ConfigLoader.loaders.file_versioning import ConfigLoaderFileVersioning
 from DataReader.data_reader_file_versioning import DataReaderFileVersioning
 from version_extractor import extract_version
-#from parser import build_ch2_xml_new
-#from doc_gen import render_ch2_new
-
+from parsers.xml_writer import build_ch2_xml_attr_rows
+from DocGen.doc_gen import generate_chapter2_docx
 try:
     global_cfg = ConfigLoaderGlobal("config/global_config.json")
     ch2_cfg = ConfigLoaderFileVersioning("config/ch2_config.json")
@@ -33,9 +32,11 @@ except Exception as e:
 
 rows = []
 
-for file in ch2_reader.scan_files():
-    version = extract_version(file)
-    rows.append((str(file), version))  #lista di tuple
+#for file in ch2_reader.scan_files():
+#    version = extract_version(file, version_extraction_criteria)
+#    rows.append((str(file), version))  #lista di tuple
+
+rows = list(ch2_reader.scan_files())
 
 for r in rows:
     print(r)
@@ -44,5 +45,10 @@ print(f"\nTotale file trovati: {len(rows)}")
 
 print("parsing")
 
+# Generate XML for chapter 2
+xml_output = build_ch2_xml_attr_rows(rows, chapter_title, out="chapter2_new2.xml")
+print(f"XML generated: {xml_output}")
+
 #build_ch2_xml_new(rows, chapter_title, out="ch2_test_2.xml")
 
+output_docx = generate_chapter2_docx(xml_output, "chapter2_output_test.docx")

@@ -25,10 +25,12 @@ VERSION_VALUE_RE = re.compile(
 def extract_version(path: Path, criteria=None):
     version = None
 
-    VERSION_VALUE_RE = re.compile(
-        r"(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)",
-        re.IGNORECASE
-    )
+    #VERSION_VALUE_RE = re.compile(
+    #    r"(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)",
+    #    re.IGNORECASE
+    #)
+    # old regex json "version_extraction_criteria": "(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)",
+
     
     with path.open("r", encoding="utf-8", errors="ignore") as f:
         i = 0
