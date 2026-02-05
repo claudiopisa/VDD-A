@@ -4,10 +4,11 @@ from types import SimpleNamespace
 from typing import Any
 
 class ConfigLoader:
-    def __init__(self, path: str):
+    def __init__(self, path: str | Path):
         self.path = Path(path)
-        raw = self._load()
-        self.config_data = self._parse(raw)
+        self.congig_data = self._load()
+        #raw = self._load()
+        #self.config_data = self._parse(raw)
         self.__dict__.update(self.config_data.__dict__)
 
     def _load(self) -> dict:
@@ -15,7 +16,10 @@ class ConfigLoader:
             raise FileNotFoundError(f"Error | File not found at path: {self.path}")
         try:
             with open(self.path, "r", encoding="utf-8") as file:
-                return json.load(file)
+                #return json.load(file)
+                #return json.load(file, object_hook=lambda elem: self._parse(elem))
+                return json.load(file, object_hook=lambda elem: SimpleNamespace(**elem))
+
         except json.JSONDecodeError as e:
             raise ValueError(f"Error | JSON Decode Error at {self.path}: {e}")
 

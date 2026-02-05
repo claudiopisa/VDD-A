@@ -1,31 +1,39 @@
 from pathlib import Path
-from ConfigLoader.config_loader import ConfigLoader
-from FileScanner.file_scanner import scan_files
+from ConfigLoader.loaders.global_config import ConfigLoaderGlobal
+from ConfigLoader.loaders.file_versioning import ConfigLoaderFileVersioning
+from DataReader.data_reader_file_versioning import DataReaderFileVersioning
 from version_extractor import extract_version
-from parser import build_ch2_xml_new
-from doc_gen import render_ch2_new
+#from parser import build_ch2_xml_new
+#from doc_gen import render_ch2_new
 
 try:
-    global_cfg = ConfigLoader("config/global_config.json").data
-    ch2_cfg = ConfigLoader("config/ch2_config.json").data
+    global_cfg = ConfigLoaderGlobal("config/global_config.json")
+    ch2_cfg = ConfigLoaderFileVersioning("config/ch2_config.json")
 except Exception as e:
     print(f"Error | {e}")
     exit(1)
 
-workspace = Path(global_cfg["paths"]["stream_root"])
-component = global_cfg["paths"]["components"]["NSPC"]
+workspace = global_cfg.get_stream_root(as_path=True)
+
+component = global_cfg.get_components().NSPC
 root = workspace / component
 
 print(root)
 
-allowed_ext = set(ch2_cfg["scan"]["allowed_extensions"])
-exclude_dirs = set(ch2_cfg["scan"]["exclude"]["dirs_exact"])
-chapter_title = ch2_cfg["title"]
-version_extraction_criteria = ch2_cfg["scan"]["version_extraction_criteria"]
+allowed_ext = ch2_cfg.get_allowed_extensions()
+exclude_dirs = ch2_cfg.get_excluded_dirs()
+chapter_title = ch2_cfg.get_title()
+version_extraction_criteria = ch2_cfg.get_version_extraction_criteria()
+
+try:
+    ch2_reader = DataReaderFileVersioning(root, ch2_cfg)
+except Exception as e:
+    print(f"Error | {e}")
+    exit(1)
 
 rows = []
 
-for file in scan_files(root, allowed_ext, exclude_dirs):
+for file in ch2_reader.scan_files():
     version = extract_version(file)
     rows.append((str(file), version))  #lista di tuple
 
@@ -36,5 +44,5 @@ print(f"\nTotale file trovati: {len(rows)}")
 
 print("parsing")
 
-build_ch2_xml_new(rows, chapter_title, out="ch2_test_2.xml")
+#build_ch2_xml_new(rows, chapter_title, out="ch2_test_2.xml")
 

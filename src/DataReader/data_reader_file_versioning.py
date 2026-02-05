@@ -1,20 +1,18 @@
 from pathlib import Path
 import os
 from abc import ABC, abstractmethod
-import DataReader
+from ConfigLoader.loaders.file_versioning import ConfigLoaderFileVersioning
+from .data_reader import DataReader
 
-
-from ConfigLoader.config_loader import VersioningMode
 
 class DataReaderFileVersioning(DataReader):
-    def __init__(self, data_path: Path | str, rules, mode : VersioningMode):
-        super.__init__(data_path, rules)
-        self.rules = rules
-        self.mode = mode
+    def __init__(self, data_path: Path | str, config: ConfigLoaderFileVersioning):
+        super().__init__(data_path)
+        self.config = config
 
     def scan_files(self):
-        excluded_dirs = {d.lower() for d in self.rules["exclusion"]["dirs"]}
-        allowed_ext = {e.lower() for e in self.rules["inclusion"]["extension"]}
+        excluded_dirs = {d.lower() for d in self.config.get_excluded_dirs()}
+        allowed_ext = {e.lower() for e in self.config.get_allowed_extensions()}
 
         for dir_path, dir_names, file_names in os.walk(self.data_path):
             #per poter potare l alber odelle directory bisogna modificare dirnames a runtime
@@ -29,7 +27,7 @@ class DataReaderFileVersioning(DataReader):
 
 
         
-def scan_files(root: Path, allowed_ext: set[str], exclude_dirs: set[str]):
+"""def scan_files(root: Path, allowed_ext: set[str], exclude_dirs: set[str]):
     exclude_dirs = {d.lower() for d in exclude_dirs} # crea set per dir escluse e estensioni ammesse
     allowed_ext = {e.lower() for e in allowed_ext}
 
@@ -40,7 +38,7 @@ def scan_files(root: Path, allowed_ext: set[str], exclude_dirs: set[str]):
         for name in filenames:
             p = Path(dirpath) / name
             if p.suffix.lower() in allowed_ext: #suffix ritorna la parte finale
-                yield p
+                yield p"""
 
 
 
