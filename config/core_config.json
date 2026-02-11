@@ -1,0 +1,12 @@
+{
+    "vdd_type": "vital",
+    "input_mode" : "localSource",
+    "paths": {
+        "stream_root": "C:/Users/cpisa/Desktop/stream/DEVRASTA",
+        "output_dir": "C:/Users/cpisa/Desktop/VDD-automation/VDD-A/output",
+        "rtc_chace_dir": "C:/Users/cpisa/Desktop/VDD-automation/VDD-A/rtc_cache"
+    },
+    "metadata": {
+        "doc_name": "VDD Test"
+    }
+}

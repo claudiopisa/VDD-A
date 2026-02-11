@@ -2,11 +2,7 @@ from enum import Enum
 
 
 class ConfigKeysFileVersioning(str, Enum):
-    """
-    Enum che standardizza i percorsi degli attributi di configurazione per il file versioning.
-    Eredita da str per poter usare direttamente i valori come stringhe senza .value.
-    """
-    
+
     # Attributi di primo livello
     VERSIONING_MODE = "mode"
     ALLOWED_EXTENSIONS = "allowed_extensions"

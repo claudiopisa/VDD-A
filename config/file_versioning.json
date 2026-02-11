@@ -1,0 +1,9 @@
+{
+    "version_extraction_criteria": "(?:\\\\*|//|--|;|#).*Version\\s*:?\\s*(\\d+\\.\\d+)",
+
+    "mode": "version",
+    "metadata": {
+      "title": "LIST OF WSPHS+ SW FILES AND RELEVANT VERSIONS",
+      "columns_name" : ["File name", "File version"]
+    }   
+}

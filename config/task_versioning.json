@@ -1,0 +1,12 @@
+{
+    "kernel_mode": "internal",
+    "previous_release": {
+        "enabled": false,
+        "version": "0.1.0",
+        "root": "C:\\Users\\cpisa\\Desktop\\stream\\DEVRASTA_old"
+    },
+    "metadata": {
+        "title": "TASK VERSION TABLE",
+        "columns_name": ["Name", "Type", "Version", "Modified"]
+  }
+}

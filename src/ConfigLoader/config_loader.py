@@ -7,12 +7,21 @@ from abc import abstractmethod
 
 
 class ConfigLoader:
-    def __init__(self, path: str):
-        self.path = Path(path)
-        self.config_data = self._load() 
+    def __init__(self, path: str | Path):
+        if isinstance(path, str):
+            self.path = Path(path)
+        elif isinstance(path, Path):
+            self.path = path
+        else:
+            raise TypeError(f"Error class {self.__class__.__name__} | Path must be a string or Path object, got {type(path)}")
+
+        try:
+            self.config_data = self._load()
+        except Exception as e:
+            raise ValueError(f"Error class {self.__class__.__name__} | problem loading config from {self.path}: {e}") 
         #raw = self._load() # load raw data from json
         #self.config_data = self._parse(raw) # parse raw data 
-        self.__dict__.update(self.config_data.__dict__) # set attributes from parsed data
+        #self.__dict__.update(self.config_data.__dict__) # set attributes from parsed data
         #alternativa
         #for k, v in self.config_data.__dict__.items():
             #setattr(self, k, v)
@@ -20,7 +29,7 @@ class ConfigLoader:
          
     def _load(self) -> dict:
         if not self.path.exists():
-            raise FileNotFoundError(f"Error | File not found at path: {self.path}")
+            raise FileNotFoundError(f"Error class {self.__class__.__name__} | File not found at path: {self.path}")
 
         try:
             with open(self.path, "r", encoding="utf-8") as file:
@@ -28,7 +37,7 @@ class ConfigLoader:
                 return json.load(file, object_hook=lambda elem: SimpleNamespace(**elem))
 
         except json.JSONDecodeError as e:
-            raise ValueError(f"Error | JSON Decode Error at {self.path}: {e}")
+            raise ValueError(f"Error class {self.__class__.__name__} | JSON Decode Error at {self.path}: {e}")
         
         print("DEBUG | Config Loaded")
 
