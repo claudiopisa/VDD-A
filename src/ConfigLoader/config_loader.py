@@ -56,6 +56,8 @@ class ConfigLoader:
 
         return SimpleNamespace(**parsed) # converte parsed in SimpleNamespace in modo da poter accedere agli attributi con la notazione a punto
 
+    
+                
     #crea metodo astratto per validazione che deve essere implementato dalle sottoclassi
     @abstractmethod
     def validate(self):

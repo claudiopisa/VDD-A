@@ -3,7 +3,7 @@ from pathlib import Path
 
 from ConfigLoader.user_config_loader import UserConfigLoader
 #import core_config.py
-from configs.default_config.core_default_config_loader import CoreDefaultConfig
+from configs.default_config.core_default_config import CoreDefaultConfig
 
 
 class CoreConfigLoader():
