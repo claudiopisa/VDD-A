@@ -29,7 +29,7 @@ class Rules:
     exclusion: ExclusionRules = field(default_factory=ExclusionRules)
     inclusion: InclusionRules = field(default_factory=InclusionRules)
 
-#@dataclass(frozen=True)
+@dataclass(frozen=True)
 class FileVersioningDefaultConfig:
     """
     Default configuration for file versioning operations.
@@ -38,19 +38,17 @@ class FileVersioningDefaultConfig:
     User-specific config (version_extraction_criteria, mode, metadata)
     come from JSON files and should NOT be in this default config.
     """
-    component_roots: List[str] = field(default_factory=lambda: ["NSPC"])
-    allowed_extensions: List[str] = field(default_factory=lambda: [
-        ".c", ".h", ".ads", ".adb", ".asm", ".s"
-    ])
+    root: List[str] = field(default_factory=lambda: ["NSPC"])
+    version_extraction_criteria: str = r"(?:\\\\*|//|--|;|#).*Versione\s*:?\\s*(\d+\.\d+)" 
     rules: Rules = field(default_factory=Rules)
+    
 
 # Singleton instance
 """CONFIG = FileVersioningDefaultConfig()
 
 # Utilizzo
-print(CONFIG.component_roots)
+print(CONFIG.root)
 print(CONFIG.rules.exclusion.dirs)
-print(CONFIG.metadata.title)
 
 # Questo solleverà un errore (frozen=True)
 # CONFIG.mode = "altro"  # FrozenInstanceError"""

@@ -2,19 +2,19 @@ from pathlib import Path
 import os
 from abc import ABC, abstractmethod
 import re
-from ConfigLoader.loaders.file_versioning import ConfigLoaderFileVersioning
+from configs.file_versioning_config import FileVersioningConfig
 from .data_reader import DataReader
 
 
 class DataReaderFileVersioning(DataReader):
-    def __init__(self, data_path: Path | str, config: ConfigLoaderFileVersioning):
+    def __init__(self, data_path: Path | str, config: FileVersioningConfig):
         super().__init__(data_path)
         self.config = config
 
     def _scan_files(self):
-        excluded_dirs = {d.lower() for d in self.config.get_excluded_dirs()}
-        allowed_ext = {e.lower() for e in self.config.get_allowed_extensions()}
-        criteria = self.config.get_version_extraction_criteria()
+        excluded_dirs = {d.lower() for d in self.config.excluded_dirs}
+        allowed_ext = {e.lower() for e in self.config.allowed_extensions}
+        criteria = self.config.version_extraction_criteria
 
         for dir_path, dir_names, file_names in os.walk(self.data_path):
             #per poter potare l alber odelle directory bisogna modificare dirnames a runtime
@@ -36,8 +36,6 @@ class DataReaderFileVersioning(DataReader):
         for file in self._scan_files():
             yield file
 
-
-
     def _extract_version(self, path: Path, criteria=None):
         version = None
     
@@ -49,9 +47,9 @@ class DataReaderFileVersioning(DataReader):
      
         with open(path, "r", encoding="utf-8", errors="ignore") as f:
             for line in f:
-                m = VERSION_VALUE_RE.search(line)
-                if m:
-                    return m.group(1)
+                match = VERSION_VALUE_RE.search(line)
+                if match:
+                    return match.group(1)
 
         return version
 

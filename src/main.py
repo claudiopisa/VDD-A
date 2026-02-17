@@ -41,7 +41,7 @@ rows = list(ch2_reader.scan_files())
 for r in rows:
     print(r)
 
-print(f"\nTotale file trovati: {len(rows)}")
+
 
 print("parsing")
 

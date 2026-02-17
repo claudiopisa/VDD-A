@@ -14,3 +14,6 @@ class TaskVersioningDefaultConfig:
     
     # Structural defaults
     component_roots: List[str] = field(default_factory=lambda: ["NSPC"])
+
+    def __repr__(self):
+        return f"TaskVersioningDefaultConfig(component_roots={self.component_roots})"

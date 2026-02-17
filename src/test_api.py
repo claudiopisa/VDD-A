@@ -16,4 +16,3 @@ print(coreConfig.internal_root)
 print(coreConfig.external_root)
 print(coreConfig.components)
 
-print(coreConfig)

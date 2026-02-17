@@ -16,6 +16,9 @@ class Components:
     SWNV:       str = "SWNV"
     TOOLS:      str = "NS_TOOLS"
 
+    def __repr__(self):
+        return f"Available components(NSPC='{self.NSPC}', NS_KERNEL='{self.NS_KERNEL}', SWNV='{self.SWNV}', TOOLS='{self.TOOLS}').\n Usage example: config_object.components.NSPC to access the string 'NSPC'."
+
 @dataclass(frozen=True)
 class CoreDefaultConfig:
     """
@@ -29,13 +32,9 @@ class CoreDefaultConfig:
     roots:      Roots       = field(default_factory=Roots)
     components: Components  = field(default_factory=Components)
     
-    def __str__(self):
-        # Provide a compact, user-friendly view of the default configuration.
-        payload = asdict(self)
-        return f"{self.__class__.__name__}({json.dumps(payload, indent=2)})"
-
     def __repr__(self):
-        return self.__str__()
+        return f"CoreDefaultConfig(roots={asdict(self.roots)}, components={asdict(self.components)})"
+    
 # Singleton instance
 #CONFIG = CoreDefaultConfig()
 

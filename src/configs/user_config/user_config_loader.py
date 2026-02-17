@@ -39,7 +39,8 @@ class UserConfigLoader:
             data = json.load(file)
             return data if return_dict else DottedDict(data) # se data è già un dict, DottedDict lo accetta direttamente
   
-
+    def __repr__(self):
+        return f"User Configuration dump: {json.dumps(self.load(self.user_config_path, return_dict=True), indent=2)}"
 
 # ============================================================================
 # DEPRECATED - Old implementation using ConfigNamespace

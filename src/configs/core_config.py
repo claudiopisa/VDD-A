@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from configs.config import Config
+from configs.default_config.core_default_config import Components, Roots
 
 class CoreConfig(Config):
     """
@@ -43,6 +44,14 @@ class CoreConfig(Config):
         return self.user_config.paths.stream_root
     
     @property
+    def stream_root_as_path(self) -> Path:
+        stream_root = self.stream_root
+        if stream_root is not None:
+            return Path(stream_root)
+        
+        return None
+    
+    @property
     def output_dir(self):
         return self.user_config.paths.output_dir
     
@@ -67,5 +76,25 @@ class CoreConfig(Config):
     def components(self):
         return self.default_config.components
     
+    def __repr__(self):
+        pretty_print_str_user = "User Core Configuration:\n"
 
+        for key, value in self.user_config.items():
+            if isinstance(value, dict):
+                pretty_print_str_user += f"{key}:\n"
+                for sub_key, sub_value in value.items():
+                    pretty_print_str_user += f"\t{sub_key}:\t{sub_value}\n"
+            else:
+                pretty_print_str_user += f"{key}:\t{value}\n"
+        
+        pretty_print_str_default = "\nDefault Core Configuration:\n"
 
+        for key, value in self.default_config.__dict__.items():
+            if isinstance(value, Roots) or isinstance(value, Components):
+                pretty_print_str_default += f"{key}:\n"
+                for sub_key, sub_value in value.__dict__.items():
+                    pretty_print_str_default += f"\t{sub_key}:\t{sub_value}\n"
+            else:
+                pretty_print_str_default += f"{key}:\t{value}\n"
+        
+        return pretty_print_str_user + pretty_print_str_default
