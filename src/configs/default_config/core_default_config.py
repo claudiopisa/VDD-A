@@ -2,19 +2,15 @@ import json
 from dataclasses import asdict, dataclass, field
 from typing import Tuple, Dict, Any
 
-@dataclass(frozen=True)
-class Roots:
-    #internal: List[str] = field(default_factory=lambda: ("NSPC",))
-    #internal: Union[str, List[str]] = "NSPC" # se si vuole opzionalemnte una lista o una stringa
-    internal: str               = "NSPC"
-    external: Tuple[str, ...]   = field(default_factory=lambda: ("NSPC", "NS_KERNEL"))
+
 
 @dataclass(frozen=True)
-class Components:
-    NSPC:       str = "NSPC"
-    NS_KERNEL:  str = "NS_KERNEL"
-    SWNV:       str = "SWNV"
-    TOOLS:      str = "NS_TOOLS"
+class SoftwareComponents:
+    SAFETY_NUCLEUS:             str = "NSPC"
+    SAFETY_NUCLEUS_KERNEL:      str = "NS_KERNEL"
+    SAFETY_NUCLEUS_SIMULATION:  str = "SIMNS"
+    NON_VITAL_ENV:              str = "SWNV"
+    TOOLS:                      str = "NS_TOOLS"
 
     def __repr__(self):
         return f"Available components(NSPC='{self.NSPC}', NS_KERNEL='{self.NS_KERNEL}', SWNV='{self.SWNV}', TOOLS='{self.TOOLS}').\n Usage example: config_object.components.NSPC to access the string 'NSPC'."
@@ -29,11 +25,12 @@ class CoreDefaultConfig:
     come from JSON files and should NOT be in this default config.
     """
     # Structural defaults
-    roots:      Roots       = field(default_factory=Roots)
-    components: Components  = field(default_factory=Components)
+    #roots:      Roots       = field(default_factory=Roots)
+    components: SoftwareComponents  = field(default_factory=SoftwareComponents)
+    image_config_name: str = "Imgconf.ini"
     
     def __repr__(self):
-        return f"CoreDefaultConfig(roots={asdict(self.roots)}, components={asdict(self.components)})"
+        return f"CoreDefaultConfig(roots={asdict(self.roots)}, components={asdict(self.components)}, image_config_name='{self.image_config_name}')"
     
 # Singleton instance
 #CONFIG = CoreDefaultConfig()

@@ -1,5 +1,4 @@
 {
-    "kernel_mode": "internal",
     "previous_release": {
         "enabled": false,
         "version": "0.1.0",

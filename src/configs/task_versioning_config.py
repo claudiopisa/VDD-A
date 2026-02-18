@@ -32,3 +32,33 @@ class TaskVersioningConfig(Config):
         # DefaultConfigLoader will automatically load TaskVersioningDefaultConfig
         self.default_config = self.load_default_config()
 
+    @property
+    def roots(self):
+        return self.default_config.roots
+    
+    @property
+    def internal_roots(self):
+        return self.default_config.roots.internal
+    
+    @property
+    def external_roots(self):
+        return self.default_config.roots.external
+    
+    @property
+    def has_previous_release(self):
+        return self.user_config.previous_release.enabled
+    
+    @property
+    def previous_release_version(self):
+        return self.user_config.previous_release.version
+    
+    @property
+    def previous_release_root(self):
+        return self.user_config.previous_release.root
+    
+    @property
+    def title(self):
+        return self.user_config.metadata.title
+
+    
+
