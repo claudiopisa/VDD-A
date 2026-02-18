@@ -1,5 +1,5 @@
 from pathlib import Path
-from DataReader.date_reader_task_versioning import DataReaderTaskVersioning
+from DataReader.data_reader_task_versioning import DataReaderTaskVersioning
 from configs.core_config import CoreConfig
 from configs.task_versioning_config import TaskVersioningConfig
 
