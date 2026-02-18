@@ -140,10 +140,11 @@ def build_ch3_docx(tasks: list[TaskRow], out_docx: str | Path):
 # QUICK TEST (tu cambi i path)
 # -------------------------
 if __name__ == "__main__":
-    imgconf = r"C:\Users\cpisa\Desktop\stream\DEVRASTA\NSPC\Imgconf.ini"
-    nspc_root = r"C:\Users\cpisa\Desktop\stream\DEVRASTA\NSPC"  # root dove risolvere i file relativi (es. FileLoaderVer)
-    out = r"C:\Users\cpisa\Desktop\ch3_test.docx"
+    imgconf = r"C:\Users\claud\Desktop\streamDemo\NSPC\Imgconf.ini"
+    nspc_root = r"C:\Users\claud\Desktop\streamDemo\NSPC"  # root dove risolvere i file relativi (es. FileLoaderVer)
+    out = r"C:\Users\claud\Desktop\ch3_test.docx"
 
     tasks = read_tasks_kernel_internal(imgconf, nspc_root)
-    build_ch3_docx(tasks, out)
-    print(f"OK -> generated: {out}")
+    print(tasks)
+    #build_ch3_docx(tasks, out)
+    #print(f"OK -> generated: {out}")

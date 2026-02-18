@@ -1,6 +1,5 @@
 from pathlib import Path
-from DataReader.data_reader_file_versioning import DataReaderFileVersioning
-from DataReader.data_reader_task_versioning import DataReaderTaskVersioning
+from DataReader.date_reader_task_versioning import DataReaderTaskVersioning
 from configs.core_config import CoreConfig
 from configs.task_versioning_config import TaskVersioningConfig
 
@@ -27,6 +26,6 @@ ini = workspace / components / core_conf.image_config_name
 print(f"Looking for Imgconf.ini at: {ini}")
 
 reader = DataReaderTaskVersioning(ini)
-tasks = reader.read_tasks_imgconf()
+tasks = reader.read_tasks()
 
 print(tasks)

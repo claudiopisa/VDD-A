@@ -1,5 +1,5 @@
 from pathlib import Path
-from DataReader.data_reader_task_versioning import DataReaderTaskVersioning
+from DataReader.data_reader_task_versioning__ import DataReaderTaskVersioning
 from parsers.xml_ch3_parser import build_ch3_xml
 from DocGen.doc_ch3_render import render_ch3_from_xml
 
