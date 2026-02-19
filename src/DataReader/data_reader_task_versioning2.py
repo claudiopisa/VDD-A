@@ -59,9 +59,8 @@ class Task:
     def __repr__(self):
         return Task.format_row(self.name, self.type, self.version, self.modified)
     
-
-class TaskList(list[Task]):  # TaskList composizione con Task.
-
+class TaskList(list[Task]): #TaskList composizione con Task.
+    
     def __repr__(self):
         out = "TaskList:\n"
         out += Task.format_header_row("NAME", "TYPE", "VERSION", "MODIFIED") + "\n"
@@ -70,23 +69,15 @@ class TaskList(list[Task]):  # TaskList composizione con Task.
 
         return out
     
-
 class DataReaderTaskVersioning:
-    def __init__(self, imgconf_path: str | Path, previous_imgconf_path: str | Path | None = None):
+    def __init__(self, imgconf_path: str | Path):
         self.imgconf_path = Path(imgconf_path) if isinstance(imgconf_path, str) else imgconf_path
         if not self.imgconf_path.exists():
             raise FileNotFoundError(f"Imgconf.ini not found: {self.imgconf_path}")
+        
+        self._parser = self._init_parser()
 
-        self._parser = self._init_parser(self.imgconf_path)
-        self.previous_imgconf_path = None
-        self._previous_parser = None
-
-        if previous_imgconf_path is not None:
-            self.previous_imgconf_path = Path(previous_imgconf_path) if isinstance(previous_imgconf_path, str) else previous_imgconf_path
-            if self.previous_imgconf_path.exists():
-                self._previous_parser = self._init_parser(self.previous_imgconf_path)
-
-    def _init_parser(self, imgconf_path: Path) -> ConfigParser:
+    def _init_parser(self) -> ConfigParser:
         parser = ConfigParser(
             interpolation=None,
             comment_prefixes=(";", "#", "//"),
@@ -96,67 +87,35 @@ class DataReaderTaskVersioning:
         )
         parser.optionxform = str  # preserva case
 
-        with imgconf_path.open("r", encoding="utf-8", errors="ignore") as file:
+        with self.imgconf_path.open("r", encoding="utf-8", errors="ignore") as file:
             parser.read_file(file)
 
         return parser
-
-    @staticmethod
-    def _build_task_version_index(parser: ConfigParser) -> dict[str, str]:
-        """Build an index {task_name: version} from a parsed Imgconf.ini.
-
-        Only tasks with a meaningful version (Kernel + scheduled tasks) are included.
-        """
-        if "Settings" not in parser:
-            return {}
-        settings = parser["Settings"]
-        out: dict[str, str] = {}
-
-        # Kernel
-        if "RelKernel" in settings:
-            out["KERNEL"] = settings.get("RelKernel", "").strip()
-
-        # Application tasks
-        try:
-            num_tasks = int(settings.get("NumTask", "0").strip() or "0")
-        except ValueError:
-            num_tasks = 0
-
-        for i in range(1, num_tasks + 1):
-            type_ = settings.get(f"TipoTask{i}", "").strip()
-            if type_ and type_.upper() not in ("NO_SCHED", "RBC"):
-                name = Path(settings.get(f"V1_FileTask{i}", "").strip()).stem
-                version = settings.get(f"RelTask{i}", "").strip()
-                if name:
-                    out[name] = version
-
-        return out
-
+    
     def read_tasks(self) -> TaskList:
         if "Settings" not in self._parser:
             raise ValueError("Missing [Settings] section in Imgconf.ini")
 
-        # reset length cache before reading tasks, to ensure that the max length is calculated correctly based on the current set of tasks being read, without being influenced by any previous reads or Task instances that may have been created.
+        #reset length cache before reading tasks, to ensure that the max length is calculated correctly based on the current set of tasks being read, without being influenced by any previous reads or Task instances that may have been created.
         Task.reset_length_cache()
 
-        # load the entire setting section
+        #load the entire setting section
         settings = self._parser["Settings"]
         tasks: TaskList = TaskList()
 
-        prev_index = None
-        if self._previous_parser is not None:
-            prev_index = self._build_task_version_index(self._previous_parser)
-
-        # System tasks (BOOT / BOOTAP / Loader) - per ora TODO
+        # System tasks, such as BOOT, BOOTAP, Loader, Kernel, are in the [Settings] section with chiavi come FileBootVer, FileBootAPVer, FileLoaderVer, FileKernelVer
+        # BOOT
         if "FileBoot" in settings:
             name = Path(settings.get("FileBoot", "").strip()).stem
             tasks.append(Task(name="BOOT", type="SYSTEM", version="<TODO >"))
 
+        # BOOTAP
         if "FileBootAPs" in settings:
             name = Path(settings.get("FileBootAPs", "").strip()).stem
             tasks.append(Task(name="BOOTAP", type="SYSTEM", version="<TODO>"))
 
-        if "V1_FileLoader" in settings:
+        # Loader (per ora just mark as TODO, file extraction can be added later)
+        if "V1_FileLoader"in settings:
             name = Path(settings.get("V1_FileLoader", "").strip()).stem
             tasks.append(Task(name="Loader", type="SYSTEM", version="<TODO>"))
 
@@ -164,15 +123,9 @@ class DataReaderTaskVersioning:
         if "RelKernel" in settings:
             name = Path(settings.get("RelKernel", "").strip()).stem
             version = settings.get("RelKernel", "").strip()
-            tasks.append(
-                Task(
-                    name="KERNEL",
-                    type="SYSTEM",
-                    version=version,
-                    modified=("NO" if (prev_index is not None and prev_index.get("KERNEL") == version) else ("YES" if prev_index is not None else "N/A")),
-                )
-            )
-
+            tasks.append(Task(name="KERNEL", type="SYSTEM", version=version))
+  
+            
         # Application tasks
         try:
             num_tasks = int(settings.get("NumTask", "0").strip() or "0")
@@ -187,13 +140,7 @@ class DataReaderTaskVersioning:
                 version = settings.get(f"RelTask{i}", "").strip()
                 name = Path(settings.get(f"V1_FileTask{i}", "").strip()).stem
 
-                tasks.append(
-                    Task(
-                        name=name,
-                        type=type,
-                        version=version,
-                        modified=("NO" if (prev_index is not None and prev_index.get(name) == version) else ("YES" if prev_index is not None else "N/A")),
-                    )
-                )
+                tasks.append(Task(name=name, type=type, version=version, modified="N/A"))
 
         return tasks
+
