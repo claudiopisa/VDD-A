@@ -28,7 +28,7 @@ print(f"Components to scan: {components_to_scan}")
 # Optional previous stream (baseline) support
 prev_workspace = None
 if tv_conf.has_previous_release and tv_conf.previous_release_root:
-    prev_workspace = Path(tv_conf.previous_release_root)
+    prev_workspace = tv_conf.previous_release_root_as_path
     if not prev_workspace.exists():
         prev_workspace = None
 
@@ -51,5 +51,5 @@ for comp in components_to_scan:
             print(f"Baseline Imgconf.ini not found for {comp} -> Modified will be N/A")
 
     reader = DataReaderTaskVersioning(ini, previous_imgconf_path=prev_ini)
-    tasks = reader.read_tasks()
+    tasks = reader.scan_files()
     print(tasks)

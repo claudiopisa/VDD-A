@@ -1,8 +1,8 @@
 {
     "previous_release": {
-        "enabled": false,
+        "enabled": true,
         "version": "0.1.0",
-        "root": "C:\\Users\\cpisa\\Desktop\\stream\\DEVRASTA_old"
+        "root": "C:\\Users\\claud\\Desktop\\prevStreamDemo"
     },
     "metadata": {
         "title": "TASK VERSION TABLE",

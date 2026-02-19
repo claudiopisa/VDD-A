@@ -50,11 +50,15 @@ class TaskVersioningConfig(Config):
     
     @property
     def previous_release_version(self):
-        return self.user_config.previous_release.version
+        return self.user_config.previous_release.version if self.has_previous_release else None
     
     @property
     def previous_release_root(self):
-        return self.user_config.previous_release.root
+        return self.user_config.previous_release.root if self.has_previous_release else None
+    
+    @property
+    def previous_release_root_as_path(self):
+        return Path(self.previous_release_root if self.has_previous_release else "")
     
     @property
     def title(self):
