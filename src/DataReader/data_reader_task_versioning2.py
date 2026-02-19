@@ -70,14 +70,20 @@ class TaskList(list[Task]): #TaskList composizione con Task.
         return out
     
 class DataReaderTaskVersioning:
-    def __init__(self, imgconf_path: str | Path):
+    def __init__(self, imgconf_path: str | Path, previous_imgconf_path: str | Path | None = None):
         self.imgconf_path = Path(imgconf_path) if isinstance(imgconf_path, str) else imgconf_path
         if not self.imgconf_path.exists():
             raise FileNotFoundError(f"Imgconf.ini not found: {self.imgconf_path}")
         
-        self._parser = self._init_parser()
+        self.previous_imgconf_path = Path(previous_imgconf_path) if isinstance(previous_imgconf_path, str) else previous_imgconf_path
+        if self.previous_imgconf_path and not self.previous_imgconf_path.exists():
+            raise FileNotFoundError(f"Previous Imgconf.ini not found: {self.previous_imgconf_path}")
 
-    def _init_parser(self) -> ConfigParser:
+        self._parser = self._init_parser(self.imgconf_path)
+        self.tasks: TaskList = TaskList()
+
+        
+    def _init_parser(self, imgconf_path: Path) -> ConfigParser:
         parser = ConfigParser(
             interpolation=None,
             comment_prefixes=(";", "#", "//"),
@@ -86,13 +92,48 @@ class DataReaderTaskVersioning:
             strict=False,
         )
         parser.optionxform = str  # preserva case
-
-        with self.imgconf_path.open("r", encoding="utf-8", errors="ignore") as file:
+        
+        with imgconf_path.open("r", encoding="utf-8", errors="ignore") as file:
             parser.read_file(file)
 
         return parser
     
+    def _load_prev_config(self, prev_imgconf_path: Path) -> dict[str, str]:
+        parser = self._init_parser(prev_imgconf_path)
+
+        if "Settings" not in parser:
+            raise ValueError("Missing [Settings] section in previous Imgconf.ini")
+        
+        settings = parser["Settings"]
+        out: dict[str, str] = {}
+
+         # Kernel
+        if "RelKernel" in settings:
+            out["KERNEL"] = settings.get("RelKernel", "").strip()
+
+        # Application tasks
+        try:
+            num_tasks = int(settings.get("NumTask").strip())
+        except ValueError:
+            num_tasks = None
+
+        #if num_task is none, then cannot continue loading tasks
+        if num_tasks is None:
+            raise ValueError("Invalid NumTask value in previous Imgconf.ini")
+
+
+        for i in range(1, num_tasks + 1):
+            type_ = settings.get(f"TipoTask{i}", "").strip()
+            if type_ and type_.upper() not in ("NO_SCHED", "RBC"):
+                name = Path(settings.get(f"V1_FileTask{i}", "").strip()).stem
+                version = settings.get(f"RelTask{i}", "").strip()
+                if name:
+                    out[name] = version
+
+        return out
+
     def read_tasks(self) -> TaskList:
+        
         if "Settings" not in self._parser:
             raise ValueError("Missing [Settings] section in Imgconf.ini")
 
@@ -101,36 +142,50 @@ class DataReaderTaskVersioning:
 
         #load the entire setting section
         settings = self._parser["Settings"]
-        tasks: TaskList = TaskList()
+        #tasks: TaskList = TaskList()
+
+        if self.previous_imgconf_path:
+            prev_config = self._load_prev_config(self.previous_imgconf_path)
+
 
         # System tasks, such as BOOT, BOOTAP, Loader, Kernel, are in the [Settings] section with chiavi come FileBootVer, FileBootAPVer, FileLoaderVer, FileKernelVer
         # BOOT
         if "FileBoot" in settings:
             name = Path(settings.get("FileBoot", "").strip()).stem
-            tasks.append(Task(name="BOOT", type="SYSTEM", version="<TODO >"))
+            self.tasks.append(Task(name="BOOT", type="SYSTEM", version="<TODO >"))
 
         # BOOTAP
         if "FileBootAPs" in settings:
             name = Path(settings.get("FileBootAPs", "").strip()).stem
-            tasks.append(Task(name="BOOTAP", type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name="BOOTAP", type="SYSTEM", version="<TODO>"))
 
         # Loader (per ora just mark as TODO, file extraction can be added later)
         if "V1_FileLoader"in settings:
             name = Path(settings.get("V1_FileLoader", "").strip()).stem
-            tasks.append(Task(name="Loader", type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name="Loader", type="SYSTEM", version="<TODO>"))
 
         # Kernel
         if "RelKernel" in settings:
             name = Path(settings.get("RelKernel", "").strip()).stem
             version = settings.get("RelKernel", "").strip()
-            tasks.append(Task(name="KERNEL", type="SYSTEM", version=version))
+            self.tasks.append(Task(
+                                    name="KERNEL", 
+                                    type="SYSTEM", 
+                                    version=version, 
+                                    modified=("NO" if (self.previous_imgconf_path and prev_config.get("KERNEL") == version) 
+                                              else ("YES" if self.previous_imgconf_path 
+                                                    else "N/A"))))
   
             
         # Application tasks
         try:
-            num_tasks = int(settings.get("NumTask", "0").strip() or "0")
+            num_tasks = int(settings.get("NumTask", "0").strip())
         except ValueError:
-            num_tasks = 0
+            num_tasks = None
+
+        #if num_task is none, then cannot continue loading tasks
+        if num_tasks is None:
+            raise ValueError("Invalid NumTask value in Imgconf.ini")
 
         for i in range(1, num_tasks + 1):
             type = settings.get(f"TipoTask{i}", "").strip()
@@ -140,7 +195,13 @@ class DataReaderTaskVersioning:
                 version = settings.get(f"RelTask{i}", "").strip()
                 name = Path(settings.get(f"V1_FileTask{i}", "").strip()).stem
 
-                tasks.append(Task(name=name, type=type, version=version, modified="N/A"))
+                self.tasks.append(Task(
+                                        name=name, 
+                                        type=type, 
+                                        version=version, 
+                                        modified=("NO" if (self.previous_imgconf_path and prev_config.get(name) == version) 
+                                                  else ("YES" if self.previous_imgconf_path 
+                                                        else "N/A"))))
 
-        return tasks
+        return self.tasks
 
