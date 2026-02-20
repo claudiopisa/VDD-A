@@ -1,9 +1,9 @@
 {
     "vdd_type": "vital",
     "input_mode" : "localSource",
-    "kernel_mode": "internal",
+    "kernel_mode": "external",
     "paths": {
-        "stream_root": "C:\\Users\\claud\\Desktop\\streamDemo",
+        "stream_root": "C:\\Users\\claud\\Desktop\\streamDemoExt",
         "output_dir": "C:\\Users\\claud\\Desktop\\VDD-automation\\VDD-A\\output",
         "rtc_cache_dir": "C:\\Users\\claud\\Desktop\\VDD-automation\\VDD-A\\rtc_cache"
     },

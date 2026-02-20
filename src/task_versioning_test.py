@@ -26,7 +26,7 @@ components_to_scan = (components,) if isinstance(components, str) else tuple(com
 print(f"Components to scan: {components_to_scan}")
 
 # Optional previous stream (baseline) support
-prev_workspace = None
+"""prev_workspace = None
 if tv_conf.has_previous_release and tv_conf.previous_release_root:
     prev_workspace = tv_conf.previous_release_root_as_path
     if not prev_workspace.exists():
@@ -51,5 +51,24 @@ for comp in components_to_scan:
             print(f"Baseline Imgconf.ini not found for {comp} -> Modified will be N/A")
 
     reader = DataReaderTaskVersioning(ini, previous_imgconf_path=prev_ini)
+    tasks = reader.scan_files()
+    print(tasks)"""
+
+
+if not core_conf.is_kernel_internal:
+    print("\nScanning kernel tasks in external mode...")
+    kernel_ini = workspace / "NS_KERNEL" / core_conf.image_config_name
+    prev_kernel_ini = None
+    #if prev_workspace:
+        #candidate = prev_workspace / "NS_KERNEL" / core_conf.image_config_name
+        #if candidate.exists():
+            #prev_kernel_ini = candidate
+
+    print(f"\nExternal kernel test: {kernel_ini}")
+    reader = DataReaderTaskVersioning(
+        kernel_ini,
+        previous_imgconf_path=None,
+        kernel_mode="external"
+    )
     tasks = reader.scan_files()
     print(tasks)
