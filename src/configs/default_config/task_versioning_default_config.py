@@ -13,11 +13,11 @@ class AppTask:
 
 @dataclass(frozen=True)
 class SysTask:
-    boot: str = "FileBoot"
-    boot_ap: str = "FileBootAPs"
-    loader: str = "V1_FileLoader"
-    kernel: str = "V1_FileKernel"
-    kernel_version: str = "RelKernel"
+    BOOT: str = "FileBoot"
+    BOOT_AP: str = "FileBootAPs"
+    LOADER: str = "V1_FileLoader"
+    KERNEL: str = "V1_FileKernel"
+    KERNEL_VERSION: str = "RelKernel"
 
 @dataclass(frozen=True)
 class InclusionRules:
@@ -30,11 +30,15 @@ class InclusionRules:
 class ExclusionRules:
     task_type: Tuple[str, ...] = field(default_factory=lambda: ("NO_SCHED", "RBC"))
 
+#@dataclass(frozen=True)
+#class INISections:
+#    settings: str = "Settings"
+#    container: str = "CONTAINER"
+
 @dataclass(frozen=True)
 class INISections:
-    settings: str = "Settings"
-    container: str = "CONTAINER"
-
+    internal: str = "Settings"
+    external: str = "CONTAINER"
 
 @dataclass(frozen=True)
 class Roots:

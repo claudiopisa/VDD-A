@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 from configs.default_config.task_versioning_default_config import TaskVersioningDefaultConfig
 
@@ -9,75 +9,111 @@ from .data_reader import DataReader
 
 import re
 
-
+from model.task import Task
+from model.task_list import TaskList
+    
 @dataclass
-class Task:
-    name: str
-    type: str
-    version: str
-    modified: str = "N/A"  # per ora non hai baseline precedente
+class Sources:
+    # "internal" | "external"
+    mode: str
 
-    # Static attribute. Keeps track of the max length of each field across all Task instances, used for formatting the output in a clean way.
-    _length_cache: ClassVar[dict[str, int]] = {
-        "name": len("NAME"),
-        "type": len("TYPE"),
-        "version": len("VERSION"),
-        "modified": len("MODIFIED"),
-    }
+    # sys ini (internal: NSPC/Imgconf.ini; external: NS_KERNEL/Imgconf.ini)
+    sys_current: Path
+    sys_previous: Optional[Path] = None
 
-    # Special method called automatically after the dataclass __init__ method, used to update
-    # the max length of each field in the _length_cache dictionary every time a new Task
-    # instance is created.
+    # app ini (internal: {} ; external: {"ixl": path, "srlw": path, ...})
+    app_current: dict[str, Path] = None
+    app_previous: Optional[dict[str, Path]] = None
+
     def __post_init__(self):
-        """Aggiorna i max ogni volta che un Task viene creato."""
-        for key, current_max in Task._length_cache.items():
-            Task._length_cache[key] = max(current_max, len(str(getattr(self, key))))
+        if self.app_current is None:
+            object.__setattr__(self, "app_current", {})
 
-    @classmethod
-    def reset_length_cache(cls) -> None:
-        cls._length_cache = {
-            "name": len("NAME"),
-            "type": len("TYPE"),
-            "version": len("VERSION"),
-            "modified": len("MODIFIED"),
-        }
-
-    @classmethod
-    def format_row(cls, name: str, type_: str, version: str, modified: str) -> str:
-        gap = "  "
-        return (
-            f"{name:<{cls._length_cache['name']}}"
-            f"{gap}{type_:<{cls._length_cache['type']}}"
-            f"{gap}{version:<{cls._length_cache['version']}}"
-            f"{gap}{modified:<{cls._length_cache['modified']}}"
-        )
-
-    @classmethod
-    def format_header_row(cls, name: str, type_: str, version: str, modified: str) -> str:
-        gap = "  "
-        return (
-            f"{name:^{cls._length_cache['name']}}"
-            f"{gap}{type_:^{cls._length_cache['type']}}"
-            f"{gap}{version:^{cls._length_cache['version']}}"
-            f"{gap}{modified:^{cls._length_cache['modified']}}"
-        )
-
-    def __repr__(self):
-        return Task.format_row(self.name, self.type, self.version, self.modified)
-    
-class TaskList(list[Task]): #TaskList composizione con Task.
-    
-    def __repr__(self):
-        out = "TaskList:\n"
-        out += Task.format_header_row("NAME", "TYPE", "VERSION", "MODIFIED") + "\n"
-        for task in self:
-            out += f"{task}\n"
-
-        return out
-    
 class DataReaderTaskVersioning(DataReader):
+    #Use cases:
+    # Kernel is internal: we have max 2 ini files to read, current and optional previous, the former in the NSPC dir, the latter in the previous stream root if available. Both contain a [Settings] section with BOOT, BOOTAP, Loader, Kernel and application tasks with their type and version. We compare BOOT, BOOTAP, Loader, Kernel and application tasks versions between current and previous ini to determine if they are modified or not.
+    # Kernel is external: we have 1 ini file for the sys tasks and N ini files (usually 2, ixl.ini and srlw.ini) for app tasks (current stream), and optionally the same for the previous stream, resulting in a max of 2N app inis + 2 sys ini (current + previous). The sys ini contains BOOT, BOOTAP, Loader, Kernel with their version, while the app ini(s) contain application tasks with their type and version. We compare BOOT, BOOTAP, Loader, Kernel versions from the sys ini and application tasks versions from the app ini(s) between current and previous stream to determine if they are modified or not.
     
-    def __init__(self, imgconf_path: str | Path, previous_imgconf_path: str | Path | None = None, kernel_mode: str = "internal"):
+    def __init__(self, sources: Sources):
+        self.sources = sources
+
+        # fils needed to be validated and passed to parent constructor for path checks and attribute creation
+        paths: list[Path] = [sources.sys_current]
+        if sources.sys_previous:
+            paths.append(sources.sys_previous)
+
+        paths.extend(sources.app_current.values())
+        if sources.app_previous:
+            paths.extend(sources.app_previous.values())
+
+        super().__init__(*paths)
+
+        self.config = TaskVersioningDefaultConfig()
+        self.prev_config: dict[str, str] = self._load_prev_config() # uses self.sources to load properly 
+        self.tasks: TaskList = TaskList()
+
+    
+
+    @classmethod
+    def from_internal(cls, current_imgconf: Path, previous_imgconf: Optional[Path] = None) -> "DataReaderTaskVersioning":
+
+        prev = previous_imgconf if (previous_imgconf and previous_imgconf.exists()) else None
+        
+        sources = Sources(
+            mode="internal",
+            sys_current=current_imgconf,
+            sys_previous=prev,
+            app_current={},
+            app_previous=None
+        )
+
+        return cls(sources)
+
+    @classmethod
+    def from_external(
+        cls,
+        stream_root: Path,
+        previous_stream_root: Optional[Path] = None,
+        sys_conf: Path = Path("NS_KERNEL") / "Imgconf.ini",
+        app_conf: Path = Path("NSPC") / "Configurazioni",
+        app_files: tuple[str, ...] = ("ixl.ini", "srlw.ini")
+    ) -> "DataReaderTaskVersioning":
+        
+        sys_current = stream_root / sys_conf
+        sys_previous = (previous_stream_root / sys_conf) if previous_stream_root else None
+        if sys_previous and not sys_previous.exists():
+            sys_previous = None
+        
+        # App inis: only the known ones (ixl.ini, srlw.ini)
+        app_dir = stream_root / app_conf
+        #app_current = {p.stem: p for p in app_dir if p.name in ("ixl.ini", "srlw.ini")}
+        #app_current = {p.stem: p for p in app_dir.glob("*.ini") if p.name in ("ixl.ini", "srlw.ini")}
+        app_current: dict[str, Path] = {}
+        for fname in app_files:
+            p = app_dir / fname
+            if p.exists():
+                app_current[p.stem] = p
+
+        # previous app: match by stem name
+        app_previous: dict[str, Path] = {} # stores the paths of previous app confs, if available, keyed by their stem (e.g. ixl, srlw)
+        if previous_stream_root:
+            prev_app_dir = previous_stream_root / app_conf
+            for name in app_current.keys():
+                candidate = prev_app_dir / f"{name}.ini"
+                if candidate.exists():
+                    app_previous[name] = candidate
+        
+        sources = Sources(
+            mode="external",
+            sys_current=sys_current,
+            sys_previous=sys_previous,
+            app_current=app_current,
+            app_previous=app_previous if app_previous else None
+        )
+
+        return cls(sources)
+    
+    #def __init__(self, imgconf_path: str | Path, previous_imgconf_path: str | Path | None = None, kernel_mode: str = "internal"):
         """
         Initialize with current imgconf and optional previous version.
         
@@ -161,7 +197,7 @@ class DataReaderTaskVersioning(DataReader):
 
         return sorted(idx)
     
-    def _load_prev_config(self, prev_imgconf_path: Path) -> dict[str, str]:
+    def _load_prev_config_old(self, prev_imgconf_path: Path) -> dict[str, str]:
         #parser = self._init_parser(prev_imgconf_path)
 
         #if self.kernel_mode == "internal":
@@ -227,6 +263,59 @@ class DataReaderTaskVersioning(DataReader):
 
         return out
     
+    def _load_prev_config(self) -> dict[str, str]:
+       
+        out: dict[str, str] = {}
+
+        # No previous sys ini => no baseline at all => return empty
+        if not self.sources.sys_previous:
+            return out
+
+        # -----------------------------
+        # Previous system ini (Settings)
+        # -----------------------------
+        prev_sys_parser = self._init_parser(self.sources.sys_previous)
+        if self.config.sections.settings in prev_sys_parser:
+            prev_settings = prev_sys_parser[self.config.sections.settings]
+
+            # Kernel version
+            if self.config.sys_task.kernel_version in prev_settings:
+                out["KERNEL"] = prev_settings.get(self.config.sys_task.kernel_version, "").strip()
+
+            # Internal mode: app tasks are also in Settings
+            if self.sources.mode == "internal":
+                try:
+                    num = int(prev_settings.get(self.config.num_tasks, "0").strip())
+                except ValueError:
+                    num = 0
+
+                for i in range(1, num + 1):
+                    t = prev_settings.get(f"{self.config.app_task.type}{i}", "").strip()
+                    if t and t.upper() not in self.config.rules.exclusion.task_type:
+                        # NOTE: se hai backslash nei path, qui in futuro meglio usare PureWindowsPath
+                        name = Path(prev_settings.get(f"{self.config.app_task.path}{i}", "").strip()).stem
+                        ver = prev_settings.get(f"{self.config.app_task.version}{i}", "").strip()
+                        if name:
+                            out[name] = ver
+
+        # -----------------------------
+        # External mode: previous app containers
+        # -----------------------------
+        if self.sources.mode == "external" and self.sources.app_previous:
+            for stem, prev_ini in self.sources.app_previous.items():
+                prev_app_parser = self._init_parser(prev_ini)
+                if self.config.sections.container not in prev_app_parser:
+                    continue
+
+                c = prev_app_parser[self.config.sections.container]
+                for i in self._container_indices(c):
+                    name = c.get(f"{self.config.app_task.name}{i}", "").strip()
+                    ver = c.get(f"{self.config.app_task.version}{i}", "").strip()
+                    if name:
+                        out[name] = ver
+
+        return out
+    
     def _read_sys_tasks(self, section) -> None:
         # System tasks, such as BOOT, BOOTAP, Loader, Kernel, are in the [Settings] section with chiavi come FileBootVer, FileBootAPVer, FileLoaderVer, FileKernelVer
         # BOOT
@@ -255,6 +344,24 @@ class DataReaderTaskVersioning(DataReader):
                                                     else "N/A"))))
 
     def scan_files(self) -> TaskList:
+        # 1) Sys tasks
+        sys_parser = self._init_parser(self.sources.sys_current)
+        if self.config.sections.settings in sys_parser:
+            self._read_sys_tasks(sys_parser[self.config.sections.settings])
+
+
+        # 2) App tasks
+        if not self.sources.app_current: 
+            #Internal: app tasks are in sys_current [Settings]
+            self._read_app_tasks_internal(sys_parser[self.config.sections.settings])
+        else:
+            #External: app tasks are in separate ini(s)
+            for conf_path in self.sources.app_current.values():
+                app_parser = self._init_parser(conf_path)
+                if self.config.sections.container in app_parser:
+                    self._read_app_tasks_external(app_parser[self.config.sections.container])
+
+    def scan_files_temp(self) -> TaskList:
         if self.kernel_mode == "internal":
             parser = self._init_parser(self.imgconf_path)
             section = parser[self.config.sections.settings]
