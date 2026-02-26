@@ -4,14 +4,6 @@ from abc import ABC, abstractmethod
 class DataReader(ABC):
     
     def __init__(self, *data_paths: Path | str):
-        # if len is 1, return a single Path object
-        # else if len is > 1, return a list of Path objects
-        """if len(data_paths) == 1:
-            self.data = self._normalize_path(data_paths[0])
-        else:
-            self.data = [self._normalize_path(data_path) for data_path in data_paths]
-
-        self.data_paths: list[Path] = []"""
 
 
         self._data: dict[str, Path] = {}
@@ -24,21 +16,7 @@ class DataReader(ABC):
                 raise ValueError(f"Duplicate key '{key}' derived from data path '{data_path}'. Please ensure unique filenames for each data path.")
             
             self._data[key] = path
-
-
-        """for data_path in data_paths:
-            if isinstance(data_path, str):
-                data_path = Path(data_path)
-            if not data_path.exists():
-                raise FileNotFoundError(f"Data path '{data_path}' does not exist.")
-            if not data_path.is_file():
-                raise ValueError(f"Data path '{data_path}' is not a file.")
             
-            self.data_paths.append(data_path)"""
-        
-        # Keep reference to first path for backward compatibility
-        #self.data_path = self.data_paths[0] if self.data_paths else None
-    
     @abstractmethod
     def scan_files(self):
         pass
