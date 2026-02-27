@@ -4,7 +4,9 @@ from model.data_path import DataPath
 
 class DataReader(ABC):
     
-    def __init__(self, *data_paths: Path | str | DataPath):
+    """def __init_old__(self, *data_paths: Path | str):
+
+
         self._data: dict[str, Path] = {}
 
         for data_path in data_paths:
@@ -13,13 +15,19 @@ class DataReader(ABC):
 
             # no duplicates allowed
             if key in self._data:
-                if key == path.stem:
-                    raise ValueError(f"Duplicate key '{key}' derived from data path '{data_path}'. Please ensure unique filenames or provide custom alt_name for each data path.")
-                elif path.alt_name and key == path.alt_name:
-                    raise ValueError(f"Duplicate key with same alt_name '{key}' derived from data path '{data_path}'. Please ensure unique alt_names for each data path in order to avoid confusion and conflicts.")
-                
-            self._data[key] = path
+                raise ValueError(f"Duplicate key '{key}' derived from data path '{data_path}'. Please ensure unique filenames for each data path.")
+            
+            self._data[key] = path"""
 
+    #new version with kwargs
+    def __init__(self, **data_paths: Path |  str):
+        self._data: dict[str, Path] = {}
+        for key, path in data_paths.items():
+            if path is not None:
+                path = self._normalize_path(path)
+                self._data[key] = path # use key as name and path as value in the dict
+                #setattr(self, key, path) # set attribute for direct access (e.g., self.imgconf)
+                 
     @abstractmethod
     def scan_files(self):
         pass

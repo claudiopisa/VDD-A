@@ -15,31 +15,11 @@ from model.task.task import Task
 from model.task.task_list import TaskList
 
 class DataReaderTaskVersioningInternal(DataReader):
-    def __init_old__(self, user_config: TaskVersioningConfig, default_config: TaskVersioningDefaultConfig, imgconf_path: str | Path, prev_imgconf_path: Optional[str | Path] = None):
-        if prev_imgconf_path is not None:
-            super().__init__(imgconf_path, prev_imgconf_path)  # Pass both paths to the base class constructor
-        else:
-            super().__init__(imgconf_path)  # Pass only the current path to the base class constructor
-
-        self.imgconf = self._normalize_path(imgconf_path)
-        self.prev_imgconf = self._normalize_path(prev_imgconf_path) if prev_imgconf_path else None
-        
-        self.config = default_config  # Load default config for task versioning
-        self.user_config = user_config  # Load user config for task versioning
-        #self.prev_config: dict[str, str] = self._load_prev_config() if self.prev_imgconf else None
-        self.prev_config: Optional[dict[str, str]] = {}
-        self.tasks: TaskList = TaskList()
-
-    def __init__(self, imgconf_path: DataPath, prev_imgconf_path: Optional[DataPath] = None):
-        if prev_imgconf_path is not None:
-            super().__init__(imgconf_path, prev_imgconf_path)  # Pass both paths to the base class constructor
-        else:
-            super().__init__(imgconf_path)  # Pass only the current path to the base class constructor
-
-        self.imgconf = self.get(imgconf_path.alt_name) 
-        self.prev_imgconf = self.get(prev_imgconf_path.alt_name) if prev_imgconf_path else None
+    def __init__(self, imgconf_path: str | Path, prev_imgconf_path: Optional[str | Path] = None):
+        super().__init__(imgconf=imgconf_path, prev_imgconf=prev_imgconf_path)
         
         self.config = TaskVersioningDefaultConfig()  # Load default config for task versioning
+        #self.prev_config: dict[str, str] = self._load_prev_config() if self.prev_imgconf else None
         self.prev_config: Optional[dict[str, str]] = {}
         self.tasks: TaskList = TaskList()
 
@@ -85,6 +65,7 @@ class DataReaderTaskVersioningInternal(DataReader):
                     modified = "N/A" if not self.prev_imgconf else ("NO" if self.prev_config.get(name) == version else "YES")
                     self.tasks.append(Task(name=name, type=type_, version=version, modified=modified))
                 else:
+                    #out[name] = version
                     self.prev_config[name] = version
 
             i += 1
@@ -104,5 +85,3 @@ class DataReaderTaskVersioningInternal(DataReader):
         self._read_app_tasks(section, is_prev=False)
             
         return self.tasks
-    
-
