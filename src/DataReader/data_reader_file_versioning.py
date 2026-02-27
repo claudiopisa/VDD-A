@@ -8,7 +8,7 @@ from .data_reader import DataReader
 
 class DataReaderFileVersioning(DataReader):
     def __init__(self, data_path: Path | str, config: FileVersioningConfig):
-        super().__init__(data_path)
+        super().__init__(data_path=data_path)
         self.config = config
 
     def _scan_files(self):

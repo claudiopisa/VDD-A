@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class DataReader(ABC):
     
-    def __init__(self, *data_paths: Path | str):
+    """def __init_old__(self, *data_paths: Path | str):
 
 
         self._data: dict[str, Path] = {}
@@ -15,8 +15,17 @@ class DataReader(ABC):
             if key in self._data:
                 raise ValueError(f"Duplicate key '{key}' derived from data path '{data_path}'. Please ensure unique filenames for each data path.")
             
-            self._data[key] = path
-            
+            self._data[key] = path"""
+
+    #new version with kwargs
+    def __init__(self, **data_paths: Path |  str):
+        self._data: dict[str, Path] = {}
+        for key, path in data_paths.items():
+            if path is not None:
+                path = self._normalize_path(path)
+                self._data[key] = path # use key as name and path as value in the dict
+                #setattr(self, key, path) # set attribute for direct access (e.g., self.imgconf)
+                 
     @abstractmethod
     def scan_files(self):
         pass

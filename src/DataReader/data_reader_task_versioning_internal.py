@@ -14,13 +14,7 @@ from model.task_list import TaskList
 
 class DataReaderTaskVersioningInternal(DataReader):
     def __init__(self, imgconf_path: str | Path, prev_imgconf_path: Optional[str | Path] = None):
-        if prev_imgconf_path is not None:
-            super().__init__(imgconf_path, prev_imgconf_path)  # Pass both paths to the base class constructor
-        else:
-            super().__init__(imgconf_path)  # Pass only the current path to the base class constructor
-
-        self.imgconf = self._normalize_path(imgconf_path)
-        self.prev_imgconf = self._normalize_path(prev_imgconf_path) if prev_imgconf_path else None
+        super().__init__(imgconf=imgconf_path, prev_imgconf=prev_imgconf_path)
         
         self.config = TaskVersioningDefaultConfig()  # Load default config for task versioning
         #self.prev_config: dict[str, str] = self._load_prev_config() if self.prev_imgconf else None
