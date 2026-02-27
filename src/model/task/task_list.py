@@ -1,4 +1,4 @@
-from model.task import Task
+from model.task.task import Task
 
 
 class TaskList(list[Task]): #classe TaskList composizione con classe Task.

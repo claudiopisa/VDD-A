@@ -1,11 +1,11 @@
 {
     "vdd_type": "vital",
     "input_mode" : "localSource",
-    "kernel_mode": "external",
+    "kernel_mode": "internal",
     "paths": {
-        "stream_root": "C:\\Users\\claud\\Desktop\\streamDemoExt",
-        "output_dir": "C:\\Users\\claud\\Desktop\\VDD-automation\\VDD-A\\output",
-        "rtc_cache_dir": "C:\\Users\\claud\\Desktop\\VDD-automation\\VDD-A\\rtc_cache"
+        "stream_root": "C:\\Users\\cpisa\\Desktop\\stream\\DEVRASTA",
+        "output_dir": "C:\\Users\\cpisa\\Desktop\\VDD-automation\\VDD-A\\output",
+        "rtc_cache_dir": "C:\\Users\\cpisa\\Desktop\\VDD-automation\\VDD-A\\rtc_cache"
     },
     "metadata": {
         "doc_name": "VDD Test"

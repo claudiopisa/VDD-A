@@ -9,8 +9,8 @@ from .data_reader import DataReader
 
 import re
 
-from model.task import Task
-from model.task_list import TaskList
+from model.task.task import Task
+from model.task.task_list import TaskList
     
 @dataclass
 class Sources:
