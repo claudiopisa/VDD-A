@@ -5,26 +5,24 @@ from configs.default_config.core_default_config import SoftwareComponents
 
 @dataclass(frozen=True)
 class AppTask:
-    name: str = "NomeTask"
-    path: str = "V1_FileTask"
-    type: str = "TipoTask"
-    version: str = "RelTask"
+    name    : str = "NomeTask"
+    path    : str = "V1_FileTask"
+    type_   : str = "TipoTask" #Note: `type` is a reserved keyword, hence the underscore suffix
+    version : str = "RelTask"
 
 
 @dataclass(frozen=True)
 class SysTask:
-    BOOT: str = "FileBoot"
-    BOOT_AP: str = "FileBootAPs"
-    LOADER: str = "V1_FileLoader"
-    KERNEL: str = "V1_FileKernel"
-    KERNEL_VERSION: str = "RelKernel"
+    BOOT            : str = "FileBoot"
+    BOOT_AP         : str = "FileBootAPs"
+    LOADER          : str = "V1_FileLoader"
+    KERNEL          : str = "V1_FileKernel"
+    KERNEL_VERSION  : str = "RelKernel"
 
 @dataclass(frozen=True)
 class InclusionRules:
     internal: str = "Imgconf.ini"
-    external: List[str] = field(default_factory=lambda: [
-        "ixl.ini", "srlw.ini"
-    ])
+    external: Tuple[str, ...] = field(default_factory=lambda: ("ixl.ini", "srlw.ini"))
 
 @dataclass(frozen=True)
 class ExclusionRules:
@@ -37,8 +35,9 @@ class ExclusionRules:
 
 @dataclass(frozen=True)
 class INISections:
-    internal: str = "Settings"
-    external: str = "CONTAINER"
+    SETTINGS    : str = "Settings"
+    CONTAINER   : str = "CONTAINER"
+    AP          : str = "AP"
 
 @dataclass(frozen=True)
 class Roots:
@@ -46,7 +45,7 @@ class Roots:
     #internal: Union[str, List[str]] = "NSPC" # se si vuole opzionalemnte una lista o una stringa
     
     internal: SoftwareComponents    = field(default_factory=lambda: SoftwareComponents.SAFETY_NUCLEUS)
-    external: Tuple[str, ...]        = field(default_factory=lambda: (SoftwareComponents.SAFETY_NUCLEUS, SoftwareComponents.SAFETY_NUCLEUS_KERNEL))
+    external: Tuple[str, ...]       = field(default_factory=lambda: (SoftwareComponents.SAFETY_NUCLEUS, SoftwareComponents.SAFETY_NUCLEUS_KERNEL))
 
     #old way
     #internal: str               = "NSPC"

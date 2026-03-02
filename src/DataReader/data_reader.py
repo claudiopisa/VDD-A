@@ -49,6 +49,7 @@ class DataReader(ABC):
         
         return self._data[name]
     
+    # useless ? maybe we can use it to get all data paths as a dict
     def get(self, name: str) -> DataPath:
         return self.__getattr__(name)
     

@@ -45,6 +45,7 @@ if prev_workspace:
     else:
         print(f"Prev Imgconf.ini not found for {comp} -> Modified will be N/A")
 
-reader = DataReaderTaskVersioningInternal(imgconf_path=imgconf, prev_imgconf_path=prev_imgconf)
+reader = DataReaderTaskVersioningInternal(reader_config=tv_conf, imgconf_path=imgconf, prev_imgconf_path=prev_imgconf)
 tasks = reader.scan_files()
 print(tasks)
+

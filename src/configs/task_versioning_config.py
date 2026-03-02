@@ -45,24 +45,96 @@ class TaskVersioningConfig(Config):
         return self.default_config.roots.external
     
     @property
-    def has_previous_release(self):
-        return self.user_config.previous_release.enabled
+    def sys_task(self):
+        return self.default_config.sys_task
+    
+    @property
+    def app_task(self):
+        return self.default_config.app_task
+    
+    @property
+    def boot_key(self):
+        return self.sys_task.BOOT
+    
+    @property
+    def boot_ap_key(self):
+        return self.sys_task.BOOT_AP
+    
+    @property
+    def loader_key(self):
+        return self.sys_task.LOADER
+    
+    @property
+    def kernel_key(self):
+        return self.sys_task.KERNEL
+    
+    @property
+    def kernel_version_key(self):
+        return self.sys_task.KERNEL_VERSION
+    
+    @property
+    def app_name_key(self):
+        return self.app_task.name
+    
+    @property
+    def app_path_key(self):
+        return self.app_task.path
+    
+    @property
+    def app_type_key(self):
+        return self.app_task.type_
+    
+    @property
+    def app_version_key(self):
+        return self.app_task.version
+
+    @property
+    def num_tasks(self):
+        return self.default_config.num_tasks
+    
+    @property
+    def rules(self):
+        return self.default_config.rules
+    
+    @property
+    def excluded_task_types(self):
+        return self.rules.exclusion.task_type
+    
+    #TODO: add inclusion rules    
     
     @property
     def previous_release_version(self):
-        return self.user_config.previous_release.version if self.has_previous_release else None
+        return self.user_config.previous_release.version
     
     @property
     def previous_release_root(self):
-        return self.user_config.previous_release.root if self.has_previous_release else None
+        return self.user_config.previous_release.root
     
+    def has_previous_release(self) -> bool:
+        return self.user_config.previous_release.enabled and self.previous_release_root is not None
+
     @property
     def previous_release_root_as_path(self):
-        return Path(self.previous_release_root if self.has_previous_release else "")
+        return Path(self.previous_release_root if self.has_previous_release() else "")
     
     @property
     def title(self):
         return self.user_config.metadata.title
-
+    
+    @property
+    def app_internal_section(self):
+        return self.default_config.sections.SETTINGS
+    
+    @property
+    def sys_internal_section(self):
+        return self.default_config.sections.SETTINGS
+    
+    @property
+    def app_external_section(self):
+        return self.default_config.sections.CONTAINER
+    
+    @property
+    def sys_external_section(self):
+        return self.default_config.sections.SETTINGS
     
 
