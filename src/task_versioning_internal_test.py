@@ -25,7 +25,7 @@ else:
 
 
 prev_workspace = None
-if tv_conf.has_previous_release and tv_conf.previous_release_root:
+if tv_conf.has_previous_release() and tv_conf.previous_release_root:
     prev_workspace = tv_conf.previous_release_root_as_path
     if prev_workspace.exists():
         print(f"Previous stream root detected: {prev_workspace}")

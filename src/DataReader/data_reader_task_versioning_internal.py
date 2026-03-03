@@ -21,7 +21,7 @@ class DataReaderTaskVersioningInternal(DataReader):
         super().__init__(imgconf=imgconf_path, prev_imgconf=prev_imgconf_path)
         
         self.config = reader_config
-        self.prev_config: Optional[dict[str, str]] = {}
+        self.prev_config: Optional[dict[str, str]] = None
         self.tasks: TaskList = TaskList()
 
 
