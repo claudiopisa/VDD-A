@@ -38,8 +38,8 @@ class DataReader(ABC):
         
         if not data_path.exists():
             raise FileNotFoundError(f"Data path '{path}' does not exist.")
-        if not data_path.is_file():
-            raise ValueError(f"Data path '{path}' is not a file.")
+        #if not data_path.is_file():
+        #    raise ValueError(f"Data path '{path}' is not a file.")
         
         return data_path
     

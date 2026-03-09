@@ -6,8 +6,8 @@ class INIParser:
         self.ini_path = Path(ini_path)
         if not self.ini_path.exists():
             raise FileNotFoundError(f"INI file '{self.ini_path}' does not exist.")
-        if not self.ini_path.is_file():
-            raise ValueError(f"INI path '{self.ini_path}' is not a file.")
+        #if not self.ini_path.is_file():
+            #raise ValueError(f"INI path '{self.ini_path}' is not a file.")
         
         self.config = ConfigParser(
             interpolation=None,  # Disable interpolation to preserve raw values
@@ -33,7 +33,9 @@ class INIParser:
     
     def get_section(self, section: str) -> dict[str, str]:
         if not self.config.has_section(section):
-            raise KeyError(f"Section '{section}' not found in INI file.")
+            #raise KeyError(f"Section '{section}' not found in INI file.")
+            # raise custom exception to distinguish between "section not found" and "key not found"
+            raise Exception(f"Section '{section}' not found in INI file: {self.ini_path}")
         
         return dict(self.config.items(section)) # convert SectionProxy to a regular dictionary 
     

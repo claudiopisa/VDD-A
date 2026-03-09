@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from configs.config import Config
-
+from configs.core_config import CoreConfig
 
 class TaskVersioningConfig(Config):
     """
@@ -31,6 +31,7 @@ class TaskVersioningConfig(Config):
         self.user_config = self.load_user_config(user_config_path)
         # DefaultConfigLoader will automatically load TaskVersioningDefaultConfig
         self.default_config = self.load_default_config()
+        self.core_config = CoreConfig(user_config_path=self.user_config_path)  # Load core config for shared defaults like image_config_name
 
     @property
     def roots(self):
@@ -122,6 +123,18 @@ class TaskVersioningConfig(Config):
         return self.user_config.metadata.title
     
     @property
+    def app_tasks(self):
+        return self.user_config.app_tasks
+    
+    def get_app_tasks(self, as_dict=True):
+        if as_dict:
+            # get task file nime, without `.ini` extension, as key, and the whole name with extension as value
+            return {f"{Path(task).stem}": task for task in self.app_tasks}
+            #return {f"{task[-3]}" for task in self.app_tasks}
+        else:
+            return self.app_tasks
+    
+    @property
     def app_internal_section(self):
         return self.default_config.sections.SETTINGS
     
@@ -136,5 +149,9 @@ class TaskVersioningConfig(Config):
     @property
     def sys_external_section(self):
         return self.default_config.sections.SETTINGS
+    
+    @property
+    def ap_section_key(self):
+        return self.default_config.sections.AP
     
 

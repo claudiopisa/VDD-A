@@ -9,8 +9,8 @@ class DataPath:
 
         if not self.path.exists():
             raise FileNotFoundError(f"Data file '{self.path}' does not exist.")
-        if not self.path.is_file():
-            raise ValueError(f"Data file '{self.path}' is not a file.")
+        #if not self.path.is_file():
+            #raise ValueError(f"Data file '{self.path}' is not a file.")
 
         if not file_name:
             if self.has_father():
