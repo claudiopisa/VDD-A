@@ -8,12 +8,12 @@ from typing import Tuple, Dict, Any
 class SoftwareComponents:
     SAFETY_NUCLEUS:             str = "NSPC"
     SAFETY_NUCLEUS_KERNEL:      str = "NS_KERNEL"
-    SAFETY_NUCLEUS_SIMULATION:  str = "SIMNS"
+    SAFETY_NUCLEUS_SIMULATOR:  str = "SIMNS"
     NON_VITAL_ENV:              str = "SWNV"
     TOOLS:                      str = "NS_TOOLS"
 
     def __repr__(self):
-        return f"Available components(NSPC='{self.NSPC}', NS_KERNEL='{self.NS_KERNEL}', SWNV='{self.SWNV}', TOOLS='{self.TOOLS}').\n Usage example: config_object.components.NSPC to access the string 'NSPC'."
+        return f"Available components(NSPC='{self.SAFETY_NUCLEUS}', NS_KERNEL='{self.SAFETY_NUCLEUS_KERNEL}', SIMNS='{self.SAFETY_NUCLEUS_SIMULATOR}', SWNV='{self.NON_VITAL_ENV}', TOOLS='{self.TOOLS}').\n Usage example: config_object.components.SAFETY_NUCLEUS to access the string 'NSPC'."
 
 @dataclass(frozen=True)
 class CoreDefaultConfig:

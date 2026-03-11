@@ -113,7 +113,7 @@ class DataReaderTaskVersioning(DataReader):
 
         return cls(sources)
     
-    #def __init__(self, imgconf_path: str | Path, previous_imgconf_path: str | Path | None = None, kernel_mode: str = "internal"):
+    def __init__(self, imgconf_path: str | Path, previous_imgconf_path: str | Path | None = None, kernel_mode: str = "internal"):
         """
         Initialize with current imgconf and optional previous version.
         
@@ -145,9 +145,8 @@ class DataReaderTaskVersioning(DataReader):
         self.prev_app_config_dir = None
 
         if self.kernel_mode == "external":
-            if isinstance(self.config.roots.external, (tuple, list)) and len(self.config.roots.external) >= 2:
-                self.app_component = self.config.roots.external[0]
-                self.kernel_component = self.config.roots.external[1]
+            self.app_component = self.config.roots.external.app
+            self.kernel_component = self.config.roots.external.sys
 
             if self.stream_root and self.app_component:
                 self.app_config_dir = self.stream_root / self.app_component / "Configurazioni"

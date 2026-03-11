@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Optional
 
-
-class DataPath:
+# CLASSE DEPRECATA 
+"""class DataPath:
     def __init__(self, path: str | Path, file_name: Optional[str] = None):
         self.path = Path(path)
         print(f"Initializing DataPath with path: {self.path}")
@@ -40,3 +40,6 @@ class DataPath:
 
     def get_father(self) -> Optional[str]:
         return self.path.parent.parent.stem if self.has_father() else None
+
+
+"""

@@ -26,12 +26,15 @@ class TaskVersioningConfig(Config):
         component_roots = config.default_config.component_roots
     """
     
-    def __init__(self, user_config_path: str | Path):
+    def __init__(self, user_config_path: str | Path, core_user_config_path: str | Path | CoreConfig):
         self.user_config_path = user_config_path
         self.user_config = self.load_user_config(user_config_path)
         # DefaultConfigLoader will automatically load TaskVersioningDefaultConfig
         self.default_config = self.load_default_config()
-        self.core_config = CoreConfig(user_config_path=self.user_config_path)  # Load core config for shared defaults like image_config_name
+        if isinstance(core_user_config_path, CoreConfig):
+            self.core = core_user_config_path
+        else:
+            self.core = CoreConfig(user_config_path=core_user_config_path)  # Load core config for shared defaults like image_config_name
 
     @property
     def roots(self):
@@ -44,6 +47,22 @@ class TaskVersioningConfig(Config):
     @property
     def external_roots(self):
         return self.default_config.roots.external
+    
+    @property
+    def app_root(self):
+        """Returns NSPC for internal kernel, NSPC/Configurazioni for external kernel."""
+        if self.core.is_kernel_internal:
+            return self.internal_roots
+        else:
+            return f"{self.external_roots.app}/Configurazioni"
+
+    @property
+    def sys_root(self):
+        """Returns NSPC for internal kernel, NS_KERNEL for external kernel."""
+        if self.core.is_kernel_internal:
+            return self.internal_roots
+        else:
+            return self.external_roots.sys
     
     @property
     def sys_task(self):

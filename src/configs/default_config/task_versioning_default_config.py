@@ -37,19 +37,20 @@ class ExclusionRules:
 class INISections:
     SETTINGS    : str = "Settings"
     CONTAINER   : str = "CONTAINER"
-    AP          : str = "AP"
+    AP            : str = "AP"
+
+@dataclass(frozen=True)
+class ExternalRoots:
+    app: str = SoftwareComponents.SAFETY_NUCLEUS          # "NSPC"
+    sys: str = SoftwareComponents.SAFETY_NUCLEUS_KERNEL   # "NS_KERNEL"
+
 
 @dataclass(frozen=True)
 class Roots:
-    #internal: List[str] = field(default_factory=lambda: ("NSPC",))
-    #internal: Union[str, List[str]] = "NSPC" # se si vuole opzionalemnte una lista o una stringa
-    
-    internal: SoftwareComponents    = field(default_factory=lambda: SoftwareComponents.SAFETY_NUCLEUS)
-    external: Tuple[str, ...]       = field(default_factory=lambda: (SoftwareComponents.SAFETY_NUCLEUS, SoftwareComponents.SAFETY_NUCLEUS_KERNEL))
-
-    #old way
-    #internal: str               = "NSPC"
-    #external: Tuple[str, ...]   = field(default_factory=lambda: ("NSPC", "NS_KERNEL"))
+    #both app and sys has SAFETY_NUCLEUS as root
+    internal: str        = field(default_factory=lambda: SoftwareComponents.SAFETY_NUCLEUS)
+    # whereas in external mode, app → NSPC and sys → NS_KERNEL
+    external: ExternalRoots = field(default_factory=ExternalRoots)
 
 @dataclass(frozen=True)
 class Rules:

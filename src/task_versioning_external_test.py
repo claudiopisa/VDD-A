@@ -10,13 +10,14 @@ CONFIG_DIR = PROJECT_ROOT / "config"
 # Core config
 core_conf = CoreConfig(user_config_path=CONFIG_DIR / "core_config.json")
 # Task versioning config
-tv_conf = TaskVersioningConfig(user_config_path=CONFIG_DIR / "task_versioning.json")
+tv_conf = TaskVersioningConfig(user_config_path=CONFIG_DIR / "task_versioning.json", core_user_config_path=core_conf)
 
-workspace = core_conf.stream_root_as_path
+#workspace = core_conf.stream_root_as_path
+workspace = tv_conf.core.stream_root_as_path
 print(f"Workspace: {workspace}")
 
 # Pick components roots based on kernel mode
-if core_conf.is_kernel_internal:
+if tv_conf.core.is_kernel_internal:
     print("Kernel mode is internal.")
     comp = tv_conf.internal_roots
 else:
@@ -38,9 +39,8 @@ if tv_conf.has_previous_release() and tv_conf.previous_release_root:
 app_imgconf_root = workspace / comp[0] / "Configurazioni"
 print(f"\nCurrent Imgconf.ini at: {app_imgconf_root}")
 
-app_imgconf_kwargs =  {Path(task).stem: Path(app_imgconf_root) / task for task in tv_conf.app_tasks}
-
-print(f"App imgconf kwargs: {app_imgconf_kwargs}")
+app_imgconf_paths = [app_imgconf_root / task for task in tv_conf.app_tasks]
+print(f"App imgconf paths: {app_imgconf_paths}")
 
 prev_imgconf = None
 if prev_workspace:
@@ -55,7 +55,15 @@ sys_imgconf = workspace / comp[1] / core_conf.image_config_name
 print(f"\nCurrent Sys Imgconf.ini at: {sys_imgconf}")
 
 taskorder = workspace / comp[0] / "Configurazioni" / "taskorder.ini"
-reader = DataReaderTaskVersioningExternal(reader_config=tv_conf, sys_imgconf_path=sys_imgconf, app_imgconf_paths=app_imgconf_kwargs, task_order=taskorder, prev_sys_imgconf_path=None, prev_app_imgconf_paths=None, prev_task_order=None)
+reader = DataReaderTaskVersioningExternal(
+    reader_config=tv_conf,
+    sys_imgconf_path=sys_imgconf,
+    app_imgconf_paths=app_imgconf_paths,   # lista, non dict
+    task_order=taskorder,
+    prev_sys_imgconf_path=None,
+    prev_app_imgconf_paths=None,
+    prev_task_order=None
+)
 tasks = reader.scan_files()
 x = reader._read_taskorder(taskorder)
 
