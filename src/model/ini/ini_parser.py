@@ -24,8 +24,10 @@ class INIParser:
 
     
     def get(self, section: str, key: str) -> str:
+        #check if given section exists
         if not self.config.has_section(section):
             raise KeyError(f"Section '{section}' not found in INI file.")
+        #if such sections exists, check whether given option exists within
         if not self.config.has_option(section, key):
             raise KeyError(f"Key '{key}' not found in section '{section}' of INI file.")
         

@@ -22,7 +22,7 @@ class SysTask:
 @dataclass(frozen=True)
 class InclusionRules:
     internal: str = "Imgconf.ini"
-    external: Tuple[str, ...] = field(default_factory=lambda: ("ixl.ini", "srlw.ini"))
+    external: Tuple[str, ...] = field(default_factory=lambda: ("ixl.ini", "srlw.ini")) #This should be in the user config
 
 @dataclass(frozen=True)
 class ExclusionRules:

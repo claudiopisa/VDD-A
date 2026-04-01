@@ -1,17 +1,32 @@
 from pathlib import Path
 import os
-from abc import ABC, abstractmethod
 import re
 from configs.file_versioning_config import FileVersioningConfig
 from .data_reader import DataReader
 
 
 class DataReaderFileVersioning(DataReader):
-    def __init__(self, data_path: Path | str, config: FileVersioningConfig):
-        super().__init__(data_path=data_path)
+    def __init__(self, config: FileVersioningConfig):
+        #super().__init__(data_path=data_path)
         self.config = config
+        self.root = self._retrieve_path()
 
-    def _scan_files(self):
+        super().__init__(data_path=self.root)
+
+    def _retrieve_path(self) -> Path:
+        workspace = self.config.core.stream_root_as_path
+        component = self.config.component_root
+        root = workspace / component
+
+        if not root.exists():
+            raise FileNotFoundError(f"Root path does not exist: {root}")
+        if not root.is_dir():
+            raise ValueError(f"Root path is not a directory: {root}")
+        
+        return root
+    
+
+    def scan_files(self):
         excluded_dirs = {d.lower() for d in self.config.excluded_dirs}
         allowed_ext = {e.lower() for e in self.config.allowed_extensions}
         criteria = self.config.version_extraction_criteria
@@ -31,10 +46,6 @@ class DataReaderFileVersioning(DataReader):
 
                     # yield a tuple of (string path, version) to avoid WindowsPath repr
                     yield (str(p), version)
-    
-    def scan_files(self): # wrapper pubblico
-        for file in self._scan_files():
-            yield file
 
     def _extract_version(self, path: Path, criteria=None):
         version = None

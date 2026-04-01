@@ -6,7 +6,8 @@ from configs.file_versioning_config import FileVersioningConfig
 core_conf = CoreConfig(user_config_path="config/core_config.json")
 
 #file versioning config 
-fv_conf = FileVersioningConfig(user_config_path="config/file_versioning.json")
+fv_conf = FileVersioningConfig(user_config_path="config/file_versioning.json", core_user_config_path=core_conf)
+
 
 #print(coreConfig)
 #print(fileVersioningConfig)

@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from configs.config import Config
+from configs.core_config import CoreConfig
 from configs.default_config.file_versioning_default_config import FileVersioningDefaultConfig, Rules, ExclusionRules, InclusionRules
 
 
@@ -28,15 +29,23 @@ class FileVersioningConfig(Config):
         extensions = config.default_config.allowed_extensions
     """
     
-    def __init__(self, user_config_path: str | Path):
+    def __init__(self, user_config_path: str | Path, core_user_config_path: str | Path | CoreConfig):
         self.user_config_path = user_config_path
         self.user_config = self.load_user_config(user_config_path)
         # DefaultConfigLoader will automatically load FileVersioningDefaultConfig
         self.default_config = self.load_default_config()
+        if isinstance(core_user_config_path, CoreConfig):
+            self.core = core_user_config_path
+        else:
+            self.core = CoreConfig(user_config_path=core_user_config_path)  # Load core config for shared defaults like image_config_name
 
     @property
     def root(self):
         return self.default_config.root
+    
+    @property
+    def component_root(self):
+        return self.default_config.components.SAFETY_NUCLEUS
     
     @property
     def exclusion_rules(self):

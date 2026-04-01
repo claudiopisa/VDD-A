@@ -1,136 +1,136 @@
 from configparser import ConfigParser
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar, Optional
+from typing import Optional
 
-from configs.default_config.task_versioning_default_config import TaskVersioningDefaultConfig
 from configs.task_versioning_config import TaskVersioningConfig
-from model.data_path import DataPath
 from model.ini.ini_parser import INIParser
 from .data_reader import DataReader
-
-import re
-
 from model.task.task import Task
 from model.task.task_list import TaskList
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class DataReaderTaskVersioningInternal(DataReader):
-   
 
-    def __init__(self, reader_config: TaskVersioningConfig, imgconf_path: str | Path, prev_imgconf_path: Optional[str | Path] = None):
-        super().__init__(imgconf=imgconf_path, prev_imgconf=prev_imgconf_path)
-        
+    def __init__(self, reader_config: TaskVersioningConfig):
         self.config = reader_config
-        self.prev_config: Optional[dict[str, str]] = None
+        self.core = self.config.core
+
+        if not self.core.is_kernel_internal:
+            raise ValueError(
+                "DataReaderTaskVersioningInternal should not be used in external kernel mode, "
+                "check your core config kernel_mode value"
+            )
+
+        if self.config.has_previous_release() and not self.config.previous_release_root:
+            raise ValueError("Previous release enabled but no previous_release_root specified in config")
+
+        workspace = self.core.stream_root_as_path
+        logger.debug("Workspace resolved: %s", workspace)
+
+        self.imgconf_path = self._retrieve_path(workspace)
+        logger.debug("Resolved imgconf_path: %s", self.imgconf_path)
+
+        self.prev_imgconf_path = None
+        if self.config.has_previous_release():
+            prev_workspace = self.config.previous_release_root_as_path
+            logger.debug("Previous workspace resolved: %s", prev_workspace)
+            
+            self.prev_imgconf_path = self._retrieve_path(prev_workspace)
+            logger.debug("Resolved prev_imgconf_path: %s", self.prev_imgconf_path)
+
+        super().__init__(
+            imgconf=self.imgconf_path,
+            prev_imgconf=self.prev_imgconf_path,
+        )
+
+        self.prev_config: dict[str, str] = {}
         self.tasks: TaskList = TaskList()
 
+    def _retrieve_path(self, workspace: Path) -> Path:
+        root = workspace / self.config.app_root
+        imgconf_path = root / self.core.image_config_name
 
-    # refactor read sys tasks in order to handle prev config as well
-    def _read_sys_tasks(self, section: dict[str, str], is_prev: bool):
-        # with old `config` implementation:
-        #
-        """boot = Path(section.get(self.config.sys_task.BOOT, " ")).stem
-        boot_ap = Path(section.get(self.config.sys_task.BOOT_AP, " ")).stem
-        loader = Path(section.get(self.config.sys_task.LOADER, " ")).stem
-        kernel = Path(section.get(self.config.sys_task.KERNEL, " ")).stem
-        kernel_version = section.get(self.config.sys_task.KERNEL_VERSION, " ")"""
+        logger.debug("Resolving imgconf with root: %s -> %s", root, imgconf_path)
 
-        #new config implementation with TaskVersioningConfig:
-        boot            = Path(section.get(self.config.boot_key, " ")).stem
-        boot_ap         = Path(section.get(self.config.boot_ap_key, " ")).stem
-        loader          = Path(section.get(self.config.loader_key, " ")).stem
-        kernel          = Path(section.get(self.config.kernel_key, " ")).stem
-        kernel_version  = section.get(self.config.kernel_version_key, " ").strip() # do i need to strip ? 
+        return imgconf_path
+
+    def _has_prev_imgconf(self) -> bool:
+        return (
+            super()._has_prev_imgconf()
+            and "prev_imgconf" in self._data
+        )
+
+    """def _read_sys_tasks(self, section: dict[str, str], is_prev: bool):
+        boot           = Path(section.get(self.config.boot_key, " ")).stem.upper()
+        boot_ap        = Path(section.get(self.config.boot_ap_key, " ")).stem.upper()   
+        loader         = Path(section.get(self.config.loader_key, " ")).stem.upper()
+        kernel         = Path(section.get(self.config.kernel_key, " ")).stem.upper()
+        kernel_version = section.get(self.config.kernel_version_key, " ").strip().upper()
 
         if not is_prev:
-            modified = "N/A" if not self._has_prev_imgconf() else ("NO" if self.prev_config.get(kernel) == kernel_version else "YES")
-            self.tasks.append(Task(name=boot, type="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=boot_ap, type="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=loader, type="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=kernel, type="SYSTEM", version=kernel_version, modified=modified))
+            modified = "N/A" if not self._has_prev_imgconf() else (
+                "NO" if self.prev_config.get(kernel) == kernel_version else "YES"
+            )
+            self.tasks.append(Task(name=boot,      type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name=boot_ap,   type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name=loader,    type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name=kernel,    type="SYSTEM", version=kernel_version, modified=modified))
         else:
-            self.prev_config[kernel] = kernel_version
-            # TODO: save also other sys tasks versions
+            self.prev_config[kernel] = kernel_version"""
 
-    
-    # util function that contains for loop that itertes over ini file and salves info into a dict and returns it
-    def _read_app_tasks(self, section, is_prev: bool):
-
-        #check if prev is valid
+    def _read_app_tasks(self, section: dict[str, str], is_prev: bool):
         if is_prev and not self._has_prev_imgconf():
-            raise Exception("Previous imgconf not available but trying to read previous app tasks -> this should not happen, check the logic for enabling previous release and loading prev imgconf")
-        
+            raise ValueError("Previous imgconf not available but trying to read previous app tasks")
+
         try:
             num_tasks = int(section.get(self.config.num_tasks, "").strip())
         except ValueError:
-            raise Exception(f"NumTask value not found or not valid in the INI file: {self.prev_imgconf if is_prev else self.imgconf}")
-            # TODO: add fallback with regex
+            raise ValueError(
+                f"NumTask value not found or not valid in: "
+                f"{self.prev_imgconf if is_prev else self.imgconf}"
+            )
 
-        i = 1
-        while i <= num_tasks:
-            type_ = section.get(f"{self.config.app_type_key}{i}", "").strip()
+        for i in range(1, num_tasks + 1):
+            type_ = section.get(f"{self.config.app_type_key}{i}", "").strip().upper()
 
-            if type_ and type_.upper() not in self.config.excluded_task_types:
-
-                name = Path(section.get(f"{self.config.app_path_key}{i}", "").strip()).stem
+            if type_.upper() not in self.config.excluded_task_types:
+                raw_name = section.get(f"{self.config.app_path_key}{i}", "").strip()
                 version = section.get(f"{self.config.app_version_key}{i}", "").strip()
-                
-                if not is_prev:
-                    modified = "N/A" if not self._has_prev_imgconf() else ("NO" if self.prev_config.get(name) == version else "YES")
-                    self.tasks.append(Task(name=name, type=type_, version=version, modified=modified))
-                else:
-                    #out[name] = version
-                    self.prev_config[name] = version
 
-            i += 1
+                if not raw_name:
+                    raise ValueError(f"App task name not found for task {i} in: {self.prev_imgconf if is_prev else self.imgconf}")
+                if not version:
+                    raise ValueError(f"App task version not found for task {i} in: {self.prev_imgconf if is_prev else self.imgconf}")
 
+                if raw_name and version:
+                    name = Path(raw_name).stem.upper()
 
-    """def scan_files_old(self) -> TaskList:
-        if self.prev_imgconf:
-            prev_parser = INIParser(self.prev_imgconf)
-            prev_section = prev_parser.get_section(self.config.sections.SETTINGS)
-            self._read_sys_tasks(prev_section, is_prev=True)
-            self._read_app_tasks(prev_section, is_prev=True)
+                    if not is_prev:
+                        modified = "N/A" if not self._has_prev_imgconf() else (
+                            "NO" if self.prev_config.get(name) == version else "YES"
+                        )
+                        self.tasks.append(Task(name=name, type=type_, version=version, modified=modified))
+                    else:
+                        self.prev_config[name] = version
 
-        # load current 
-        parser = INIParser(self.imgconf)
-        section = parser.get_section(self.config.sections.SETTINGS)
-        self._read_sys_tasks(section, is_prev=False)
-        self._read_app_tasks(section, is_prev=False)
-            
-        return self.tasks"""
-
-    # simple utility function that checks whether the previous release is enabled and has root specified and, if so, check if prev imgconf exists
-    def _has_prev_imgconf(self) -> bool:
-        return self.config.has_previous_release() and self.prev_imgconf and self.prev_imgconf.exists()
-    
-    # simple utility function that evaluates the `modified` status (DOENST WORK !!!)
-    def _modified_status(self, name: str) -> str:
-        if not self._has_prev_imgconf():
-            return "N/A"
-        else:
-            prev_version = self.prev_config.get(name)
-            if prev_version is None:
-                return "N/A"
-            else:
-                current_version = self.prev_config.get(name)  # for both sys and app tasks we save them in the same dict with name as key, so we can use the same logic to get the current version
-
-                return "NO" if prev_version == current_version else "YES"
-    
-    # TODO: handle duplicate task names (sigle task could be rescheduled and appear multiple times in the imgconf)
     def scan_files(self) -> TaskList:
-        # load prev
+        logger.debug("Starting internal task scan")
+
         if self._has_prev_imgconf():
-            #print("DEBUG| Previous imgconf detected, loading previous tasks versions for comparison...")
-            prev_parser = INIParser(self.prev_imgconf)
-            prev_section = prev_parser.get_section(self.config.sys_internal_section)
+            logger.debug("Previous release detected: loading baseline task versions")
+            prev_section = INIParser(self.prev_imgconf).get_section(self.config.sys_internal_section)
             self._read_sys_tasks(prev_section, is_prev=True)
             self._read_app_tasks(prev_section, is_prev=True)
 
-        # load current 
-        parser = INIParser(self.imgconf)
-        section = parser.get_section(self.config.sys_internal_section)
+        logger.debug("Loading current release task versions")
+        section = INIParser(self.imgconf).get_section(self.config.sys_internal_section)
         self._read_sys_tasks(section, is_prev=False)
         self._read_app_tasks(section, is_prev=False)
 
+        logger.info("Internal task scan completed: %d tasks loaded", len(self.tasks))
+        
         return self.tasks

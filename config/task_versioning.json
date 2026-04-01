@@ -7,6 +7,6 @@
     "metadata": {
         "title": "TASK VERSION TABLE",
         "columns_name": ["Name", "Type", "Version", "Modified"]
-  },
-  "app_tasks": ["ixl.ini", "srlw.ini"]
+    },
+    "app_tasks": ["ixl.ini", "srlw.ini"]
 }

@@ -143,11 +143,11 @@ class TaskVersioningConfig(Config):
     
     @property
     def app_tasks(self):
-        return self.user_config.app_tasks
+        return self.user_config.app_tasks # returns list of app tasks .ini fils, e.g. ixl.ini, srlw.ini etc
     
     def get_app_tasks(self, as_dict=True):
         if as_dict:
-            # get task file nime, without `.ini` extension, as key, and the whole name with extension as value
+            # get task file name, without `.ini` extension, as key, and the whole name with extension as value
             return {f"{Path(task).stem}": task for task in self.app_tasks}
             #return {f"{task[-3]}" for task in self.app_tasks}
         else:

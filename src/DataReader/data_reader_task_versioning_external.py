@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar, Optional, Sequence
 
-from configs.default_config.task_versioning_default_config import TaskVersioningDefaultConfig
 from configs.task_versioning_config import TaskVersioningConfig
+from DataReader.data_reader_task_versioning import DataReaderTaskVersioning
 from model.ini.ini_parser import INIParser
 from .data_reader import DataReader
 
@@ -13,107 +13,136 @@ import re
 
 from model.task.task import Task
 from model.task.task_list import TaskList
+from utils.logger import get_logger
+
+
+logger = get_logger(__name__)
 
 
 type PathInput = str | Path
 type PathSequence = Sequence[PathInput]
 
 
-class DataReaderTaskVersioningExternal(DataReader):
+class DataReaderTaskVersioningExternal(DataReaderTaskVersioning):
         
     # Kernel is external: we have 1 ini file for the sys tasks and N ini files (usually 2, ixl.ini and srlw.ini) for app tasks (current stream), and optionally the same for the previous stream, resulting in a max of 2N app inis + 2 sys ini (current + previous). 
-    
-    def __init__(
-        self,
-        reader_config: TaskVersioningConfig,
-        sys_imgconf_path: PathInput,
-        app_imgconf_paths: PathSequence,
-        task_order: PathInput,
-        prev_sys_imgconf_path: Optional[PathInput] = None,
-        prev_app_imgconf_paths: Optional[PathSequence] = None,
-        prev_task_order: Optional[PathInput] = None,
-    ):
-        if sys_imgconf_path is None:
-            raise ValueError("sys_imgconf_path is required")
-        if not app_imgconf_paths:
-            raise ValueError("app_imgconf_paths is required")
-        if task_order is None:
-            raise ValueError("task_order is required")
 
-        self.config = reader_config
-
-        # DataReader normalizes all paths (single or list/tuple)
-        super().__init__(
-            sys_imgconf=sys_imgconf_path,
-            app_imgconf=app_imgconf_paths,
-            task_order=task_order,
-            prev_sys_imgconf=prev_sys_imgconf_path,
-            prev_app_imgconf=prev_app_imgconf_paths,
-            prev_task_order=prev_task_order,
-        )
-
-        self.prev_sys_config: dict[str, str] = {}
-        self.prev_app_config: dict[str, deque[str]] = defaultdict(deque)
-        self.tasks: TaskList = TaskList()
-        
-
-    def __init__(
-        self,
-        reader_config: TaskVersioningConfig,
-        sys_imgconf_path: PathInput,
-        app_imgconf_paths: PathSequence,
-        task_order: PathInput,
-        prev_sys_imgconf_path: Optional[PathInput] = None,
-        prev_app_imgconf_paths: Optional[PathSequence] = None,
-        prev_task_order: Optional[PathInput] = None,
-    ):
-        if sys_imgconf_path is None:
-            raise ValueError("sys_imgconf_path is required")
-        if not app_imgconf_paths:
-            raise ValueError("app_imgconf_paths is required")
-        if task_order is None:
-            raise ValueError("task_order is required")
-
+    def __init__old(self, reader_config: TaskVersioningConfig):
         self.config = reader_config
         self.core = self.config.core
 
+        if self.core.is_kernel_internal:
+            raise ValueError("DataReaderTaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
+        
+        #if not self.config.app_tasks:
+            #raise ValueError("No app tasks specified in config, at least one is required for external kernel mode")
+        
+        if self.config.has_previous_release() and not self.config.previous_release_root:
+            raise ValueError("Previous release enabled but no previous_release_root specified in config")
+        
         #retireve roots and paths based on kernel mode
         workspace = self.core.stream_root_as_path
-        print(f"Workspace: {workspace}")
+        logger.debug("Workspace resolved: %s", workspace)
 
-        # Pick components roots based on kernel mode
-        app_root = self.config.app_root
-        sys_root = self.config.sys_root
+        # create current paths
+        self.sys_imgconf_path, self.app_imgconf_paths, self.taskorder_imgconf_path = self._retrieve_paths(workspace)
 
-        self.app_imgconf_paths = [app_root / task for task in self.conf.app_tasks]
-        self.sys_imgconf_path = sys_root / self.core.image_config_name
+        logger.debug("Resolved sys_imgconf_path: %s", self.sys_imgconf_path)
+        logger.debug("Resolved app_imgconf_paths: %s", self.app_imgconf_paths)
+        logger.debug("Resolved taskorder_imgconf_path: %s", self.taskorder_imgconf_path)
 
-        self.taskorder_imgconf_path = app_root / "Configurazioni" / "taskorder.ini"
+        self.prev_sys_imgconf_path = None
+        self.prev_app_imgconf_paths = None
+        self.prev_taskorder_imgconf_path = None
+
+        #create prev paths
+        if self.config.has_previous_release():
+            prev_workspace = self.config.previous_release_root_as_path
+            logger.debug("Previous workspace resolved: %s", prev_workspace)
+
+            self.prev_sys_imgconf_path, self.prev_app_imgconf_paths, self.prev_taskorder_imgconf_path = self._retrieve_paths(prev_workspace)
+
+            logger.debug("Resolved prev_sys_imgconf_path: %s", self.prev_sys_imgconf_path)
+            logger.debug("Resolved prev_app_imgconf_paths: %s", self.prev_app_imgconf_paths)
+            logger.debug("Resolved prev_taskorder_imgconf_path: %s", self.prev_taskorder_imgconf_path)
 
          # DataReader normalizes all paths (single or list/tuple)
         super().__init__(
             sys_imgconf=self.sys_imgconf_path,
             app_imgconf=self.app_imgconf_paths,
             task_order=self.taskorder_imgconf_path,
-            prev_sys_imgconf=prev_sys_imgconf_path,
-            prev_app_imgconf=prev_app_imgconf_paths,
-            prev_task_order=prev_task_order,
+            prev_sys_imgconf=self.prev_sys_imgconf_path,
+            prev_app_imgconf=self.prev_app_imgconf_paths,
+            prev_task_order=self.prev_taskorder_imgconf_path,
         )
+
+        self.prev_sys_config: dict[str, str] = {}
+        self.prev_app_config: dict[str, deque[str]] = defaultdict(deque)
+        self.tasks: TaskList = TaskList()
+
+    def __init__(self, config: TaskVersioningConfig):
+        super().__init__(config=config)
+
+        if self.core.is_kernel_internal:
+            raise ValueError("DataReaderTaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
+        
+        #if not self.config.app_tasks:
+            #raise ValueError("No app tasks specified in config, at least one is required for external kernel mode")
+        
+        if self.config.has_previous_release() and not self.config.previous_release_root:
+            raise ValueError("Previous release enabled but no previous_release_root specified in config")
+        
+        workspace = self.core.stream_root_as_path
+        logger.debug("Workspace resolved: %s", workspace)
+
+        curr_paths = self._retrieve_paths(workspace)
+        logger.debug("Resolved curr paths: %s", curr_paths)
+
+        prev_paths = {}
+        if self.config.has_previous_release():
+            prev_workspace = self.config.previous_release_root_as_path
+            logger.debug("Previous workspace resolved: %s", prev_workspace)
+            prev_paths = {f"prev_{k}": v for k, v in self._retrieve_paths(prev_workspace).items()}
+            logger.debug("Resolved prev paths: %s", prev_paths)
+
+        self.parse_data_paths(**curr_paths, **prev_paths)
+
+        
+    #handle both current and prev case
+    def _retrieve_paths(self, workspace: Path) -> dict[str, Path | list[Path]]:
+        app_root = workspace / self.config.app_root
+        sys_root = workspace / self.config.sys_root
+
+        logger.debug("Resolving paths with app_root: %s and sys_root: %s", app_root, sys_root)
+
+        return {
+            "sys_imgconf_path"  : sys_root / self.core.image_config_name,
+            "app_imgconf_paths" : [app_root / task for task in self.config.get_app_tasks(as_dict=False)],
+            "task_order_path"   : app_root / "taskorder.ini",
+        }
+
 
     def _has_prev_imgconf(self) -> bool:
         return (
-            self.config.has_previous_release()
+            super()._has_prev_imgconf()
             and "prev_sys_imgconf" in self._data
             and "prev_app_imgconf" in self._data
             and "prev_task_order" in self._data
         )
 
-    def _read_sys_tasks(self, section: dict[str, str], is_prev: bool):
-        boot            = Path(section.get(self.config.boot_key, " ")).stem
-        boot_ap         = Path(section.get(self.config.boot_ap_key, " ")).stem
-        loader          = Path(section.get(self.config.loader_key, " ")).stem
-        kernel          = Path(section.get(self.config.kernel_key, " ")).stem
-        kernel_version  = section.get(self.config.kernel_version_key, " ").strip() # do i need to strip ? 
+    """def _read_sys_tasks(self, section: dict[str, str], is_prev: bool):
+        boot            = Path(section.get(self.config.boot_key, " ")).stem.upper()
+        boot_ap         = Path(section.get(self.config.boot_ap_key, " ")).stem.upper()
+        loader          = Path(section.get(self.config.loader_key, " ")).stem.upper()
+        kernel          = Path(section.get(self.config.kernel_key, " ")).stem.upper()
+        kernel_version  = section.get(self.config.kernel_version_key, " ").strip().upper() # do i need to strip ? 
+
+        #logger.debug("Reading sys tasks: boot=%s, boot_ap=%s, loader=%s, kernel=%s, kernel_version=%s", boot, boot_ap, loader, kernel, kernel_version)
+
+        #if names are empty, raise exception
+        if not boot or not boot_ap or not loader or not kernel \
+            or len(boot) == 0 or len(boot_ap) == 0 or len(loader) == 0 or len(kernel) == 0:
+            raise ValueError("One or more sys task names are empty in the imgconf section %s", section)
 
         if not is_prev:
             modified = "N/A" if not self._has_prev_imgconf() else ("NO" if self.prev_sys_config.get(kernel) == kernel_version else "YES")
@@ -122,7 +151,7 @@ class DataReaderTaskVersioningExternal(DataReader):
             self.tasks.append(Task(name=loader, type="SYSTEM", version="<TODO>"))
             self.tasks.append(Task(name=kernel, type="SYSTEM", version=kernel_version, modified=modified))
         else:
-            self.prev_sys_config[kernel] = kernel_version
+            self.prev_sys_config[kernel] = kernel_version"""
 
     
     def _read_taskorder(self, taskorder_path: Path) -> list[dict[str, str]]:
@@ -142,7 +171,6 @@ class DataReaderTaskVersioningExternal(DataReader):
                 i += 1
             except Exception: # catch the custom exception raised by INIParser when section is not found
                 has_sections = False
-                continue
 
         return sections
 
@@ -161,7 +189,7 @@ class DataReaderTaskVersioningExternal(DataReader):
     def _flatten_taskorder_names(self, sections: list[dict[str, str]]) -> list[str]:
         ordered_names: list[str] = []
 
-        for sec in sections:
+        for sec in sections: # for each AP0, ..., APn
             # Estraggo indici da chiavi NomeTask{i} senza regex
             #indices: list[int] = []
             #prefix = self.config.app_name_key  # es: NomeTask
@@ -174,7 +202,7 @@ class DataReaderTaskVersioningExternal(DataReader):
 
             #indices.sort()
 
-            size = len(sec)
+            size = len(sec) # number of tasks within section
 
             for i in range(1, size + 1):
                 raw = sec.get(f"{self.config.app_name_key}{i}", "").strip()
@@ -186,6 +214,7 @@ class DataReaderTaskVersioningExternal(DataReader):
     def _build_app_catalog(self, app_paths: Sequence[Path]) -> dict[str, list[dict[str, str]]]:
         """
         Catalogo: task_name -> [{type, version}, ...]
+        ad ogni nome task (chiave dizionario), viene associato ad esso una lista di occorrenze (sia nello stesso file che non)
         Le entry multiple gestiscono casi di duplicati/reschedule.
         """
         catalog: dict[str, list[dict[str, str]]] = defaultdict(list)
@@ -210,18 +239,19 @@ class DataReaderTaskVersioningExternal(DataReader):
                 type_ = section.get(f"{self.config.app_type_key}{i}", "").strip()
                 version = section.get(f"{self.config.app_version_key}{i}", "").strip()
 
-                if not raw_name:
-                    continue
-                if type_ and type_.upper() in self.config.excluded_task_types:
-                    continue
+                #if not raw_name:
+                #    continue
+                #if type_ and type_.upper() in self.config.excluded_task_types:
+                  #  continue
 
-                name = Path(raw_name).stem
-                catalog[name].append(
-                    {
-                        "type": type_ if type_ else "APP",
-                        "version": version if version else "<N/A>",
-                    }
-                )
+                if raw_name and (type_.upper() not in self.config.excluded_task_types):
+                    name = Path(raw_name).stem
+                    catalog[name].append(
+                        {
+                            "type": type_ if type_ else "APP",
+                            "version": version if version else "<N/A>",
+                        }
+                    )
 
         return catalog
 
@@ -276,8 +306,10 @@ class DataReaderTaskVersioningExternal(DataReader):
             )
 
     def scan_files(self) -> TaskList:
+        logger.debug("Starting external task scan")
         # 1) previous baseline
         if self._has_prev_imgconf():
+            logger.debug("Previous release detected: loading baseline task versions")
             prev_sys_section = INIParser(self.prev_sys_imgconf).get_section(self.config.sys_external_section)
             self._read_sys_tasks(prev_sys_section, is_prev=True)
 
@@ -287,6 +319,7 @@ class DataReaderTaskVersioningExternal(DataReader):
             self._read_app_task(prev_ordered_names, prev_catalog, is_prev=True)
 
         # 2) current
+        logger.debug("Loading current release task versions")
         sys_section = INIParser(self.sys_imgconf).get_section(self.config.sys_external_section)
         self._read_sys_tasks(sys_section, is_prev=False)
 
@@ -294,5 +327,7 @@ class DataReaderTaskVersioningExternal(DataReader):
         curr_ordered_names = self._flatten_taskorder_names(curr_sections)
         curr_catalog = self._build_app_catalog(self.app_imgconf)
         self._read_app_task(curr_ordered_names, curr_catalog, is_prev=False)
+
+        logger.info("External task scan completed: %d tasks loaded", len(self.tasks))
 
         return self.tasks

@@ -12,14 +12,14 @@ Combina:
 class DottedDict(dict):
     """
     Un dict che supporta accesso sia dict['key'] che dict.key
-    Converte automaticamente dict innestati in DottedDict.
+    Converte automaticamente dict innestati in oggetto DottedDict.
     
     Esempio:
         data = DottedDict({'name': 'Mario', 'metadata': {'doc': 'VDD'}})
-        data.name                  # 'Mario' ✓
-        data['name']               # 'Mario' ✓
-        data.metadata.doc          # 'VDD' ✓ (metadata è DottedDict)
-        print(data)                # {'name': 'Mario', ...} ✓
+        data.name                  # 'Mario' 
+        data['name']               # 'Mario' 
+        data.metadata.doc          # 'VDD'  (metadata è DottedDict)
+        print(data)                # {'name': 'Mario', ...} 
     """
 
     def __init__(self, *args, **kwargs): # per essere generici conviene usare *args e **kwargs, così è compatibile con qualsiasi input che dict accetterebbe (es. dict(a=1, b=2) o dict({'a': 1, 'b': 2}))

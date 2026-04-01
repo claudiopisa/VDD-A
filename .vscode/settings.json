@@ -1,5 +1,7 @@
 {
     "python.analysis.extraPaths": [
         "./src"
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.default.compilerPath": "cl.exe"
 }

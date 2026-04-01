@@ -7,14 +7,15 @@ from typing import ClassVar
 @dataclass
 class Task:
     name: str
-    type: str
+    type_: str
     version: str
     modified: str = "N/A"  # per ora non hai baseline precedente
 
     # Static attribute. Keeps track of the max length of each field across all Task instances, used for formatting the output in a clean way.
+    # key string values must be the exact same as the attribute class names 
     _length_cache: ClassVar[dict[str, int]] = {
         "name": len("NAME"),
-        "type": len("TYPE"),
+        "type_": len("TYPE"),
         "version": len("VERSION"),
         "modified": len("MODIFIED"),
     }
@@ -31,7 +32,7 @@ class Task:
     def reset_length_cache(cls) -> None:
         cls._length_cache = {
             "name": len("NAME"),
-            "type": len("TYPE"),
+            "type_": len("TYPE"),
             "version": len("VERSION"),
             "modified": len("MODIFIED"),
         }
