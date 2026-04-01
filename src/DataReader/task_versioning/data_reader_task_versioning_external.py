@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import ClassVar, Optional, Sequence
 
 from configs.task_versioning_config import TaskVersioningConfig
-from DataReader.data_reader_task_versioning import DataReaderTaskVersioning
-from model.ini.ini_parser import INIParser
-from .data_reader import DataReader
+from DataReader.task_versioning.task_versioning import TaskVersioning
+from model.ini.image_config_parser import INIParser
+from ..data_reader import DataReader
 
 import re
 
@@ -23,7 +23,7 @@ type PathInput = str | Path
 type PathSequence = Sequence[PathInput]
 
 
-class DataReaderTaskVersioningExternal(DataReaderTaskVersioning):
+class TaskVersioningExternal(TaskVersioning):
         
     # Kernel is external: we have 1 ini file for the sys tasks and N ini files (usually 2, ixl.ini and srlw.ini) for app tasks (current stream), and optionally the same for the previous stream, resulting in a max of 2N app inis + 2 sys ini (current + previous). 
 
@@ -32,7 +32,7 @@ class DataReaderTaskVersioningExternal(DataReaderTaskVersioning):
         self.core = self.config.core
 
         if self.core.is_kernel_internal:
-            raise ValueError("DataReaderTaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
+            raise ValueError("TaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
         
         #if not self.config.app_tasks:
             #raise ValueError("No app tasks specified in config, at least one is required for external kernel mode")
@@ -84,7 +84,7 @@ class DataReaderTaskVersioningExternal(DataReaderTaskVersioning):
         super().__init__(config=config)
 
         if self.core.is_kernel_internal:
-            raise ValueError("DataReaderTaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
+            raise ValueError("TaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
         
         #if not self.config.app_tasks:
             #raise ValueError("No app tasks specified in config, at least one is required for external kernel mode")

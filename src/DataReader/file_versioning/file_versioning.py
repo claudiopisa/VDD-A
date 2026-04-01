@@ -2,18 +2,18 @@ from pathlib import Path
 import os
 import re
 from configs.file_versioning_config import FileVersioningConfig
-from .data_reader import DataReader
+from ..data_reader import DataReader
 
 
-class DataReaderFileVersioning(DataReader):
+class FileVersioning(DataReader):
     def __init__(self, config: FileVersioningConfig):
         #super().__init__(data_path=data_path)
         self.config = config
-        self.root = self._retrieve_path()
+        self.root = self._retrieve_paths()
 
         super().__init__(data_path=self.root)
 
-    def _retrieve_path(self) -> Path:
+    def _retrieve_paths(self) -> Path:
         workspace = self.config.core.stream_root_as_path
         component = self.config.component_root
         root = workspace / component

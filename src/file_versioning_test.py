@@ -1,4 +1,4 @@
-from DataReader.data_reader_file_versioning import DataReaderFileVersioning
+from DataReader.file_versioning.file_versioning import FileVersioning
 from configs.core_config import CoreConfig
 from configs.file_versioning_config import FileVersioningConfig
 
@@ -30,7 +30,7 @@ print(f"Excluded directories: {excluded_dirs}")
 #data reader
 
 try:
-    fv_reader = DataReaderFileVersioning(root, fv_conf)
+    fv_reader = FileVersioning(fv_conf)
 except Exception as e:
     print(f"Error initializing Data Reader for File Versioning: {e}")
 

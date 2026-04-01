@@ -1,7 +1,7 @@
 from pathlib import Path
 from ConfigLoader.loaders.global_config import ConfigLoaderGlobal
 from ConfigLoader.loaders.file_versioning import ConfigLoaderFileVersioning
-from DataReader.data_reader_file_versioning import DataReaderFileVersioning
+from DataReader.file_versioning.file_versioning import FileVersioning
 from version_extractor_test import extract_version
 from parsers.xml_writer import build_ch2_xml_attr_rows
 from DocGen.doc_gen import generate_chapter2_docx
@@ -31,9 +31,9 @@ chapter_title = ch2_cfg.get_title()
 version_extraction_criteria = ch2_cfg.get_version_extraction_criteria()
 
 try:
-    ch2_reader = DataReaderFileVersioning(root, ch2_cfg)
+    ch2_reader = FileVersioning(ch2_cfg)
 except Exception as e:
-    logger.exception("Error initializing DataReaderFileVersioning: %s", e)
+    logger.exception("Error initializing FileVersioning: %s", e)
     exit(1)
 
 rows = []

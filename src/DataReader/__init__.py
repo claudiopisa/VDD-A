@@ -1,4 +1,4 @@
 from .data_reader import DataReader
-from .data_reader_file_versioning import DataReaderFileVersioning
+from .file_versioning.file_versioning import FileVersioning
 
-__all__ = ["data_reader", "data_reader_file_versioning"]
+__all__ = ["DataReader", "FileVersioning"]

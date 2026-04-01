@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 from typing import Dict, Any
-from utils.dotted_dict import DottedDict
+from utils.json_parser import JsonParser
 
 
 class UserConfigLoader:
@@ -11,13 +11,13 @@ class UserConfigLoader:
     """
     
     @staticmethod
-    def load(path: str | Path, return_dict: bool = False) -> Dict[str, Any] | DottedDict:
+    def load(path: str | Path, return_dict: bool = False) -> Dict[str, Any] | JsonParser:
         """
         Load user configuration from a JSON file.
         
         Args:
             path: Path to the JSON configuration file
-            return_dict: If True, returns a dict; if False, returns a DottedDict
+            return_dict: If True, returns a dict; if False, returns a JsonParser (dot notation access)
             
         Returns:
             Configuration data as Dict or DottedDict
@@ -37,7 +37,7 @@ class UserConfigLoader:
         
         with path.open("r", encoding="utf-8") as file:
             data = json.load(file)
-            return data if return_dict else DottedDict(data) # se data è già un dict, DottedDict lo accetta direttamente
+            return data if return_dict else JsonParser(data) # se data è già un dict, JsonParser lo accetta direttamente
   
     def __repr__(self):
         return f"User Configuration dump: {json.dumps(self.load(self.user_config_path, return_dict=True), indent=2)}"

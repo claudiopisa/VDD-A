@@ -6,7 +6,7 @@ from typing import ClassVar, Optional
 from configs.default_config.task_versioning_default_config import TaskVersioningDefaultConfig
 from configs.task_versioning_config import TaskVersioningConfig
 
-from .data_reader import DataReader
+from ..data_reader import DataReader
 
 import re
 
@@ -18,7 +18,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
     
 
-class DataReaderTaskVersioning(DataReader):
+class TaskVersioning(DataReader):
     #Use cases:
     # Kernel is internal: we have max 2 ini files to read, current and optional previous, the former in the NSPC dir, the latter in the previous stream root if available. Both contain a [Settings] section with BOOT, BOOTAP, Loader, Kernel and application tasks with their type and version. We compare BOOT, BOOTAP, Loader, Kernel and application tasks versions between current and previous ini to determine if they are modified or not.
     # Kernel is external: we have 1 ini file for the sys tasks and N ini files (usually 2, ixl.ini and srlw.ini) for app tasks (current stream), and optionally the same for the previous stream, resulting in a max of 2N app inis + 2 sys ini (current + previous). The sys ini contains BOOT, BOOTAP, Loader, Kernel with their version, while the app ini(s) contain application tasks with their type and version. We compare BOOT, BOOTAP, Loader, Kernel versions from the sys ini and application tasks versions from the app ini(s) between current and previous stream to determine if they are modified or not.

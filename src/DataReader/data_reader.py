@@ -48,10 +48,10 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def _retrieve_path(self, *args, **kwargs) -> Path:
+    def _retrieve_paths(self, *args, **kwargs):
         pass
 
-    # TODO: Consider to accept only directories, not path to files. DataReader should be responsible to only verify the existence of the given dir data path, whereas the scanning of files and retrieval of file paths is the responsibility of the concrete DataReader implementation (e.g., DataReaderFileVersioning). This way we can have more flexibility in the type of data paths we can accept (e.g., we can accept both file and dir paths, and it's up to the concrete implementation to decide how to handle them). Moreover, this way we can also have a more consistent interface for the DataReader class, since all concrete implementations will have the same type of data path (i.e., directory) and the same method for scanning files (i.e., scan_files).
+    # TODO: Consider to accept only directories, not path to files. DataReader should be responsible to only verify the existence of the given dir data path, whereas the scanning of files and retrieval of file paths is the responsibility of the concrete DataReader implementation (e.g., FileVersioning). This way we can have more flexibility in the type of data paths we can accept (e.g., we can accept both file and dir paths, and it's up to the concrete implementation to decide how to handle them). Moreover, this way we can also have a more consistent interface for the DataReader class, since all concrete implementations will have the same type of data path (i.e., directory) and the same method for scanning files (i.e., scan_files).
     def _normalize_path(self, path: PathInput) -> Path:
         # the given `path` argument must be either a string or a Path object, thanks to the type hint, hence, we directly convert it to a DataPath object
         if isinstance(path, str):

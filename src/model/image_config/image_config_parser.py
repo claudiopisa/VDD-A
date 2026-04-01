@@ -1,7 +1,7 @@
 from pathlib import Path
 from configparser import ConfigParser
 
-class INIParser:
+class ImageConfigParser:
     def __init__(self, ini_path: str | Path):
         self.ini_path = Path(ini_path)
         if not self.ini_path.exists():

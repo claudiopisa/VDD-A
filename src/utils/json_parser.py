@@ -9,16 +9,16 @@ Combina:
 """
 
 
-class DottedDict(dict):
+class JsonParser(dict):
     """
     Un dict che supporta accesso sia dict['key'] che dict.key
-    Converte automaticamente dict innestati in oggetto DottedDict.
+    Converte automaticamente dict innestati in oggetto JsonParser.
     
     Esempio:
-        data = DottedDict({'name': 'Mario', 'metadata': {'doc': 'VDD'}})
+        data = JsonParser({'name': 'Mario', 'metadata': {'doc': 'VDD'}})
         data.name                  # 'Mario' 
         data['name']               # 'Mario' 
-        data.metadata.doc          # 'VDD'  (metadata è DottedDict)
+        data.metadata.doc          # 'VDD'  (metadata è JsonParser, non dict)
         print(data)                # {'name': 'Mario', ...} 
     """
 

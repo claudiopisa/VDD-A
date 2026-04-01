@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 from configs.default_config.default_config_loader import DefaultConfigLoader
 from configs.user_config.user_config_loader import UserConfigLoader
-from utils.dotted_dict import DottedDict
+from utils.json_parser import DottedDict
 
 
 class Config():

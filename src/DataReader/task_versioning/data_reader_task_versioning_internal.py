@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Optional
 
 from configs.task_versioning_config import TaskVersioningConfig
-from model.ini.ini_parser import INIParser
-from .data_reader import DataReader
+from model.ini.image_config_parser import INIParser
+from ..data_reader import DataReader
 from model.task.task import Task
 from model.task.task_list import TaskList
 from utils.logger import get_logger
@@ -13,7 +13,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-class DataReaderTaskVersioningInternal(DataReader):
+class TaskVersioningInternal(DataReader):
 
     def __init__(self, reader_config: TaskVersioningConfig):
         self.config = reader_config
@@ -21,7 +21,7 @@ class DataReaderTaskVersioningInternal(DataReader):
 
         if not self.core.is_kernel_internal:
             raise ValueError(
-                "DataReaderTaskVersioningInternal should not be used in external kernel mode, "
+                "TaskVersioningInternal should not be used in external kernel mode, "
                 "check your core config kernel_mode value"
             )
 
