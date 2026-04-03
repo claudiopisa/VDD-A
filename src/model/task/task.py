@@ -42,7 +42,7 @@ class Task:
         gap = "  "
         return (
             f"{name:<{cls._length_cache['name']}}"
-            f"{gap}{type_:<{cls._length_cache['type']}}"
+            f"{gap}{type_:<{cls._length_cache['type_']}}"
             f"{gap}{version:<{cls._length_cache['version']}}"
             f"{gap}{modified:<{cls._length_cache['modified']}}"
         )
@@ -52,10 +52,10 @@ class Task:
         gap = "  "
         return (
             f"{name:^{cls._length_cache['name']}}"
-            f"{gap}{type_:^{cls._length_cache['type']}}"
+            f"{gap}{type_:^{cls._length_cache['type_']}}"
             f"{gap}{version:^{cls._length_cache['version']}}"
             f"{gap}{modified:^{cls._length_cache['modified']}}"
         )
 
     def __repr__(self):
-        return Task.format_row(self.name, self.type, self.version, self.modified)
+        return Task.format_row(self.name, self.type_, self.version, self.modified)

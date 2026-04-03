@@ -1,5 +1,5 @@
 """
-DottedDict - Dictionary con accesso tramite attributi (dot notation).
+JsonParser - Dictionary con accesso tramite attributi (dot notation).
 
 Combina:
 - Accesso dict: config['key']
@@ -65,10 +65,10 @@ class JsonParser(dict):
     
 
     def __setitem__(self, key, value):
-        super().__setitem__(key, self._parse(value)) # passa tutto a __setitem__ che fa il parsing ricorsivo, così è garantito che anche i dict innestati vengano convertiti in DottedDict
+        super().__setitem__(key, self._parse(value)) # passa tutto a __setitem__ che fa il parsing ricorsivo, così è garantito che anche i dict innestati vengano convertiti in JsonParser
 
     def __str__(self):
-        # Rappresentazione per far capire all'utilizatore il contenuto in modo chiaro, senza mostrare i dettagli tecnici di DottedDict
+        # Rappresentazione per far capire all'utilizatore il contenuto in modo chiaro, senza mostrare i dettagli tecnici di JsonParser
         printable_dict = {k: v for k, v in self.items()} # converto in dict standard per una rappresentazione più pulita
         return str(printable_dict)
 
@@ -81,9 +81,9 @@ class JsonParser(dict):
                 parsed[k] = self._parse(v)
 
             # alternativa con comprehension (versione più compatta e senza dizionario intermedio):
-            # return DottedDict({k: self._parse(v) for k, v in elem.items()})
+            # return JsonParser({k: self._parse(v) for k, v in elem.items()})
 
-            return DottedDict(parsed) #ERRORE: CHIAMAREBBE IL COSTRUTTORE RICORSIVAMENTE, CAUSANDO UN LOOP INFINITO. SOLUZIONE: USARE SUPER() PER EVITARE DI RICHIAMARE IL COSTRUTTORE DI DottedDict
+            return JsonParser(parsed) #ERRORE: CHIAMAREBBE IL COSTRUTTORE RICORSIVAMENTE, CAUSANDO UN LOOP INFINITO. SOLUZIONE: USARE SUPER() PER EVITARE DI RICHIAMARE IL COSTRUTTORE DI JsonParser
         
         elif isinstance(elem, list):
             return [self._parse(x) for x in elem]
@@ -113,13 +113,13 @@ class JsonParser(dict):
     def _parse(self, value):
         """Converte ricorsivamente dict e liste"""
 
-        if isinstance(value, DottedDict): # se è già un DottedDict, lo ritorna così com'è (evita di riconvertire un DottedDict già creato)
+        if isinstance(value, JsonParser): # se è già un JsonParser, lo ritorna così com'è (evita di riconvertire un JsonParser già creato)
             return value
         
-        if isinstance(value, dict): # and not isinstance(value, DottedDict):
-            return DottedDict(value)
-            #alternativa se non voglio chiamare `DottedDict`
-            #parsed = DottedDict() # creo un DottedDict vuoto
+        if isinstance(value, dict): # and not isinstance(value, JsonParser):
+            return JsonParser(value)
+            #alternativa se non voglio chiamare `JsonParser`
+            #parsed = JsonParser() # creo un JsonParser vuoto
             #for k, v in value.items():
                 #parsed[k] = v # non c'e' bisogno di fare _parse(v) perché quando assegno parsed[k] = v, passa per __setitem__ che fa già il parsing ricorsivo di tutti i dict innestati
             #return parsed

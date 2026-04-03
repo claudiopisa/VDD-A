@@ -45,7 +45,7 @@ class FileVersioningConfig(Config):
     
     @property
     def component_root(self):
-        return self.default_config.components.SAFETY_NUCLEUS
+        return self.core.components.SAFETY_NUCLEUS
     
     @property
     def exclusion_rules(self):

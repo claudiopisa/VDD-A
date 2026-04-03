@@ -1,4 +1,4 @@
-from DataReader.file_versioning.file_versioning import FileVersioning
+from data_reader.file_versioning.file_versioning import FileVersioning
 from configs.core_config import CoreConfig
 from configs.file_versioning_config import FileVersioningConfig
 

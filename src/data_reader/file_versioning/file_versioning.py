@@ -7,11 +7,10 @@ from ..data_reader import DataReader
 
 class FileVersioning(DataReader):
     def __init__(self, config: FileVersioningConfig):
-        #super().__init__(data_path=data_path)
-        self.config = config
-        self.root = self._retrieve_paths()
+        super().__init__(config=config)
 
-        super().__init__(data_path=self.root)
+        root = self._retrieve_paths()
+        self.parse_data_paths(data_path=root)
 
     def _retrieve_paths(self) -> Path:
         workspace = self.config.core.stream_root_as_path
@@ -26,7 +25,7 @@ class FileVersioning(DataReader):
         return root
     
 
-    def scan_files(self):
+    def _scan_files(self):
         excluded_dirs = {d.lower() for d in self.config.excluded_dirs}
         allowed_ext = {e.lower() for e in self.config.allowed_extensions}
         criteria = self.config.version_extraction_criteria
@@ -46,6 +45,7 @@ class FileVersioning(DataReader):
 
                     # yield a tuple of (string path, version) to avoid WindowsPath repr
                     yield (str(p), version)
+
 
     def _extract_version(self, path: Path, criteria=None):
         version = None

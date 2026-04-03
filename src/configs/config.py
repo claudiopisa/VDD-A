@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 from configs.default_config.default_config_loader import DefaultConfigLoader
 from configs.user_config.user_config_loader import UserConfigLoader
-from utils.json_parser import DottedDict
+from utils.json_parser import JsonParser
 
 
 class Config():
@@ -36,7 +36,7 @@ class Config():
 
         return config_data
     
-    def _apply_and_validate_config(self, config_data: DottedDict) -> None:
+    def _apply_and_validate_config(self, config_data: JsonParser) -> None:
         """
         Apply and validate configuration.
         
@@ -62,7 +62,7 @@ class Config():
         
         self._flatten_config(config_data)
     
-    def _flatten_config(self, config_data: DottedDict) -> None:
+    def _flatten_config(self, config_data: JsonParser) -> None:
         """
         Flatten configuration data into class attributes.
         

@@ -10,7 +10,7 @@ class CoreConfig(Config):
     Core configuration for VDD documents.
     
     Provides access to configuration data through:
-    - self.user_config: User-specific configuration from JSON file (DottedDict with dot notation)
+    - self.user_config: User-specific configuration from JSON file (for dot notation)
     - self.default_config: Static structural defaults (CoreDefaultConfig dataclass)
     
     Example usage:

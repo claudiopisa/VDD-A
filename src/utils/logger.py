@@ -2,7 +2,7 @@ import logging
 import os
 
 
-DEFAULT_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+DEFAULT_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)-35s | %(message)s"
 
 
 def setup_logging(level: str | int | None = None, fmt: str = DEFAULT_FORMAT) -> None:

@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from data_reader.task_versioning.task_versioning import TaskVersioning
 from configs.task_versioning_config import TaskVersioningConfig
 from model.image_config.image_config_parser import ImageConfigParser
-from ..data_reader import DataReader
 from model.task.task import Task
 from model.task.task_list import TaskList
 from utils.logger import get_logger
@@ -13,11 +13,10 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-class TaskVersioningInternal(DataReader):
+class TaskVersioningInternal(TaskVersioning):
 
-    def __init__(self, reader_config: TaskVersioningConfig):
-        self.config = reader_config
-        self.core = self.config.core
+    def __init__(self, config: TaskVersioningConfig):
+        super().__init__(config=config)
 
         if not self.core.is_kernel_internal:
             raise ValueError(
@@ -25,32 +24,27 @@ class TaskVersioningInternal(DataReader):
                 "check your core config kernel_mode value"
             )
 
-        if self.config.has_previous_release() and not self.config.previous_release_root:
-            raise ValueError("Previous release enabled but no previous_release_root specified in config")
+        curr_path: Path = self._retrieve_paths(is_prev=False)
+        logger.debug("Resolved current imgconf path: %s", curr_path)
 
-        workspace = self.core.stream_root_as_path
-        logger.debug("Workspace resolved: %s", workspace)
+        prev_path: Optional[Path] = None
+        if self.config.has_previous_release():
+            prev_path = self._retrieve_paths(is_prev=True)
+            logger.debug("Resolved previous imgconf path: %s", prev_path)
 
-        self.imgconf_path = self._retrieve_paths(workspace)
+
+        self.imgconf_path = self._retrieve_paths(is_prev=False)
         logger.debug("Resolved imgconf_path: %s", self.imgconf_path)
 
-        self.prev_imgconf_path = None
-        if self.config.has_previous_release():
-            prev_workspace = self.config.previous_release_root_as_path
-            logger.debug("Previous workspace resolved: %s", prev_workspace)
-            
-            self.prev_imgconf_path = self._retrieve_paths(prev_workspace)
-            logger.debug("Resolved prev_imgconf_path: %s", self.prev_imgconf_path)
+        super().parse_data_paths(imgconf=curr_path, prev_imgconf=prev_path)
 
-        super().__init__(
-            imgconf=self.imgconf_path,
-            prev_imgconf=self.prev_imgconf_path,
-        )
+        #self.prev_config: dict[str, str] = {}
+        #self.tasks: TaskList = TaskList()
 
-        self.prev_config: dict[str, str] = {}
-        self.tasks: TaskList = TaskList()
+    def _retrieve_paths(self, is_prev: bool) -> Path:
+        workspace = self.config.previous_release_root_as_path if is_prev else self.core.stream_root_as_path
+        logger.debug("%s workspace resolved: %s", "Previous" if is_prev else "Current", workspace)
 
-    def _retrieve_paths(self, workspace: Path) -> Path:
         root = workspace / self.config.app_root
         imgconf_path = root / self.core.image_config_name
 
@@ -113,11 +107,12 @@ class TaskVersioningInternal(DataReader):
                         modified = "N/A" if not self._has_prev_imgconf() else (
                             "NO" if self.prev_config.get(name) == version else "YES"
                         )
-                        self.tasks.append(Task(name=name, type=type_, version=version, modified=modified))
+                        self.tasks.append(Task(name=name, type_=type_, version=version, modified=modified))
                     else:
                         self.prev_config[name] = version
 
-    def scan_files(self) -> TaskList:
+
+    def _scan_files(self) -> TaskList:
         logger.debug("Starting internal task scan")
 
         if self._has_prev_imgconf():
@@ -127,10 +122,13 @@ class TaskVersioningInternal(DataReader):
             self._read_app_tasks(prev_section, is_prev=True)
 
         logger.debug("Loading current release task versions")
-        section = ImageConfigParser(self.imgconf).get_section(self.config.sys_internal_section)
-        self._read_sys_tasks(section, is_prev=False)
-        self._read_app_tasks(section, is_prev=False)
-
-        logger.info("Internal task scan completed: %d tasks loaded", len(self.tasks))
         
-        return self.tasks
+        sys_section = ImageConfigParser(self.imgconf).get_section(self.config.sys_internal_section)
+        #logger.debug("Current imgconf section for sys tasks: %s", sys_section)
+        self._read_sys_tasks(sys_section, is_prev=False)
+
+        app_section = ImageConfigParser(self.imgconf).get_section(self.config.app_internal_section)
+        #logger.debug("Current imgconf section for app tasks: %s", app_section)
+        self._read_app_tasks(app_section, is_prev=False)
+
+        logger.debug("Internal task scan completed: %d tasks loaded", len(self.tasks))

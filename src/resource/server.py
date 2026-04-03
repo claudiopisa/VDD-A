@@ -13,15 +13,11 @@ class Server(Server32):
             raise ValueError("DLL path must be provided in kwargs with key 'dll_path'")
         
         dll_type = kwargs.get("dll_type", "windll")
-        
+
         #super().__init__("C:\\Users\\cpisa\\Desktop\\Release\\PEChecksumDll.dll", "windll", host, port)
         super().__init__(dll_path, dll_type, host, port)
 
-        #self.version = self.lib.version()
-
-    def get_checksum(self, data):
-        #return self.lib.get_checksum(buf, size, checksum_ref, err_ref)
-
+        # get checksum arguments and return type
         self.lib.get_checksum.argtypes = [
             POINTER(c_ubyte),   # pSrcPe
             c_uint32,           # dimSrcPe
@@ -30,6 +26,26 @@ class Server(Server32):
         ]
         self.lib.get_checksum.restype = c_uint32
 
+        # set checksum arguments and return type
+        self.lib.set_checksum.argtypes = [
+            POINTER(c_ubyte),
+            c_uint32,
+            c_uint32,
+            POINTER(c_uint32),
+        ]
+        self.lib.set_checksum.restype = c_uint32
+
+        # verify checksum arguments and return type
+        self.lib.verify_checksum.argtypes = [
+            POINTER(c_ubyte),
+            c_uint32,
+            POINTER(c_uint32),
+            POINTER(c_uint32),
+            POINTER(c_uint32),
+        ]
+        self.lib.verify_checksum.restype = c_uint32
+
+    def get_checksum(self, data):
         #with open(path, "rb") as f:
         #    data = f.read()
 
@@ -50,14 +66,6 @@ class Server(Server32):
         return checksum.value
     
     def set_checksum(self, data, new_checksum):
-        self.lib.set_checksum.argtypes = [
-            POINTER(c_ubyte),
-            c_uint32,
-            c_uint32,
-            POINTER(c_uint32),
-        ]
-        self.lib.set_checksum.restype = c_uint32
-
         size = len(data)
         buf = (c_ubyte * size).from_buffer_copy(data)
 
@@ -68,6 +76,25 @@ class Server(Server32):
         if res == 0:
             raise RuntimeError(f"SetChecksumPE fallita, codice errore={err.value}")
 
-        #return bytes(buf)
+        return bytes(buf)
+    
+    def verify_checksum(self, data):
+        size = len(data)
+        buf = (c_ubyte * size).from_buffer_copy(data)
+
+        calc_checksum = c_uint32(0) #checksum calculated
+        file_checksum = c_uint32(0) #original file checksum read from header
+        err = c_uint32(0)
+
+        res = self.lib.verify_checksum(buf, size, file_checksum, calc_checksum, err)
+
+        if res == 0:
+            raise RuntimeError(f"VerifyChecksumPE fallita, codice errore={err.value}")
+
+        return {
+            "calc_checksum": calc_checksum.value,
+            "file_checksum": file_checksum.value,
+            "match": calc_checksum.value == file_checksum.value,
+        }
         
 

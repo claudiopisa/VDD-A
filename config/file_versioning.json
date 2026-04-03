@@ -1,5 +1,5 @@
 {
-    "version_extraction_criteria": "(?:\\\\*|//|--|;|#).*Version\\s*:?\\s*(\\d+\\.\\d+)",
+    "version_extraction_criteria": "(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)",
 
     "mode": "version",
     "metadata": {

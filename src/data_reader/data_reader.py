@@ -37,11 +37,13 @@ class DataReader(ABC):
                 else:
                     self._data[key] = self._normalize_path(path) # use key as name and path as value in the dict
     
+    #metodo che viene chiamato dall'utilizzatore finale; funge da wrapper per `_scan_files` (privato), il quale viene effettivamente implementato dalle classi figlie 
     def scan_files(self):
+        # si assicura che `parse_data_paths()` sia stato chiamato prima di `scan_files()`, altrimenti non ci sono dati da cui leggere i file, e quindi solleva un'eccezione
         if not self._data:
             raise ValueError("No data paths provided to scan for files. `parse_data_paths()` must be called first.")
         
-        self._scan_files()
+        return self._scan_files()
 
     @abstractmethod
     def _scan_files(self):

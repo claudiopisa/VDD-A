@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import ClassVar, Optional, Sequence
 
 from configs.task_versioning_config import TaskVersioningConfig
-from DataReader.task_versioning.task_versioning import TaskVersioning
-from model.ini.image_config_parser import INIParser
+from data_reader.task_versioning.task_versioning import TaskVersioning
+from model.image_config.image_config_parser import ImageConfigParser
 from ..data_reader import DataReader
 
 import re
@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 
 type PathInput = str | Path
 type PathSequence = Sequence[PathInput]
-
+type ImageConfigPathDict = dict[str, Path | list[Path]]
 
 class TaskVersioningExternal(TaskVersioning):
         
@@ -88,46 +88,45 @@ class TaskVersioningExternal(TaskVersioning):
         
         #if not self.config.app_tasks:
             #raise ValueError("No app tasks specified in config, at least one is required for external kernel mode")
-        
-        if self.config.has_previous_release() and not self.config.previous_release_root:
-            raise ValueError("Previous release enabled but no previous_release_root specified in config")
-        
-        workspace = self.core.stream_root_as_path
-        logger.debug("Workspace resolved: %s", workspace)
 
-        curr_paths = self._retrieve_paths(workspace)
+        curr_paths: ImageConfigPathDict = self._retrieve_paths(is_prev=False)
         logger.debug("Resolved curr paths: %s", curr_paths)
 
-        prev_paths = {}
+        prev_paths: Optional[ImageConfigPathDict] = {}
         if self.config.has_previous_release():
-            prev_workspace = self.config.previous_release_root_as_path
-            logger.debug("Previous workspace resolved: %s", prev_workspace)
-            prev_paths = {f"prev_{k}": v for k, v in self._retrieve_paths(prev_workspace).items()}
+            prev_paths = self._retrieve_paths(is_prev=True)
             logger.debug("Resolved prev paths: %s", prev_paths)
 
         self.parse_data_paths(**curr_paths, **prev_paths)
 
-        
+        self.prev_sys_config: dict[str, str] = {}
+        self.prev_app_config: dict[str, deque[str]] = defaultdict(deque)
+        self.tasks: TaskList = TaskList()
+
+
     #handle both current and prev case
-    def _retrieve_paths(self, workspace: Path) -> dict[str, Path | list[Path]]:
+    def _retrieve_paths(self, is_prev: bool) -> ImageConfigPathDict:
+        workspace = self.config.previous_release_root_as_path if is_prev else self.core.stream_root_as_path
+        logger.debug("%s workspace resolved: %s", "Previous" if is_prev else "Current", workspace)
+
         app_root = workspace / self.config.app_root
         sys_root = workspace / self.config.sys_root
 
         logger.debug("Resolving paths with app_root: %s and sys_root: %s", app_root, sys_root)
 
         return {
-            "sys_imgconf_path"  : sys_root / self.core.image_config_name,
-            "app_imgconf_paths" : [app_root / task for task in self.config.get_app_tasks(as_dict=False)],
-            "task_order_path"   : app_root / "taskorder.ini",
+            f"{'prev_' if is_prev else ''}sys_imgconf_path"  : sys_root / self.core.image_config_name,
+            f"{'prev_' if is_prev else ''}app_imgconf_paths" : [app_root / task for task in self.config.get_app_tasks(as_dict=False)],
+            f"{'prev_' if is_prev else ''}task_order_path"   : app_root / "taskorder.ini",
         }
 
 
     def _has_prev_imgconf(self) -> bool:
         return (
             super()._has_prev_imgconf()
-            and "prev_sys_imgconf" in self._data
-            and "prev_app_imgconf" in self._data
-            and "prev_task_order" in self._data
+            and "prev_sys_imgconf_path" in self._data
+            and "prev_app_imgconf_paths" in self._data
+            and "prev_task_order_path" in self._data
         )
 
     """def _read_sys_tasks(self, section: dict[str, str], is_prev: bool):
@@ -159,7 +158,7 @@ class TaskVersioningExternal(TaskVersioning):
         # As for now, the maximum number of AP sections is N=4 (AP0..AP3), but we want to be able to handle more in case we have more in the future, so we need to extract the indices dynamically.
         # The .ini file has a arbitrary number of section, from n = 0 to n = N, where N is unknown a priori. 
         # The minimum number of section is n=1, therefore we can have 0 < n <= N sections, so we always have at least AP0.
-        parser = INIParser(taskorder_path)
+        parser = ImageConfigParser(taskorder_path)
         has_sections = True
         sections: list[dict[str, str]] = []
         i = 0
@@ -169,7 +168,7 @@ class TaskVersioningExternal(TaskVersioning):
                 section = parser.get_section(f"{self.config.ap_section_key}{i}") # find APi section, where 0 <= i <= N-1, N is unknown a priori
                 sections.append(section)
                 i += 1
-            except Exception: # catch the custom exception raised by INIParser when section is not found
+            except Exception: # catch the custom exception raised by ImageConfigParser when section is not found
                 has_sections = False
 
         return sections
@@ -220,7 +219,7 @@ class TaskVersioningExternal(TaskVersioning):
         catalog: dict[str, list[dict[str, str]]] = defaultdict(list)
 
         for ini_path in app_paths:
-            section = INIParser(ini_path).get_section(self.config.app_external_section)
+            section = ImageConfigParser(ini_path).get_section(self.config.app_external_section)
 
             # Trovo indici presenti tramite NomeTask{i}
             """indices: list[int] = []
@@ -255,7 +254,7 @@ class TaskVersioningExternal(TaskVersioning):
 
         return catalog
 
-    def _read_app_task(self, ordered_names: list[str], catalog: dict[str, list[dict[str, str]]], is_prev: bool):
+    def _read_app_tasks(self, ordered_names: list[str], catalog: dict[str, list[dict[str, str]]], is_prev: bool):
         """
         Consuma task in ordine taskorder.
         - is_prev=True: salva versioni baseline in coda per nome.
@@ -299,35 +298,38 @@ class TaskVersioningExternal(TaskVersioning):
             self.tasks.append(
                 Task(
                     name=name,
-                    type=curr_type,
+                    type_=curr_type,
                     version=curr_version,
                     modified=modified,
                 )
             )
 
-    def scan_files(self) -> TaskList:
+    def _scan_files(self) -> TaskList:
         logger.debug("Starting external task scan")
+
         # 1) previous baseline
         if self._has_prev_imgconf():
             logger.debug("Previous release detected: loading baseline task versions")
-            prev_sys_section = INIParser(self.prev_sys_imgconf).get_section(self.config.sys_external_section)
+
+            prev_sys_section = ImageConfigParser(self.prev_sys_imgconf).get_section(self.config.sys_external_section)
             self._read_sys_tasks(prev_sys_section, is_prev=True)
 
             prev_sections = self._read_taskorder(self.prev_task_order)
             prev_ordered_names = self._flatten_taskorder_names(prev_sections)
             prev_catalog = self._build_app_catalog(self.prev_app_imgconf)
-            self._read_app_task(prev_ordered_names, prev_catalog, is_prev=True)
+            self._read_app_tasks(prev_ordered_names, prev_catalog, is_prev=True)
 
         # 2) current
         logger.debug("Loading current release task versions")
-        sys_section = INIParser(self.sys_imgconf).get_section(self.config.sys_external_section)
-        self._read_sys_tasks(sys_section, is_prev=False)
 
-        curr_sections = self._read_taskorder(self.task_order)
+        sys_section = ImageConfigParser(self.sys_imgconf_path).get_section(self.config.sys_external_section)
+        self._read_sys_tasks(sys_section, is_prev=False)
+    
+        curr_sections = self._read_taskorder(self.task_order_path)
         curr_ordered_names = self._flatten_taskorder_names(curr_sections)
-        curr_catalog = self._build_app_catalog(self.app_imgconf)
-        self._read_app_task(curr_ordered_names, curr_catalog, is_prev=False)
+        curr_catalog = self._build_app_catalog(self.app_imgconf_paths)
+        self._read_app_tasks(curr_ordered_names, curr_catalog, is_prev=False)
 
         logger.info("External task scan completed: %d tasks loaded", len(self.tasks))
 
-        return self.tasks
+        #return self.tasks

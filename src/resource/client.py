@@ -28,5 +28,7 @@ class Client(Client64):
         return self.request32('get_checksum', data)
     
     def set_checksum(self, data, new_checksum):
-        return self.request32('set_checksum', data, new_checksum)
-  
+        return self.request32('set_checksum', data, int(new_checksum))
+    
+    def verify_checksum(self, data):
+        return self.request32('verify_checksum', data)
