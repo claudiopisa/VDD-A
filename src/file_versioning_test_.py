@@ -12,4 +12,4 @@ reader = FileVersioning(config=fv_conf)
 
 out = reader.scan_files()
 
-print(list(out))
+print(out)

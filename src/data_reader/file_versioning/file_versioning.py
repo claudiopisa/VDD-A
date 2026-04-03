@@ -2,6 +2,8 @@ from pathlib import Path
 import os
 import re
 from configs.file_versioning_config import FileVersioningConfig
+from model.file.file import File
+from model.file.file_list import FileList
 from ..data_reader import DataReader
 
 
@@ -25,10 +27,12 @@ class FileVersioning(DataReader):
         return root
     
 
-    def _scan_files(self):
+    def _scan_files(self) -> FileList:
         excluded_dirs = {d.lower() for d in self.config.excluded_dirs}
         allowed_ext = {e.lower() for e in self.config.allowed_extensions}
         criteria = self.config.version_extraction_criteria
+
+        files = FileList()
 
         for dir_path, dir_names, file_names in os.walk(self.data_path):
             #per poter potare l alber odelle directory bisogna modificare dirnames a runtime
@@ -43,8 +47,9 @@ class FileVersioning(DataReader):
                     except Exception:
                         version = None
 
-                    # yield a tuple of (string path, version) to avoid WindowsPath repr
-                    yield (str(p), version)
+                    files.append(File(path=str(p), version=version))
+
+        return files
 
 
     def _extract_version(self, path: Path, criteria=None):
