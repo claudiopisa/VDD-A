@@ -35,9 +35,9 @@ class CoreDefaultConfig:
 # Singleton instance
 #CONFIG = CoreDefaultConfig()
 
-# Utilizzo
+# Usage
 #print(CONFIG.roots.internal)  # ["NSPC"]
 #print(CONFIG.components.SAFETY_NUCLEUS)  # "NSPC"
 
-# Questo solleverà un errore (frozen=True)
-# CONFIG.roots.internal.append("test")  # Funziona ma modifica la lista (attenzione!)
+# This raises an error (frozen=True)
+# CONFIG.roots.internal.append("test")  # It works but still mutates the list (watch out!)

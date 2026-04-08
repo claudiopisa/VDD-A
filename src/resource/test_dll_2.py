@@ -8,7 +8,7 @@ with open(path, "rb") as f:
         data = f.read()
 
 if not data:
-    raise ValueError("File vuoto")
+    raise ValueError("Empty file")
 
 """size = len(data)
 buf = (c_ubyte * size).from_buffer_copy(data)
@@ -20,5 +20,5 @@ c = Client()
 
 checksum_value = c.checksum(data)
 
-print(f"Checksum decimale: {checksum_value}")
-print(f"Checksum esadecimale: 0x{checksum_value:08X}")
+print(f"Decimal checksum: {checksum_value}")
+print(f"Hex checksum: 0x{checksum_value:08X}")

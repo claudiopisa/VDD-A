@@ -189,7 +189,7 @@ class TaskVersioningExternal(TaskVersioning):
         ordered_names: list[str] = []
 
         for sec in sections: # for each AP0, ..., APn
-            # Estraggo indici da chiavi NomeTask{i} senza regex
+            # Extract indices from NomeTask{i} keys without using regex
             #indices: list[int] = []
             #prefix = self.config.app_name_key  # es: NomeTask
 
@@ -212,16 +212,17 @@ class TaskVersioningExternal(TaskVersioning):
 
     def _build_app_catalog(self, app_paths: Sequence[Path]) -> dict[str, list[dict[str, str]]]:
         """
-        Catalogo: task_name -> [{type, version}, ...]
-        ad ogni nome task (chiave dizionario), viene associato ad esso una lista di occorrenze (sia nello stesso file che non)
-        Le entry multiple gestiscono casi di duplicati/reschedule.
+        Catalog: task_name -> [{type, version}, ...]
+        Each task name (dictionary key) is associated with a list of occurrences,
+        whether they appear in the same file or in different files.
+        Multiple entries handle duplicate/reschedule cases.
         """
         catalog: dict[str, list[dict[str, str]]] = defaultdict(list)
 
         for ini_path in app_paths:
             section = ImageConfigParser(ini_path).get_section(self.config.app_external_section)
 
-            # Trovo indici presenti tramite NomeTask{i}
+            # Find the indices available through NomeTask{i}
             """indices: list[int] = []
             prefix = self.config.app_name_key
             for key in section.keys():
@@ -256,9 +257,9 @@ class TaskVersioningExternal(TaskVersioning):
 
     def _read_app_tasks(self, ordered_names: list[str], catalog: dict[str, list[dict[str, str]]], is_prev: bool):
         """
-        Consuma task in ordine taskorder.
-        - is_prev=True: salva versioni baseline in coda per nome.
-        - is_prev=False: crea Task e confronta con baseline.
+        Consume tasks in taskorder order.
+        - is_prev=True: save baseline versions in a per-name queue.
+        - is_prev=False: create Task objects and compare them with the baseline.
         """
         if is_prev and not self._has_prev_imgconf():
             raise ValueError("Previous imgconf not available but trying to read previous app tasks")
@@ -269,12 +270,12 @@ class TaskVersioningExternal(TaskVersioning):
             entries = catalog.get(name, [])
             #entries = catalog[name] if name in catalog else []
             if not entries:
-                # Task schedulato ma non trovato nei container
+                # Task scheduled but not found in the containers
                 continue
 
             idx = used_index_by_name[name]
             if idx >= len(entries):
-                # Se il task appare piu volte del numero di entry disponibili, ignoro extra
+                # If the task appears more times than the available entries, ignore the extras
                 continue
 
             used_index_by_name[name] += 1

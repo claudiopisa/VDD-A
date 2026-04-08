@@ -50,7 +50,7 @@ class DefaultConfigLoader:
         
         # Check if manually registered
         if config_class_name in cls._registry:
-            default_config_class = cls._registry[config_class_name] # ritorna la classe vera e propria, di tipo `type`
+            default_config_class = cls._registry[config_class_name] # returns the actual class object, of type `type`
             return default_config_class()
         
         # Auto-resolve based on naming convention

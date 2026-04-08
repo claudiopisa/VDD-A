@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
 
-@dataclass(frozen=True)  # frozen=True rende immutabile
+@dataclass(frozen=True)  # frozen=True makes the instance immutable
 class ExclusionRules:
     dirs: List[str] = field(default_factory=lambda: [
         "Protocols_win32", ".vscode", "BIN", "INCMAKE", 
@@ -46,9 +46,9 @@ class FileVersioningDefaultConfig:
 # Singleton instance
 """CONFIG = FileVersioningDefaultConfig()
 
-# Utilizzo
+# Usage
 print(CONFIG.root)
 print(CONFIG.rules.exclusion.dirs)
 
-# Questo solleverà un errore (frozen=True)
-# CONFIG.mode = "altro"  # FrozenInstanceError"""
+# This raises an error (frozen=True)
+# CONFIG.mode = "other"  # FrozenInstanceError"""

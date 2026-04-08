@@ -16,11 +16,11 @@ class TaskRow:
     name: str
     type: str
     version: str
-    modified: str = "N.A."  # per ora non hai baseline precedente
+    modified: str = "N.A."  # there is no previous baseline for now
 
 
 # -------------------------
-# PARSER IMGCONF (kernel interno)
+# IMGCONF PARSER (internal kernel)
 # -------------------------
 def load_imgconf(imgconf_path: str | Path) -> configparser.ConfigParser:
     imgconf_path = Path(imgconf_path)
@@ -32,7 +32,7 @@ def load_imgconf(imgconf_path: str | Path) -> configparser.ConfigParser:
         delimiters=("=",),
         strict=False,
     )
-    parser.optionxform = str  # preserva case
+    parser.optionxform = str  # preserve case
     with imgconf_path.open("r", encoding="utf-8", errors="ignore") as f:
         parser.read_file(f)
     return parser
@@ -59,11 +59,11 @@ def read_tasks_kernel_internal(imgconf_path: str | Path, nspc_root: str | Path) 
     if "FileBootAPVer" in s:
         tasks.append(TaskRow(name="BOOTAP", type="SYSTEM", version=s.get("FileBootAPVer", "").strip()))
 
-    # Loader: il legacy prende un filename da FileLoaderVer e poi legge la versione dal contenuto del file :contentReference[oaicite:4]{index=4}
+    # Loader: the legacy flow gets a filename from FileLoaderVer and then reads the version from the file contents :contentReference[oaicite:4]{index=4}
     loader_ver_file = s.get("FileLoaderVer", "").strip()
     if loader_ver_file:
         loader_file = nspc_root / loader_ver_file
-        # TODO: sostituisci con la tua extract_version_smart()
+        # TODO: replace this with your extract_version_smart()
         loader_version = "<TODO extract from file>" if loader_file.exists() else "<MISSING FILE>"
         tasks.append(TaskRow(name="Loader", type="SYSTEM", version=loader_version))
 
@@ -83,7 +83,7 @@ def read_tasks_kernel_internal(imgconf_path: str | Path, nspc_root: str | Path) 
         version = s.get(f"RelTask{i}", "").strip()
         v1 = s.get(f"V1_FileTask{i}", "").strip()
 
-        # legacy: name = nome eseguibile senza estensione preso da V1 path :contentReference[oaicite:8]{index=8}
+        # legacy: name = executable name without extension, taken from the V1 path :contentReference[oaicite:8]{index=8}
         name = Path(v1).name
         if "." in name:
             name = name.split(".", 1)[0]
@@ -94,7 +94,7 @@ def read_tasks_kernel_internal(imgconf_path: str | Path, nspc_root: str | Path) 
 
 
 # -------------------------
-# DOCX TABLE (stile come il tuo capitolo 2)
+# DOCX TABLE (same style as your chapter 2)
 # -------------------------
 def shade_cell(cell, fill_hex: str = "D9D9D9"):
     shading = OxmlElement("w:shd")

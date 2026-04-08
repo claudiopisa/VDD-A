@@ -1,42 +1,42 @@
 """
-JsonParser - Dictionary con accesso tramite attributi (dot notation).
+JsonParser - Dictionary with attribute access (dot notation).
 
-Combina:
-- Accesso dict: config['key']
-- Accesso attributo: config.key
-- __repr__ bellissimo come dict standard Python
-- Parsing ricorsivo automatico di dict e liste annidati
+Combines:
+- Dict access: config['key']
+- Attribute access: config.key
+- A clean __repr__ like a standard Python dict
+- Automatic recursive parsing of nested dicts and lists
 """
 
 
 class JsonParser(dict):
     """
-    Un dict che supporta accesso sia dict['key'] che dict.key
-    Converte automaticamente dict innestati in oggetto JsonParser.
+    A dict that supports both dict['key'] and dict.key access.
+    Automatically converts nested dicts into JsonParser objects.
     
-    Esempio:
+    Example:
         data = JsonParser({'name': 'Mario', 'metadata': {'doc': 'VDD'}})
-        data.name                  # 'Mario' 
-        data['name']               # 'Mario' 
-        data.metadata.doc          # 'VDD'  (metadata è JsonParser, non dict)
-        print(data)                # {'name': 'Mario', ...} 
+        data.name                  # 'Mario'
+        data['name']               # 'Mario'
+        data.metadata.doc          # 'VDD'  (metadata is JsonParser, not dict)
+        print(data)                # {'name': 'Mario', ...}
     """
 
-    def __init__(self, *args, **kwargs): # per essere generici conviene usare *args e **kwargs, così è compatibile con qualsiasi input che dict accetterebbe (es. dict(a=1, b=2) o dict({'a': 1, 'b': 2}))
-        super().__init__() # inizializza dict vuoto
-        data = dict(*args, **kwargs)   # preparo input
+    def __init__(self, *args, **kwargs): # *args and **kwargs keep this compatible with any input accepted by dict (e.g. dict(a=1, b=2) or dict({'a': 1, 'b': 2}))
+        super().__init__() # initialize an empty dict
+        data = dict(*args, **kwargs)   # normalize input
 
-        """ versione senza __setitem__ (parsing ricorsivo senza passare per __setitem__)
+        """ version without __setitem__ (recursive parsing without going through __setitem__)
         #data = self._parse(data)       
-        #super().__init__(data)         # inizializzo il dict base con i dati finali
+        #super().__init__(data)         # initialize the base dict with the final data
         """
 
-        #self.update(dict(*args, **kwargs))   # aggiorno il dict con i dati finali (ridondante, ma garantisce che tutti i dati siano presenti)
-        for k, v in data.items(): #alternativa ad update, cosi sono sicuro che passa per __setitem__ e quindi fa il parsing ricorsivo anche dei dict innestati
-            self[k] = v  # assicuro che tutti i dati siano presenti come chiavi del dict (ridondante, ma garantisce che tutti i dati siano presenti)
+        #self.update(dict(*args, **kwargs))   # update the dict with the final data (redundant, but guarantees everything is present)
+        for k, v in data.items(): # alternative to update, so it always goes through __setitem__ and recursively parses nested dicts too
+            self[k] = v  # ensure all data is present as dict keys (redundant, but guarantees completeness)
     
     def __getattr__(self, name):
-        """Accesso tramite attributo: obj.key"""
+        """Attribute access: obj.key"""
 
         try:
             return self[name]
@@ -44,7 +44,7 @@ class JsonParser(dict):
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'") from e
     
     def __setattr__(self, name, value):
-        """Impostazione tramite attributo: obj.key = value"""
+        """Attribute assignment: obj.key = value"""
 
         if name.startswith("_"):
             object.__setattr__(self, name, value)
@@ -52,7 +52,7 @@ class JsonParser(dict):
             self[name] = value  # !!!! passa da __setitem__ !!!!
     
     def __delattr__(self, name):
-        """Cancellazione tramite attributo: del obj.key"""
+        """Attribute deletion: del obj.key"""
 
         if name.startswith("_"):
             object.__delattr__(self, name)
@@ -65,14 +65,14 @@ class JsonParser(dict):
     
 
     def __setitem__(self, key, value):
-        super().__setitem__(key, self._parse(value)) # passa tutto a __setitem__ che fa il parsing ricorsivo, così è garantito che anche i dict innestati vengano convertiti in JsonParser
+        super().__setitem__(key, self._parse(value)) # route everything through __setitem__ so nested dicts are always converted into JsonParser
 
     def __str__(self):
-        # Rappresentazione per far capire all'utilizatore il contenuto in modo chiaro, senza mostrare i dettagli tecnici di JsonParser
-        printable_dict = {k: v for k, v in self.items()} # converto in dict standard per una rappresentazione più pulita
+        # Provide a clear representation without exposing JsonParser internals.
+        printable_dict = {k: v for k, v in self.items()} # convert to a standard dict for a cleaner representation
         return str(printable_dict)
 
-    #deprecato - non serve più, ora il parsing ricorsivo viene fatto direttamente in __setitem__
+    # deprecated - no longer needed, recursive parsing now happens directly in __setitem__
     """def _parse(self, elem):
         if isinstance(elem, dict):
             parsed = {} 
@@ -80,10 +80,10 @@ class JsonParser(dict):
             for k, v in elem.items():
                 parsed[k] = self._parse(v)
 
-            # alternativa con comprehension (versione più compatta e senza dizionario intermedio):
+            # alternative using a comprehension (more compact and without an intermediate dictionary):
             # return JsonParser({k: self._parse(v) for k, v in elem.items()})
 
-            return JsonParser(parsed) #ERRORE: CHIAMAREBBE IL COSTRUTTORE RICORSIVAMENTE, CAUSANDO UN LOOP INFINITO. SOLUZIONE: USARE SUPER() PER EVITARE DI RICHIAMARE IL COSTRUTTORE DI JsonParser
+            return JsonParser(parsed) # ERROR: this would call the constructor recursively and cause an infinite loop. FIX: use super() to avoid calling the JsonParser constructor again
         
         elif isinstance(elem, list):
             return [self._parse(x) for x in elem]
@@ -91,7 +91,7 @@ class JsonParser(dict):
         else:
             return elem"""
         
-    #deprecato - non serve più, ora il parsing ricorsivo viene fatto direttamente in __setitem__
+    # deprecated - no longer needed, recursive parsing now happens directly in __setitem__
     """def _parse(self, elem):
         if isinstance(elem, dict):
             parsed = {} 
@@ -99,7 +99,7 @@ class JsonParser(dict):
             for k, v in elem.items():
                 parsed[k] = self._parse(v)
 
-            # alternativa con comprehension (versione più compatta e senza dizionario intermedio):
+            # alternative using a comprehension (more compact and without an intermediate dictionary):
             # return {k: self._parse(v) for k, v in elem.items()}
 
             return parsed
@@ -111,17 +111,17 @@ class JsonParser(dict):
         return elem"""
     
     def _parse(self, value):
-        """Converte ricorsivamente dict e liste"""
+        """Recursively convert dicts and lists."""
 
-        if isinstance(value, JsonParser): # se è già un JsonParser, lo ritorna così com'è (evita di riconvertire un JsonParser già creato)
+        if isinstance(value, JsonParser): # if this is already a JsonParser, return it as-is and avoid converting it again
             return value
         
         if isinstance(value, dict): # and not isinstance(value, JsonParser):
             return JsonParser(value)
-            #alternativa se non voglio chiamare `JsonParser`
-            #parsed = JsonParser() # creo un JsonParser vuoto
+            # alternative if you do not want to call `JsonParser`
+            #parsed = JsonParser() # create an empty JsonParser
             #for k, v in value.items():
-                #parsed[k] = v # non c'e' bisogno di fare _parse(v) perché quando assegno parsed[k] = v, passa per __setitem__ che fa già il parsing ricorsivo di tutti i dict innestati
+                #parsed[k] = v # there is no need to call _parse(v) because parsed[k] = v already goes through __setitem__, which recursively parses nested dicts
             #return parsed
 
         elif isinstance(value, list):

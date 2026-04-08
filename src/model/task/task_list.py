@@ -1,7 +1,7 @@
 from .task import Task
 
 
-class TaskList(list[Task]): #classe TaskList composizione con classe Task.
+class TaskList(list[Task]): # TaskList class using composition with the Task class.
     
     def __repr__(self):
         out = "TaskList:\n"

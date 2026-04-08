@@ -4,10 +4,10 @@ from ctypes import c_uint32, c_ubyte, POINTER, byref
 import platform
 print(f"ARCHITECTURE: {platform.architecture()}")
 
-# Carica la DLL
+# Load the DLL
 dll = ctypes.CDLL(r"C:\Users\cpisa\Desktop\Release\PEChecksumDll.dll")
 
-# Firma C:
+# C signature:
 # t_uint32 GetChecksumPE(t_uint8* pSrcPe, t_uint32 dimSrcPe,
 #                        t_uint32* pChecksum, t_uint32* pCodErr)
 
@@ -25,7 +25,7 @@ def get_pe_checksum(path: str) -> int:
         data = f.read()
 
     if not data:
-        raise ValueError("File vuoto")
+        raise ValueError("Empty file")
 
     size = len(data)
     buf = (c_ubyte * size).from_buffer_copy(data)
@@ -41,7 +41,7 @@ def get_pe_checksum(path: str) -> int:
     )
 
     if ok == 0:
-        raise RuntimeError(f"GetChecksumPE fallita, codice errore={err.value}")
+        raise RuntimeError(f"GetChecksumPE failed, error code={err.value}")
 
     return checksum.value
 
@@ -50,5 +50,5 @@ def get_pe_checksum(path: str) -> int:
 
 exe_path = r"C:\Users\cpisa\Desktop\stream\DEVRASTA\NSPC\SWPG\SWAPPL\EXE\EXE1\fap1.ex1"
 chk = get_pe_checksum(exe_path)
-print(f"Checksum decimale: {chk}")
-print(f"Checksum esadecimale: 0x{chk:08X}")
+print(f"Decimal checksum: {chk}")
+print(f"Hex checksum: 0x{chk:08X}")
