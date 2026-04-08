@@ -1,4 +1,4 @@
-from model.file.file import File
+from .file import File
 
 
 class FileList(list[File]):
