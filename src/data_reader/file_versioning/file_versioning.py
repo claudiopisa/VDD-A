@@ -40,7 +40,7 @@ class FileVersioning(DataReader):
 
             for name in file_names:
                 p = Path(dir_path) / name
-                if p.suffix.lower() in allowed_ext: #suffix ritorna la parte finale
+                if p.suffix.lower() in allowed_ext: # suffix returns the file extension
                     # extract version (uses configured criteria when present)
                     try:
                         version = self._extract_version(p, criteria)
@@ -59,7 +59,7 @@ class FileVersioning(DataReader):
             r"(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)" if criteria is None else criteria,
             re.IGNORECASE
         )
-    # old regex json "version_extraction_criteria": "(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)",
+    # old JSON regex: "version_extraction_criteria": "(?:\\\\*|//|--|;|#).*Versione\\s*:?\\s*(\\d+\\.\\d+)",
      
         with open(path, "r", encoding="utf-8", errors="ignore") as f:
             for line in f:
@@ -71,16 +71,16 @@ class FileVersioning(DataReader):
 
         
 """def scan_files(root: Path, allowed_ext: set[str], exclude_dirs: set[str]):
-    exclude_dirs = {d.lower() for d in exclude_dirs} # crea set per dir escluse e estensioni ammesse
+    exclude_dirs = {d.lower() for d in exclude_dirs} # create sets for excluded directories and allowed extensions
     allowed_ext = {e.lower() for e in allowed_ext}
 
     for dirpath, dirnames, filenames in os.walk(root):
-        #per poter potare l alber odelle directory bisogna modificare dirnames a runtime
+        # to prune the directory tree, dirnames must be modified at runtime
         dirnames[:] = [d for d in dirnames if d.lower() not in exclude_dirs]
 
         for name in filenames:
             p = Path(dirpath) / name
-            if p.suffix.lower() in allowed_ext: #suffix ritorna la parte finale
+            if p.suffix.lower() in allowed_ext: # suffix returns the file extension
                 yield p"""
 
 

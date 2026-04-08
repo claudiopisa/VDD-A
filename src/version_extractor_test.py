@@ -3,12 +3,12 @@ from pathlib import Path
 
 #VERSION_REG = re.compile(r"(\\*|//|--|;|#).*Versione\\w*\\s*:?")
 
-#carica tutto il file in memoria e poi legge riga per riga
+# Load the whole file into memory and then read it line by line
 def extract_version_old(filepath, criteria):
     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read() #legge tutto il file e carica in memoria
+        content = f.read() # read the entire file into memory
     
-    # Cerca il pattern "Versione:" seguito dal numero di versione
+    # Search for the "Versione:" pattern followed by the version number
     match = re.search(criteria, content)
     
     if match:
@@ -21,7 +21,7 @@ VERSION_VALUE_RE = re.compile(
     re.IGNORECASE
 )
 
-#apre il file ma legge riga per riga, senza caricare l'intero file in memoria.
+# Open the file and read it line by line, without loading the whole file into memory.
 def extract_version(path: Path, criteria=None):
     version = None
 
@@ -41,7 +41,7 @@ def extract_version(path: Path, criteria=None):
             version = VERSION_VALUE_RE.search(line)
             if version:
                 found = True
-                #return m.group(1) #fermati alla prima istanza trovata
+                #return m.group(1) # stop at the first match found
             i += 1"""
                 
         """for i, line in enumerate(f):

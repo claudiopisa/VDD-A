@@ -8,7 +8,7 @@ class Task(Entry):
     name: str
     type_: str
     version: str
-    modified: str = "N/A"  # per ora non hai baseline precedente
+    modified: str = "N/A"  # there is no previous baseline for now
 
     # Static attribute. Keeps track of the max length of each field across all Task instances, used for formatting the output in a clean way.
     # key string values must be the exact same as the attribute class names 
@@ -23,6 +23,6 @@ class Task(Entry):
     # the max length of each field in the _length_cache dictionary every time a new Task
     # instance is created.
     #def __post_init__(self):
-     #   """Aggiorna i max ogni volta che un Task viene creato."""
+     #   """Update max lengths every time a Task is created."""
       #  for key, current_max in Task._length_cache.items():
        #     Task._length_cache[key] = max(current_max, len(str(getattr(self, key))))

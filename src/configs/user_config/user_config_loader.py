@@ -37,7 +37,7 @@ class UserConfigLoader:
         
         with path.open("r", encoding="utf-8") as file:
             data = json.load(file)
-            return data if return_dict else JsonParser(data) # se data è già un dict, JsonParser lo accetta direttamente
+            return data if return_dict else JsonParser(data) # if data is already a dict, JsonParser accepts it directly
   
     def __repr__(self):
         return f"User Configuration dump: {json.dumps(self.load(self.user_config_path, return_dict=True), indent=2)}"

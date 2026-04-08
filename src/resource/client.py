@@ -24,11 +24,17 @@ class Client(Client64):
 
         super(Client, self).__init__(module32='server.py', **server_kwargs)
         
-    def get_checksum(self, data):
+    def get_checksum(self, data: bytes):
         return self.request32('get_checksum', data)
     
-    def set_checksum(self, data, new_checksum):
+    def set_checksum(self, data: bytes, new_checksum: c_uint32):
         return self.request32('set_checksum', data, int(new_checksum))
     
-    def verify_checksum(self, data):
+    def get_timestamp(self, data: bytes):
+        return self.request32('get_timestamp', data)
+    
+    def set_timestamp(self, data: bytes, new_timestamp: c_uint32):
+        return self.request32('set_timestamp', data, int(new_timestamp))
+    
+    def verify_checksum(self, data: bytes):
         return self.request32('verify_checksum', data)
