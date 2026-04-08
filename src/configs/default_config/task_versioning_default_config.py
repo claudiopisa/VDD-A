@@ -42,7 +42,7 @@ class INISections:
 @dataclass(frozen=True)
 class ExternalRoots:
     app: str = SoftwareComponents.SAFETY_NUCLEUS          # "NSPC"
-    sys: str = SoftwareComponents.SAFETY_NUCLEUS_KERNEL   # "NS_KERNEL"
+    sys: str = SoftwareComponents.KERNEL   # "NS_KERNEL"
 
 
 @dataclass(frozen=True)

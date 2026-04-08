@@ -17,7 +17,7 @@ workspace = core_conf.stream_root_as_path
 #print(type(workspace))
 
 print(core_conf.components)
-component = core_conf.components.NSPC
+component = core_conf.components.SAFETY_NUCLEUS
 root = workspace / component
 
 print(f"Root: {root}")

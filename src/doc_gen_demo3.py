@@ -20,7 +20,7 @@ except Exception as e:
 
 workspace = global_cfg.get_stream_root(as_path=True)
 
-component = global_cfg.get_components().NSPC
+component = global_cfg.get_components().SAFETY_NUCLEUS
 root = workspace / component
 
 logger.debug("Root path: %s", root)

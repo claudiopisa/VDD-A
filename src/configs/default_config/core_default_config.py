@@ -37,7 +37,7 @@ class CoreDefaultConfig:
 
 # Utilizzo
 #print(CONFIG.roots.internal)  # ["NSPC"]
-#print(CONFIG.components.NSPC)  # "NSPC"
+#print(CONFIG.components.SAFETY_NUCLEUS)  # "NSPC"
 
 # Questo solleverà un errore (frozen=True)
 # CONFIG.roots.internal.append("test")  # Funziona ma modifica la lista (attenzione!)
