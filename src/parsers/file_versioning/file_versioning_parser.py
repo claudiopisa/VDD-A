@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
 from model.file.file_collection import FileCollection
-from utils import logger
+from utils import get_logger
 from ..xml_parser import XMLParser
+
+logger = get_logger(__name__)
 
 PARAGRAPH_TAG = "paragraph"
 SUBPARAGRAPH_TAG = "subparagraph"
@@ -24,8 +26,8 @@ class FileVersioningParser(XMLParser):
         self.paragraph_number = paragraph_number
         self.file_collection = file_collection
 
-        self.paragraph = ET.SubElement(parent=self.root, 
-                                       tag=PARAGRAPH_TAG, 
+        self.paragraph = ET.SubElement(self.root, 
+                           PARAGRAPH_TAG, 
                                        number=str(self.paragraph_number), 
                                        title=self.paragraph_title
                                        )
@@ -40,16 +42,16 @@ class FileVersioningParser(XMLParser):
 
     def parse(self):
         for i, (folder, files) in enumerate(self.file_collection.items(), start=1):
-            subparagraph = ET.SubElement(parent=self.paragraph, 
-                                         tag=SUBPARAGRAPH_TAG, 
+            subparagraph = ET.SubElement(self.paragraph, 
+                                         SUBPARAGRAPH_TAG, 
                                          number=f"{self.paragraph_number}.{i}", 
                                          title=folder
                                          )
-            table = ET.SubElement(parent=subparagraph, tag=TABLE_TAG)
+            table = ET.SubElement(subparagraph, TABLE_TAG)
             for file in files:
                 ET.SubElement(
-                    parent=table,
-                    tag=ROW_TAG,
+                    table,
+                    ROW_TAG,
                     name=file.name,
                     version=str(file.version),
                 ) 

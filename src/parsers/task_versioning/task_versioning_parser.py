@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
 from model.task.task_list import TaskList
-from utils import logger
+from utils import get_logger
 from ..xml_parser import XMLParser
+
+logger = get_logger(__name__)
 
 PARAGRAPH_TAG = "paragraph"
 SUBPARAGRAPH_TAG = "subparagraph"
@@ -24,8 +26,8 @@ class TaskVersioningParser(XMLParser):
         self.paragraph_number = paragraph_number
         self.task_list = task_list
 
-        self.paragraph = ET.SubElement(parent=self.root, 
-                                       tag=PARAGRAPH_TAG, 
+        self.paragraph = ET.SubElement(self.root, 
+                           PARAGRAPH_TAG, 
                                        number=str(self.paragraph_number), 
                                        title=self.paragraph_title
                                        )
