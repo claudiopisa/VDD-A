@@ -35,5 +35,18 @@ class TaskVersioningParser(XMLParser):
             logger.info("Task list parsed and XML structure created successfully.")
 
     def parse(self):
-        #TODO: implement parsing logic based on the structure of TaskList and the desired XML output
-        pass
+        table = ET.SubElement(parent=self.paragraph, tag=TABLE_TAG)
+
+        for task in self.task_list:
+            ET.SubElement(
+                table,
+                ROW_TAG,
+                name=task.name,
+                type=task.type_,
+                version=task.version,
+                modified=str(task.modified)
+            )
+
+        
+
+        
