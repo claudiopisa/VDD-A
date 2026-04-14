@@ -2,8 +2,9 @@
 
 from pathlib import Path
 
-from configs.config import Config
-from configs.default_config.core_default_config import SoftwareComponents
+from .config import Config
+from .default_config.core_default_config import SoftwareComponents
+from .default_config.task_versioning_default_config import Roots
 
 class CoreConfig(Config):
     """

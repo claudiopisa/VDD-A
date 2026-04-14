@@ -1,6 +1,8 @@
+from warnings import deprecated
+
 from .file import File
 
-
+@deprecated("FileList is deprecated. Use FileCollection instead.")
 class FileList(list[File]):
     def __repr__(self):
         out = "FileList:\n"

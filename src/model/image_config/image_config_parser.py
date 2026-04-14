@@ -4,6 +4,7 @@ from configparser import ConfigParser
 class ImageConfigParser:
     def __init__(self, ini_path: str | Path):
         self.ini_path = Path(ini_path)
+
         if not self.ini_path.exists():
             raise FileNotFoundError(f"INI file '{self.ini_path}' does not exist.")
         #if not self.ini_path.is_file():
@@ -27,7 +28,8 @@ class ImageConfigParser:
         #check if given section exists
         if not self.config.has_section(section):
             raise KeyError(f"Section '{section}' not found in INI file.")
-        #if such sections exists, check whether given option exists within
+        
+        #if such section exists, check whether given option exists within that section
         if not self.config.has_option(section, key):
             raise KeyError(f"Key '{key}' not found in section '{section}' of INI file.")
         
@@ -39,5 +41,5 @@ class ImageConfigParser:
             # raise custom exception to distinguish between "section not found" and "key not found"
             raise Exception(f"Section '{section}' not found in INI file: {self.ini_path}")
         
-        return dict(self.config.items(section)) # convert SectionProxy to a regular dictionary 
+        return dict(self.config.items(section)) # convert `SectionProxy` object to a regular dictionary 
     

@@ -3,7 +3,7 @@ from typing import ClassVar
 from model import Entry
 
 
-@dataclass
+@dataclass(frozen=True)
 class Task(Entry):
     name: str
     type_: str
@@ -14,7 +14,7 @@ class Task(Entry):
     # key string values must be the exact same as the attribute class names 
     _length_cache: ClassVar[dict[str, int]] = {
         "name": len("NAME"),
-        "type_": len("TYPE"),
+        "type_": len("TYPE_"),
         "version": len("VERSION"),
         "modified": len("MODIFIED"),
     }

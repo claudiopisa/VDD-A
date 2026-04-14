@@ -1,7 +1,7 @@
 from dataclasses import asdict, dataclass, field
 from typing import List, Tuple
 
-from configs.default_config.core_default_config import SoftwareComponents
+from .core_default_config import SoftwareComponents
 
 @dataclass(frozen=True)
 class AppTask:
@@ -19,10 +19,13 @@ class SysTask:
     KERNEL          : str = "V1_FileKernel"
     KERNEL_VERSION  : str = "RelKernel"
 
+# InclusionRules and ExclusionRules define here are the default rules for task versioning. 
+# They can be overridden by user-specific rules from JSON files, whereas these defaults provide a baseline 
+# for what to include or exclude when processing tasks.
 @dataclass(frozen=True)
 class InclusionRules:
     internal: str = "Imgconf.ini"
-    external: Tuple[str, ...] = field(default_factory=lambda: ("ixl.ini", "srlw.ini")) #This should be in the user config
+    external: Tuple[str, ...] = field(default_factory=lambda: ("ixl.ini", "srlw.ini")) 
 
 @dataclass(frozen=True)
 class ExclusionRules:
@@ -37,18 +40,18 @@ class ExclusionRules:
 class INISections:
     SETTINGS    : str = "Settings"
     CONTAINER   : str = "CONTAINER"
-    AP            : str = "AP"
+    AP          : str = "AP"
 
 @dataclass(frozen=True)
 class ExternalRoots:
-    app: str = SoftwareComponents.SAFETY_NUCLEUS          # "NSPC"
-    sys: str = SoftwareComponents.SAFETY_NUCLEUS_KERNEL   # "NS_KERNEL"
+    app: str = SoftwareComponents.SAFETY_NUCLEUS
+    sys: str = SoftwareComponents.KERNEL
 
 
 @dataclass(frozen=True)
 class Roots:
     #both app and sys has SAFETY_NUCLEUS as root
-    internal: str        = field(default_factory=lambda: SoftwareComponents.SAFETY_NUCLEUS)
+    internal: str = SoftwareComponents.SAFETY_NUCLEUS
     # whereas in external mode, app → NSPC and sys → NS_KERNEL
     external: ExternalRoots = field(default_factory=ExternalRoots)
 
@@ -80,4 +83,4 @@ class TaskVersioningDefaultConfig:
     rules: Rules = field(default_factory=Rules)
 
     def __repr__(self):
-        return f"TaskVersioningDefaultConfig(roots={asdict(self.roots)})"
+        return f"TaskVersioningDefaultConfig(roots={asdict(self.roots)}, sections={asdict(self.sections)}, app_task={asdict(self.app_task)}, sys_task={asdict(self.sys_task)}, num_tasks='{self.num_tasks}', rules={asdict(self.rules)})"

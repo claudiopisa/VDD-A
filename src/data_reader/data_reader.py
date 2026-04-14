@@ -69,7 +69,7 @@ class DataReader(ABC):
               
         return path
     
-    # alternative to 'setattr' to get data paths as attributes
+    # alternative to 'setattr' to get data paths as attributes (via dot notation)
     def __getattr__(self, name: str) -> NormalizedValue:
         if name not in self._data:
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")

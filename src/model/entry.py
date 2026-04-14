@@ -11,7 +11,6 @@ _LENGTH_CACHE_ATTR: str = "_length_cache"
 class EntryContractWarning(UserWarning):
     pass
 
-@dataclass(frozen=True)
 class Entry(ABC):
     _strict_format: ClassVar[bool] = False
 

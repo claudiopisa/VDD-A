@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
+from .core_default_config import SoftwareComponents
 
 @dataclass(frozen=True)  # frozen=True makes the instance immutable
 class ExclusionRules:
@@ -38,7 +39,8 @@ class FileVersioningDefaultConfig:
     User-specific config (version_extraction_criteria, mode, metadata)
     come from JSON files and should NOT be in this default config.
     """
-    root: List[str] = field(default_factory=lambda: ["NSPC"])
+    #root: List[str] = field(default_factory=lambda: ["NSPC"])
+    root: str = SoftwareComponents.SAFETY_NUCLEUS
     version_extraction_criteria: str = r"(?:\\\\*|//|--|;|#).*Versione\s*:?\\s*(\d+\.\d+)" 
     rules: Rules = field(default_factory=Rules)
     

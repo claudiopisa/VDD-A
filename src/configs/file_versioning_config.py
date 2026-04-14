@@ -1,9 +1,9 @@
 # FileVersioningConfig class inherits from Config abstract class
 
 from pathlib import Path
-from configs.config import Config
-from configs.core_config import CoreConfig
-from configs.default_config.file_versioning_default_config import FileVersioningDefaultConfig, Rules, ExclusionRules, InclusionRules
+from .config import Config
+from .core_config import CoreConfig
+from .default_config.file_versioning_default_config import Rules, ExclusionRules, InclusionRules
 
 
 class FileVersioningConfig(Config):
@@ -13,7 +13,7 @@ class FileVersioningConfig(Config):
     Automatically loads FileVersioningDefaultConfig through DefaultConfigLoader.
     
     Provides access to configuration data through:
-    - self.user_config: User-specific configuration from JSON file (DottedDict)
+    - self.user_config: User-specific configuration from JSON file (JsonParser for dot notation quick access)
     - self.default_config: Static structural defaults (FileVersioningDefaultConfig dataclass)
     
     Example usage:
@@ -32,6 +32,7 @@ class FileVersioningConfig(Config):
     def __init__(self, user_config_path: str | Path, core_user_config_path: str | Path | CoreConfig):
         self.user_config_path = user_config_path
         self.user_config = self.load_user_config(user_config_path)
+        
         # DefaultConfigLoader will automatically load FileVersioningDefaultConfig
         self.default_config = self.load_default_config()
         if isinstance(core_user_config_path, CoreConfig):

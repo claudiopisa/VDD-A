@@ -1,8 +1,8 @@
 # TaskVersioningConfig class inherits from Config abstract class
 
 from pathlib import Path
-from configs.config import Config
-from configs.core_config import CoreConfig
+from .config import Config
+from .core_config import CoreConfig
 
 class TaskVersioningConfig(Config):
     """
@@ -11,7 +11,7 @@ class TaskVersioningConfig(Config):
     Automatically loads TaskVersioningDefaultConfig through DefaultConfigLoader.
     
     Provides access to configuration data through:
-    - self.user_config: User-specific configuration from JSON file (DottedDict)
+    - self.user_config: User-specific configuration from JSON file (JsonParser for dot notation quick access)
     - self.default_config: Static structural defaults (TaskVersioningDefaultConfig dataclass)
     
     Example usage:

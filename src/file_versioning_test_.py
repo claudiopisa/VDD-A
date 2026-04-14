@@ -1,5 +1,6 @@
 from data_reader import FileVersioning
 from configs import CoreConfig, FileVersioningConfig
+from parsers import generate_file_versioning_xml
 from utils import setup_logging, get_logger
 
 setup_logging(level = "DEBUG")
@@ -13,3 +14,4 @@ reader = FileVersioning(config=fv_conf)
 out = reader.scan_files()
 
 print(out)
+

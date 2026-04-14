@@ -30,7 +30,7 @@ class CoreDefaultConfig:
     image_config_name: str = "Imgconf.ini"
     
     def __repr__(self):
-        return f"CoreDefaultConfig(roots={asdict(self.roots)}, components={asdict(self.components)}, image_config_name='{self.image_config_name}')"
+        return f"CoreDefaultConfig(components={asdict(self.components)}, image_config_name='{self.image_config_name}')"
     
 # Singleton instance
 #CONFIG = CoreDefaultConfig()
