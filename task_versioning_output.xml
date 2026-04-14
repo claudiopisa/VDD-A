@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TaskVersioning>
+  <paragraph number="3" title="TASK VERSION TABLE">
+    <table>
+      <task name="BOOT" type="SYSTEM" version="&lt;TODO&gt;" modified="N/A" />
+      <task name="BOOTAP" type="SYSTEM" version="&lt;TODO&gt;" modified="N/A" />
+      <task name="LOADER" type="SYSTEM" version="&lt;TODO&gt;" modified="N/A" />
+      <task name="KERNEL" type="SYSTEM" version="D.00.11" modified="N/A" />
+      <task name="INIT" type="PG" version="D.00.15" modified="N/A" />
+      <task name="SYNC" type="PG" version="D.00.10" modified="N/A" />
+      <task name="POSTPROT" type="PG" version="D.00.04" modified="N/A" />
+      <task name="GESTBCK" type="PG" version="W.04.03" modified="N/A" />
+      <task name="TXINTSTA" type="PG" version="D.00.05" modified="N/A" />
+      <task name="VOTSTA" type="PG" version="D.00.05" modified="N/A" />
+      <task name="GESTBCK" type="PG" version="W.04.03" modified="N/A" />
+      <task name="RXEH" type="PG" version="D.00.08" modified="N/A" />
+      <task name="RXETH" type="PG" version="D.00.08" modified="N/A" />
+      <task name="RXETH" type="PG" version="D.00.08" modified="N/A" />
+      <task name="COMTMRST" type="PG" version="D.00.04" modified="N/A" />
+      <task name="RASTARX" type="PG" version="D.00.04" modified="N/A" />
+      <task name="SLERX" type="PG" version="D.00.05" modified="N/A" />
+      <task name="GCMIESSFROMSLE" type="PG" version="D.00.05" modified="N/A" />
+      <task name="GCMIETRFROMSLE" type="PG" version="W.01.07" modified="N/A" />
+      <task name="SVPRX" type="PG" version="W.02.07" modified="N/A" />
+      <task name="GCMIESSFROMSVP" type="PG" version="W.03.04" modified="N/A" />
+      <task name="SAFEPRX" type="PG" version="W.03.05" modified="N/A" />
+      <task name="SARX" type="PG" version="D.00.09" modified="N/A" />
+      <task name="RXEU" type="PG" version="D.00.00" modified="N/A" />
+      <task name="ELABCDAW" type="IXL" version="D.00.09" modified="N/A" />
+      <task name="RXART" type="PG" version="D.00.11" modified="N/A" />
+      <task name="COMEST" type="PG" version="D.00.12" modified="N/A" />
+      <task name="KEYM" type="PG" version="D.00.07" modified="N/A" />
+      <task name="CMORX" type="PG" version="D.00.03" modified="N/A" />
+      <task name="CMOTX" type="PG" version="D.00.03" modified="N/A" />
+      <task name="COMSTAZ" type="PG" version="D.00.03" modified="N/A" />
+      <task name="GESTIM" type="PG" version="D.00.03" modified="N/A" />
+      <task name="IPARX" type="PG" version="D.00.09" modified="N/A" />
+      <task name="GLOG" type="PG" version="D.00.10" modified="N/A" />
+      <task name="IPATX" type="PG" version="D.00.06" modified="N/A" />
+      <task name="MKCMDCDAW" type="IXL" version="D.00.09" modified="N/A" />
+      <task name="TXEU" type="PG" version="D.00.00" modified="N/A" />
+      <task name="COMTMRST" type="PG" version="D.00.04" modified="N/A" />
+      <task name="GHMI" type="PG" version="D.00.04" modified="N/A" />
+      <task name="GCMIETRTOSLE" type="PG" version="W.01.06" modified="N/A" />
+      <task name="GCMIESSTOSLE" type="PG" version="D.00.06" modified="N/A" />
+      <task name="SLETX" type="PG" version="D.00.05" modified="N/A" />
+      <task name="GCMIESSTOSVP" type="PG" version="W.03.05" modified="N/A" />
+      <task name="SVPTX" type="PG" version="W.02.07" modified="N/A" />
+      <task name="RASTATX" type="PG" version="W.03.05" modified="N/A" />
+      <task name="SAFEPTX" type="PG" version="W.03.05" modified="N/A" />
+      <task name="SATX" type="PG" version="D.00.09" modified="N/A" />
+      <task name="POSTPROT" type="PG" version="D.00.04" modified="N/A" />
+      <task name="GESTAVR" type="PG" version="D.00.03" modified="N/A" />
+      <task name="TXART" type="PG" version="D.00.11" modified="N/A" />
+      <task name="TXINTCOM" type="PG" version="D.00.04" modified="N/A" />
+      <task name="VOTCOM" type="PG" version="D.00.05" modified="N/A" />
+      <task name="TXEH" type="PG" version="D.00.06" modified="N/A" />
+      <task name="TXART" type="PG" version="D.00.11" modified="N/A" />
+      <task name="TXETH" type="PG" version="D.00.08" modified="N/A" />
+      <task name="SYNC" type="PG" version="D.00.10" modified="N/A" />
+      <task name="FINE" type="PG" version="D.00.05" modified="N/A" />
+    </table>
+  </paragraph>
+</TaskVersioning>
