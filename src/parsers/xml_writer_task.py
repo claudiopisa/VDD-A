@@ -1,8 +1,10 @@
 # src/xml/build_ch3_xml.py
 from __future__ import annotations
 from pathlib import Path
+from warnings import deprecated
 import xml.etree.ElementTree as ET
 
+@deprecated(reason="old function")
 def build_ch3_xml(rows, title: str, out_xml: str | Path):
     out_xml = Path(out_xml)
     doc = ET.Element("document")

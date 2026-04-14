@@ -1,7 +1,9 @@
+from warnings import deprecated
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from pathlib import Path
 
+@deprecated(reason="old function")
 def build_ch3_xml(tasks, out_xml: Path):
     root = ET.Element("document")
 

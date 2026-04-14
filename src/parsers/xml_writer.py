@@ -1,12 +1,13 @@
 from pathlib import Path
 from collections import defaultdict
+from warnings import deprecated
 from lxml import etree
 from typing import List, Tuple
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
 
-
+@deprecated(reason="old function")
 def build_ch2_xml_attr_rows(rows: List[Tuple[str, str]], title: str, out: str | Path = "chapter2_new.xml") -> Path:
     """Create chapter2 XML where each <table> contains <row name="..." version="..."/> elements.
 
@@ -43,7 +44,7 @@ def build_ch2_xml_attr_rows(rows: List[Tuple[str, str]], title: str, out: str | 
 
     return out_path
 
-
+@deprecated(reason="old function")
 def build_ch3_xml2(rows, title: str, out_xml: str | Path):
     out_xml = Path(out_xml)
     doc = ET.Element("document")
@@ -60,6 +61,8 @@ def build_ch3_xml2(rows, title: str, out_xml: str | Path):
     out_xml.parent.mkdir(parents=True, exist_ok=True)
     ET.ElementTree(doc).write(out_xml, encoding="utf-8", xml_declaration=True)
 
+
+@deprecated(reason="old class")
 @dataclass
 class TaskRow:
     name: str
@@ -67,7 +70,7 @@ class TaskRow:
     version: str
     modified: str = "N/A"
 
-
+@deprecated(reason="old function")
 def build_ch3_xml(rows: list[TaskRow], out_xml: str | Path, title: str = "TASK VERSION TABLE") -> None:
     out_xml = Path(out_xml)
 
