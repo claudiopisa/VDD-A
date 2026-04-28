@@ -6,7 +6,7 @@ from model import Entry
 @dataclass(frozen=True)
 class Task(Entry):
     name: str
-    type_: str
+    type: str
     version: str
     modified: str = "N/A"  # there is no previous baseline for now
 
@@ -14,7 +14,7 @@ class Task(Entry):
     # key string values must be the exact same as the attribute class names 
     _length_cache: ClassVar[dict[str, int]] = {
         "name": len("NAME"),
-        "type_": len("TYPE_"),
+        "type": len("TYPE"),
         "version": len("VERSION"),
         "modified": len("MODIFIED"),
     }

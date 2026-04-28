@@ -25,8 +25,9 @@ class TaskVersioning(DataReader):
 
     def __init__(self, config: TaskVersioningConfig):
         super().__init__(config=config)
-        self.prev_config: Optional[dict[str, str]] = {}
-        self.prev_sys_config: Optional[dict[str, str]] = {}
+        #prev configuration should be defined inside child classes, as the structure may differ between internal and external kernel mode
+        #self.prev_config: Optional[dict[str, str]] = {}
+        #self.prev_sys_config: Optional[dict[str, str]] = {}
         self.tasks: TaskList = TaskList()
 
         if self.config.has_previous_release() and not self.config.previous_release_root:
@@ -59,10 +60,10 @@ class TaskVersioning(DataReader):
 
         if not is_prev:
             modified = "N/A" if not self._has_prev_imgconf() else ("NO" if self.prev_sys_config.get(kernel) == kernel_version else "YES")
-            self.tasks.append(Task(name=boot, type_="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=boot_ap, type_="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=loader, type_="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=kernel, type_="SYSTEM", version=kernel_version, modified=modified))
+            self.tasks.append(Task(name=boot, type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name=boot_ap, type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name=loader, type="SYSTEM", version="<TODO>"))
+            self.tasks.append(Task(name=kernel, type="SYSTEM", version=kernel_version, modified=modified))
         else:
             self.prev_sys_config[kernel] = kernel_version
 

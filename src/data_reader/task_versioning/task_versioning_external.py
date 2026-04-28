@@ -15,9 +15,7 @@ from model.task.task import Task
 from model.task.task_list import TaskList
 from utils.logger import get_logger
 
-
 logger = get_logger(__name__)
-
 
 type PathInput = str | Path
 type PathSequence = Sequence[PathInput]
@@ -26,60 +24,6 @@ type ImageConfigPathDict = dict[str, Path | list[Path]]
 class TaskVersioningExternal(TaskVersioning):
         
     # Kernel is external: we have 1 ini file for the sys tasks and N ini files (usually 2, ixl.ini and srlw.ini) for app tasks (current stream), and optionally the same for the previous stream, resulting in a max of 2N app inis + 2 sys ini (current + previous). 
-
-    def __init__old(self, reader_config: TaskVersioningConfig):
-        self.config = reader_config
-        self.core = self.config.core
-
-        if self.core.is_kernel_internal:
-            raise ValueError("TaskVersioningExternal should not be used in internal kernel mode, check your core config kernel_mode value")
-        
-        #if not self.config.app_tasks:
-            #raise ValueError("No app tasks specified in config, at least one is required for external kernel mode")
-        
-        if self.config.has_previous_release() and not self.config.previous_release_root:
-            raise ValueError("Previous release enabled but no previous_release_root specified in config")
-        
-        #retireve roots and paths based on kernel mode
-        workspace = self.core.stream_root_as_path
-        logger.debug("Workspace resolved: %s", workspace)
-
-        # create current paths
-        self.sys_imgconf_path, self.app_imgconf_paths, self.taskorder_imgconf_path = self._retrieve_paths(workspace)
-
-        logger.debug("Resolved sys_imgconf_path: %s", self.sys_imgconf_path)
-        logger.debug("Resolved app_imgconf_paths: %s", self.app_imgconf_paths)
-        logger.debug("Resolved taskorder_imgconf_path: %s", self.taskorder_imgconf_path)
-
-        self.prev_sys_imgconf_path = None
-        self.prev_app_imgconf_paths = None
-        self.prev_taskorder_imgconf_path = None
-
-        #create prev paths
-        if self.config.has_previous_release():
-            prev_workspace = self.config.previous_release_root_as_path
-            logger.debug("Previous workspace resolved: %s", prev_workspace)
-
-            self.prev_sys_imgconf_path, self.prev_app_imgconf_paths, self.prev_taskorder_imgconf_path = self._retrieve_paths(prev_workspace)
-
-            logger.debug("Resolved prev_sys_imgconf_path: %s", self.prev_sys_imgconf_path)
-            logger.debug("Resolved prev_app_imgconf_paths: %s", self.prev_app_imgconf_paths)
-            logger.debug("Resolved prev_taskorder_imgconf_path: %s", self.prev_taskorder_imgconf_path)
-
-         # DataReader normalizes all paths (single or list/tuple)
-        super().__init__(
-            sys_imgconf=self.sys_imgconf_path,
-            app_imgconf=self.app_imgconf_paths,
-            task_order=self.taskorder_imgconf_path,
-            prev_sys_imgconf=self.prev_sys_imgconf_path,
-            prev_app_imgconf=self.prev_app_imgconf_paths,
-            prev_task_order=self.prev_taskorder_imgconf_path,
-        )
-
-        self.prev_sys_config: dict[str, str] = {}
-        self.prev_app_config: dict[str, deque[str]] = defaultdict(deque)
-        self.tasks: TaskList = TaskList()
-
     def __init__(self, config: TaskVersioningConfig):
         super().__init__(config=config)
 
@@ -101,7 +45,6 @@ class TaskVersioningExternal(TaskVersioning):
 
         self.prev_sys_config: dict[str, str] = {}
         self.prev_app_config: dict[str, deque[str]] = defaultdict(deque)
-        self.tasks: TaskList = TaskList()
 
 
     #handle both current and prev case
@@ -173,34 +116,10 @@ class TaskVersioningExternal(TaskVersioning):
 
         return sections
 
-
-    def _has_prev_imgconf_old(self) -> bool:
-        return (
-            self.config.has_previous_release()
-            and self.prev_sys_imgconf is not None
-            and self.prev_sys_imgconf.exists()
-            and bool(self.prev_app_imgconf_paths)
-            and self.prev_task_order is not None
-            and self.prev_task_order.exists()
-        )
-    
-
     def _flatten_taskorder_names(self, sections: list[dict[str, str]]) -> list[str]:
         ordered_names: list[str] = []
 
         for sec in sections: # for each AP0, ..., APn
-            # Extract indices from NomeTask{i} keys without using regex
-            #indices: list[int] = []
-            #prefix = self.config.app_name_key  # es: NomeTask
-
-            #for key in sec.keys():
-                #if key.startswith(prefix):
-                  # suffix = key[len(prefix):]
-                    #if suffix.isdigit():
-                     #   indices.append(int(suffix))
-
-            #indices.sort()
-
             size = len(sec) # number of tasks within section
 
             for i in range(1, size + 1):
@@ -222,33 +141,23 @@ class TaskVersioningExternal(TaskVersioning):
         for ini_path in app_paths:
             section = ImageConfigParser(ini_path).get_section(self.config.app_external_section)
 
-            # Find the indices available through NomeTask{i}
-            """indices: list[int] = []
-            prefix = self.config.app_name_key
-            for key in section.keys():
-                if key.startswith(prefix):
-                    suffix = key[len(prefix):]
-                    if suffix.isdigit():
-                        indices.append(int(suffix))
-            indices = sorted(set(indices))"""
-
             size = len(section)
 
             for i in range(1, size + 1):
                 raw_name = section.get(f"{self.config.app_name_key}{i}", "").strip()
-                type_ = section.get(f"{self.config.app_type_key}{i}", "").strip()
+                type = section.get(f"{self.config.app_type_key}{i}", "").strip()
                 version = section.get(f"{self.config.app_version_key}{i}", "").strip()
 
                 #if not raw_name:
                 #    continue
-                #if type_ and type_.upper() in self.config.excluded_task_types:
+                #if type and type.upper() in self.config.excluded_task_types:
                   #  continue
 
-                if raw_name and (type_.upper() not in self.config.excluded_task_types):
+                if raw_name and (type.upper() not in self.config.excluded_task_types):
                     name = Path(raw_name).stem
                     catalog[name].append(
                         {
-                            "type": type_ if type_ else "APP",
+                            "type": type if type else "APP",
                             "version": version if version else "<N/A>",
                         }
                     )
@@ -299,7 +208,7 @@ class TaskVersioningExternal(TaskVersioning):
             self.tasks.append(
                 Task(
                     name=name,
-                    type_=curr_type,
+                    type=curr_type,
                     version=curr_version,
                     modified=modified,
                 )

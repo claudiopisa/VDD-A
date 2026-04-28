@@ -16,6 +16,21 @@ class SoftwareComponents:
         return f"Available components(NSPC='{self.SAFETY_NUCLEUS}', NS_KERNEL='{self.KERNEL}', SIMNS='{self.SIMULATOR}', SWNV='{self.NON_VITAL_ENV}', TOOLS='{self.NON_VITAL_TOOLS}').\n Usage example: config_object.components.SAFETY_NUCLEUS to access the string 'NSPC'."
 
 @dataclass(frozen=True)
+class XMLTag:
+    PARAGRAPH: str = "paragraph"
+    SUBPARAGRAPH: str = "subparagraph"
+    TABLE: str = "table"
+
+@dataclass(frozen=True)
+class XMLGeneratorConfig:
+    #ROOT_NAME: str = "default_root"
+    IDENTATION: bool = True
+    INDENT_SPACE: str = "  "
+    ENCODING: str = "utf-8"
+    XML_DECLARATION: bool = True
+    TAGS: XMLTag = field(default_factory=XMLTag)
+
+@dataclass(frozen=True)
 class CoreDefaultConfig:
     """
     Default configuration for Core VDD documents.
@@ -27,6 +42,7 @@ class CoreDefaultConfig:
     # Structural defaults
     #roots:      Roots       = field(default_factory=Roots)
     components: SoftwareComponents  = field(default_factory=SoftwareComponents)
+    xml_generator_config: XMLGeneratorConfig = field(default_factory=XMLGeneratorConfig)
     image_config_name: str = "Imgconf.ini"
     
     def __repr__(self):

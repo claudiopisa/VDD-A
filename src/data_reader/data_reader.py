@@ -9,20 +9,7 @@ type PathValue = PathInput | Sequence[PathInput]
 type NormalizedValue = Path | tuple[Path, ...]
 
 class DataReader(ABC):
-    
-    def __init__old(self, reader_config: Config, **data_paths: PathValue):
-        self.reader_config = reader_config
-        
-        self._data: dict[str, NormalizedValue] = {}
-        for key, path in data_paths.items():
-            if path is not None:
-                if isinstance(path, (list, tuple)):
-                    # if the path is a list or tuple, we normalize each path in the list and store the list of DataPath objects
-                    self._data[key] = tuple(self._normalize_path(p) for p in path) # what if i use a tuple ?
-                else:
-                    self._data[key] = self._normalize_path(path) # use key as name and path as value in the dict
-                #setattr(self, key, path) # set attribute for direct access (e.g., self.imgconf)
-                 
+  
     def __init__(self, config: Config):
         self.config = config
         self.core = self.config.core
@@ -33,7 +20,7 @@ class DataReader(ABC):
             if path is not None:
                 if isinstance(path, (list, tuple)):
                     # if the path is a list or tuple, we normalize each path in the list and store the list of DataPath objects
-                    self._data[key] = tuple(self._normalize_path(p) for p in path) # what if i use a tuple ?
+                    self._data[key] = tuple(self._normalize_path(p) for p in path)
                 else:
                     self._data[key] = self._normalize_path(path) # use key as name and path as value in the dict
     

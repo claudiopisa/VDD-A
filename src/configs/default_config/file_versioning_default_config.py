@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
-from .core_default_config import SoftwareComponents
+from .core_default_config import SoftwareComponents, XMLTag
 
 @dataclass(frozen=True)  # frozen=True makes the instance immutable
 class ExclusionRules:
@@ -31,6 +31,11 @@ class Rules:
     inclusion: InclusionRules = field(default_factory=InclusionRules)
 
 @dataclass(frozen=True)
+class FileVersioningTag(XMLTag):
+    ROW: str = "file"
+
+
+@dataclass(frozen=True)
 class FileVersioningDefaultConfig:
     """
     Default configuration for file versioning operations.
@@ -43,7 +48,8 @@ class FileVersioningDefaultConfig:
     root: str = SoftwareComponents.SAFETY_NUCLEUS
     version_extraction_criteria: str = r"(?:\\\\*|//|--|;|#).*Versione\s*:?\\s*(\d+\.\d+)" 
     rules: Rules = field(default_factory=Rules)
-    
+    tags: FileVersioningTag = field(default_factory=FileVersioningTag)
+
 
 # Singleton instance
 """CONFIG = FileVersioningDefaultConfig()

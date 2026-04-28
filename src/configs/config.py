@@ -29,7 +29,7 @@ class Config():
             path: Path to the JSON configuration file
             
         Returns:
-            DottedDict with the loaded configuration
+            JasonParser object, i.e. a dict-like object with the loaded configuration
         """
         config_data = UserConfigLoader.load(path)
         self._apply_and_validate_config(config_data)

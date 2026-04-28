@@ -4,6 +4,6 @@
     "mode": "version",
     "metadata": {
       "title": "LIST OF WSPHS+ SW FILES AND RELEVANT VERSIONS",
-      "columns_name" : ["File name", "File version"]
+      "columns_name" : ["Name", "Version"]
     }   
 }

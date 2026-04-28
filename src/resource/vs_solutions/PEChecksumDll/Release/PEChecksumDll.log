@@ -1,0 +1,18 @@
+﻿Build started 08/04/2026 17:55:07.
+     1>Project "C:\Users\cpisa\Desktop\exodia_eulynx\SONS_TOOLS\PEChecksumDll\PEChecksumDll.vcxproj" on node 2 (Rebuild target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I..\INCLUDE /I..\..\NS_KERNEL\SWPG\INCLUDE /I..\..\NS_KERNEL\SWPG\SONS\INCLUDE /Zi /nologo /W4 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D KRNTSKIMGDLL_EXPORTS /D DLL_IMPORT /D _WINDLL /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt pecheck.cpp
+         pecheck.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"..\Deliverables\LIB\Release\PEChecksumDll.dll" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\Deliverables\LIB\Release /LIBPATH:..\..\NS_KERNEL\SWPG\\LIB\LIB1 /LIBPATH:..\Deliverables\LIB\Release /LIBPATH:..\..\NS_KERNEL\SWPG\SONS\INCLUDE /LIBPATH:..\..\NS_KERNEL\SWPG\\LIB\LIB1 libsys.lb1 LibGestPE.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:LIBC.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:"..\Deliverables\LIB\Release\PEChecksumDll.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"..\Deliverables\LIB\Release\PEChecksumDll.lib" /MACHINE:X86 /SAFESEH /DLL Release\pecheck.obj
+            Creating library ..\Deliverables\LIB\Release\PEChecksumDll.lib and object ..\Deliverables\LIB\Release\PEChecksumDll.exp
+     1>LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+         Generating code
+         All 5 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+         Finished generating code
+         PEChecksumDll.vcxproj -> C:\Users\cpisa\Desktop\exodia_eulynx\SONS_TOOLS\PEChecksumDll\..\Deliverables\LIB\Release\PEChecksumDll.dll
+     1>Done Building Project "C:\Users\cpisa\Desktop\exodia_eulynx\SONS_TOOLS\PEChecksumDll\PEChecksumDll.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.69

@@ -99,6 +99,26 @@ class FileVersioningConfig(Config):
     @property
     def columns_name(self):
         return self.user_config.metadata.columns_name
+
+    @property
+    def tags(self):
+        return self.default_config.tags
+
+    @property
+    def paragraph_tag(self):
+        return self.tags.PARAGRAPH
+
+    @property
+    def subparagraph_tag(self):
+        return self.tags.SUBPARAGRAPH
+
+    @property
+    def table_tag(self):
+        return self.tags.TABLE
+
+    @property
+    def row_tag(self):
+        return self.tags.ROW
     
     def __repr__(self):
         pretty_print_str_user = "File Versioning User Configuration:\n"

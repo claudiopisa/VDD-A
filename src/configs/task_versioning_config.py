@@ -102,7 +102,7 @@ class TaskVersioningConfig(Config):
     
     @property
     def app_type_key(self):
-        return self.app_task.type_
+        return self.app_task.type
     
     @property
     def app_version_key(self):
@@ -172,5 +172,25 @@ class TaskVersioningConfig(Config):
     @property
     def ap_section_key(self):
         return self.default_config.sections.AP
+
+    @property
+    def tags(self):
+        return self.default_config.tags
+
+    @property
+    def paragraph_tag(self):
+        return self.tags.PARAGRAPH
+
+    @property
+    def subparagraph_tag(self):
+        return self.tags.SUBPARAGRAPH
+
+    @property
+    def table_tag(self):
+        return self.tags.TABLE
+
+    @property
+    def row_tag(self):
+        return self.tags.ROW
     
 

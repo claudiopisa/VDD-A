@@ -1,13 +1,13 @@
 from dataclasses import asdict, dataclass, field
 from typing import List, Tuple
 
-from .core_default_config import SoftwareComponents
+from .core_default_config import SoftwareComponents, XMLTag
 
 @dataclass(frozen=True)
 class AppTask:
     name    : str = "NomeTask"
     path    : str = "V1_FileTask"
-    type_   : str = "TipoTask" #Note: `type` is a reserved keyword, hence the underscore suffix
+    type    : str = "TipoTask"
     version : str = "RelTask"
 
 
@@ -61,6 +61,11 @@ class Rules:
     exclusion: ExclusionRules = field(default_factory=ExclusionRules)
 
 @dataclass(frozen=True)
+class TaskVersioningTag(XMLTag):
+    ROW: str = "task"
+
+
+@dataclass(frozen=True)
 class TaskVersioningDefaultConfig:
     """
     Default configuration for task versioning operations.
@@ -81,6 +86,7 @@ class TaskVersioningDefaultConfig:
     # misc
     num_tasks: str = "NumTask"
     rules: Rules = field(default_factory=Rules)
+    tags: TaskVersioningTag = field(default_factory=TaskVersioningTag)
 
     def __repr__(self):
         return f"TaskVersioningDefaultConfig(roots={asdict(self.roots)}, sections={asdict(self.sections)}, app_task={asdict(self.app_task)}, sys_task={asdict(self.sys_task)}, num_tasks='{self.num_tasks}', rules={asdict(self.rules)})"

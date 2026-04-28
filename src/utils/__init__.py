@@ -1,2 +1,2 @@
-from .logger import setup_logging, get_logger
+from .logger import set_logger, get_logger
 from .json_parser import JsonParser

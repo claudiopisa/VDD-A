@@ -12,7 +12,6 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-
 class TaskVersioningInternal(TaskVersioning):
 
     def __init__(self, config: TaskVersioningConfig):
@@ -39,6 +38,9 @@ class TaskVersioningInternal(TaskVersioning):
         super().parse_data_paths(imgconf=curr_path, prev_imgconf=prev_path)
 
         #self.prev_config: dict[str, str] = {}
+        self.prev_config: Optional[dict[str, str]] = {}
+        self.prev_sys_config: Optional[dict[str, str]] = {}
+
         #self.tasks: TaskList = TaskList()
 
     def _retrieve_paths(self, is_prev: bool) -> Path:
@@ -58,24 +60,6 @@ class TaskVersioningInternal(TaskVersioning):
             and "prev_imgconf" in self._data
         )
 
-    """def _read_sys_tasks(self, section: dict[str, str], is_prev: bool):
-        boot           = Path(section.get(self.config.boot_key, " ")).stem.upper()
-        boot_ap        = Path(section.get(self.config.boot_ap_key, " ")).stem.upper()   
-        loader         = Path(section.get(self.config.loader_key, " ")).stem.upper()
-        kernel         = Path(section.get(self.config.kernel_key, " ")).stem.upper()
-        kernel_version = section.get(self.config.kernel_version_key, " ").strip().upper()
-
-        if not is_prev:
-            modified = "N/A" if not self._has_prev_imgconf() else (
-                "NO" if self.prev_config.get(kernel) == kernel_version else "YES"
-            )
-            self.tasks.append(Task(name=boot,      type="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=boot_ap,   type="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=loader,    type="SYSTEM", version="<TODO>"))
-            self.tasks.append(Task(name=kernel,    type="SYSTEM", version=kernel_version, modified=modified))
-        else:
-            self.prev_config[kernel] = kernel_version"""
-
     def _read_app_tasks(self, section: dict[str, str], is_prev: bool):
         if is_prev and not self._has_prev_imgconf():
             raise ValueError("Previous imgconf not available but trying to read previous app tasks")
@@ -89,9 +73,9 @@ class TaskVersioningInternal(TaskVersioning):
             )
 
         for i in range(1, num_tasks + 1):
-            type_ = section.get(f"{self.config.app_type_key}{i}", "").strip().upper()
+            type = section.get(f"{self.config.app_type_key}{i}", "").strip().upper()
 
-            if type_.upper() not in self.config.excluded_task_types:
+            if type.upper() not in self.config.excluded_task_types:
                 raw_name = section.get(f"{self.config.app_path_key}{i}", "").strip()
                 version = section.get(f"{self.config.app_version_key}{i}", "").strip()
 
@@ -107,7 +91,7 @@ class TaskVersioningInternal(TaskVersioning):
                         modified = "N/A" if not self._has_prev_imgconf() else (
                             "NO" if self.prev_config.get(name) == version else "YES"
                         )
-                        self.tasks.append(Task(name=name, type_=type_, version=version, modified=modified))
+                        self.tasks.append(Task(name=name, type=type, version=version, modified=modified))
                     else:
                         self.prev_config[name] = version
 
