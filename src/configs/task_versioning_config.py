@@ -140,6 +140,10 @@ class TaskVersioningConfig(Config):
     @property
     def title(self):
         return self.user_config.metadata.title
+
+    @property
+    def columns_name(self):
+        return self.user_config.metadata.columns_name
     
     @property
     def app_tasks(self):

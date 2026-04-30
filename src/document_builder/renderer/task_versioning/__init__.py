@@ -1,1 +1,1 @@
-from .task_versioning_render import TaskVersioningRenderer
+from .task_versioning_renderer import TaskVersioningRenderer

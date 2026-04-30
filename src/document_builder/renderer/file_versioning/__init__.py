@@ -1,1 +1,1 @@
-from .file_versioning_render import FileVersioningRenderer
+from .file_versioning_renderer import FileVersioningRenderer
