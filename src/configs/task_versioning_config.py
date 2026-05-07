@@ -1,6 +1,8 @@
 # TaskVersioningConfig class inherits from Config abstract class
 
 from pathlib import Path
+
+from configs.default_config.task_versioning_default_config import TaskVersioningTag
 from .config import Config
 from .core_config import CoreConfig
 
@@ -178,7 +180,7 @@ class TaskVersioningConfig(Config):
         return self.default_config.sections.AP
 
     @property
-    def tags(self):
+    def tags(self) -> TaskVersioningTag:
         return self.default_config.tags
 
     @property

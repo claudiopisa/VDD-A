@@ -8,14 +8,57 @@ from utils import logger
 from ..renderer import Renderer
 
 class FileVersioningRenderer(Renderer):
-    def __init__(self, xml_path: str | Path, config: FileVersioningConfig):
+    """
+    Renderer for the **file-versioning** section of a VDD document.
 
+    Reads a file-versioning XML produced by
+    :class:`~xml_generator.file_versioning.FileVersioningXMLGenerator` and
+    writes the corresponding Word content into a ``python-docx``
+    :class:`Document`:
+
+    * A **level-1 heading** for the chapter (from ``<paragraph>``).
+    * A **level-2 heading** for each sub-folder (from ``<subparagraph>``).
+    * A **table** for the files in each
+      sub-folder (from ``<table>/<file>`` elements).
+    """
+
+    def __init__(self, xml_path: str | Path, config: FileVersioningConfig):
+        """
+        Parameters
+        ----------
+        xml_path : str | Path
+            Path to the file-versioning XML file to render.
+        config : FileVersioningConfig
+            Configuration object that provides tag constants
+            (``config.tags``) and column headers (``config.columns_name``).
+        """
         super().__init__(xml_path)
         self.config = config
         self.tags = self.config.tags
         self.headers = self.config.columns_name
 
     def render_section(self, document: Document):
+        """
+        Write the file-versioning chapter into ``document``.
+
+        Adds the following content in order:
+
+        1. A level-1 heading ``"<number>. <title>"`` from the
+           ``<paragraph>`` element.
+        2. For each ``<subparagraph>``: a level-2 heading and, if a
+           ``<table>`` child is present, a formatted Word table via
+           :meth:`~Renderer.render_table`.
+
+        Parameters
+        ----------
+        document : Document
+            The ``python-docx`` document to append content to.
+
+        Raises
+        ------
+        ValueError
+            If the XML root does not contain a ``<paragraph>`` element.
+        """
         #Parse XML
         #paragraph
         paragraph = self.root.find(self.tags.PARAGRAPH)
@@ -56,30 +99,13 @@ class FileVersioningRenderer(Renderer):
             #table
             table_elem = subpar.find(self.tags.TABLE)
             if table_elem is not None:
-                task_list = table_elem.findall(self.tags.ROW) # list of file elements, i.e. rows of the table
-                
-                if task_list:
-                    # Create Word table with header
-                    table = document.add_table(rows=1, cols=len(self.headers))
-                    table.style = 'Light Grid Accent 1'
-                    
-                    # Set header row
-                    header_cells = table.rows[0].cells # `table.rows[0]` is the header row, `.cells` is the list of cells in that row
-                    for i, header in enumerate(self.headers):
-                        header_cells[i].text = header
-                    
-                    # Make header bold
-                    for cell in header_cells:
-                        for paragraph in cell.paragraphs:
-                            for run in paragraph.runs:
-                                run.font.bold = True
-                    
-                    # Add data rows
-                    for task_elem in task_list:
-                        row_cells = table.add_row().cells
-                        for i, header in enumerate(self.headers):
-                            cell_value = task_elem.get(header.lower(), "")
-                            row_cells[i].text = cell_value
+                self.render_table(
+                    document=document,
+                    table_elem=table_elem,
+                    headers=self.headers,
+                    tags=self.tags,
+                    table_style='Light Grid Accent 1',
+                )
                     
                     # Set column widths (optional, can be adjusted as needed)
                     #for row in table.rows:

@@ -8,14 +8,55 @@ from utils import logger
 from ..renderer import Renderer
 
 class TaskVersioningRenderer(Renderer):
+    """
+    Renderer for the **task-versioning** section of a VDD document.
+
+    Reads a task-versioning XML produced by
+    :class:`~xml_generator.task_versioning.TaskVersioningXMLGenerator` and
+    writes the corresponding Word content into a ``python-docx``
+    :class:`Document`:
+
+    * A **level-1 heading** for the chapter (from ``<paragraph>``).
+    * A single flat **table** for all tasks
+      (from ``<table>/<task>`` elements).
+    """
+
     def __init__(self, xml_path: str | Path, config: TaskVersioningConfig):
+        """
+        Parameters
+        ----------
+        xml_path : str | Path
+            Path to the task-versioning XML file to render.
+        config : TaskVersioningConfig
+            Configuration object that provides tag constants
+            (``config.tags``) and column headers (``config.columns_name``).
+        """
         super().__init__(xml_path)
         self.config = config
         self.tags = self.config.tags
         self.headers = self.config.columns_name
 
     def render_section(self, document: Document):
+        """
+        Write the task-versioning chapter into ``document``.
 
+        Adds the following content in order:
+
+        1. A level-1 heading ``"<number>. <title>"`` from the
+           ``<paragraph>`` element.
+        2. If a ``<table>`` child is present, a formatted Word table via
+           :meth:`~Renderer.render_table`.
+
+        Parameters
+        ----------
+        document : Document
+            The ``python-docx`` document to append content to.
+
+        Raises
+        ------
+        ValueError
+            If the XML root does not contain a ``<paragraph>`` element.
+        """
         #Parse XML
         #paragraph
         paragraph = self.root.find(self.tags.PARAGRAPH)
@@ -39,39 +80,10 @@ class TaskVersioningRenderer(Renderer):
         #table
         table_elem = paragraph.find(self.tags.TABLE)
         if table_elem is not None:
-            task_list = table_elem.findall(self.tags.ROW) # list of file elements, i.e. rows of the table
-
-            if len(task_list) == 0:
-                logger.warning(f"No {self.tags.ROW!r} elements found in the XML. The table will be empty.")
-                return
-            
-            # Add table with headers
-            table =  document.add_table(rows=1, cols=len(self.headers))
-            table.style = 'Table Grid'
-
-            #set header row
-            header_cells = table.rows[0].cells
-            for i, header in enumerate(self.headers):
-                header_cells[i].text = header
-
-            #make header row bold
-            for cell in header_cells:
-                for paragraph in cell.paragraphs:
-                    for run in paragraph.runs:
-                        run.bold = True
-
-            # Add task rows
-            for task in task_list:
-                row_cells = table.add_row().cells # add cells to row
-                for i, header in enumerate(self.headers):
-                    attr_name = header.strip().lower().replace(" ", "_")
-                    cell_value = task.get(attr_name, None) # get value for the current header, default to empty string if not found
-                    
-                    if cell_value is None:
-                        logger.warning(
-                            f"Task element is missing attribute {attr_name!r} for header {header!r}. Using empty string as default."
-                        )
-                        cell_value = ""
-                    
-                    row_cells[i].text = cell_value
+            self.render_table(
+                document=document,
+                table_elem=table_elem,
+                headers=self.headers,
+                tags=self.tags,
+            )
 
