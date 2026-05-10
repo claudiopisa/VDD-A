@@ -158,42 +158,47 @@ python generate_docs.py --live
 
 ## Architecture overview
 
+**VDD-A follows a layered pipeline architecture:**
+
 ```mermaid
-graph LR
-    A["📄 JSON Configs"]
-    B["⚙️ Config Objects"]
-    C["🌳 Source Tree"]
-    D["📖 DataReader"]
-    E["🏗️ Model Objects"]
-    F["📦 Serializer"]
-    G["📋 XML"]
-    H["🎨 Renderer"]
-    I["📄 Word Doc"]
+flowchart TD
+    A["📄 JSON Configs<br/>(core_config.json, file_versioning.json, etc.)"]
     
-    A -->|merge| B
-    C -->|scan| D
-    D -->|extract| E
-    E -->|serialize| F
-    F -->|output| G
-    G -->|render| H
-    H -->|build| I
-    B -.->|config| E
+    B["⚙️ Config Objects<br/>(Load & Merge user + defaults)"]
+    
+    C1["🌳 Source Tree<br/>(scan for files & tasks)"]
+    C2["📖 DataReader<br/>(extract version info)"]
+    
+    D["🏗️ Model Objects<br/>(File, Task, FileCollection, TaskList)"]
+    
+    E["📦 Serializer<br/>(convert to XML)"]
+    
+    F["📋 XML Output<br/>(versioning.xml)"]
+    
+    G["🎨 Renderer<br/>(parse XML & format)"]
+    
+    H["📚 DocumentBuilder<br/>(build Word tables)"]
+    
+    I["📄 Final Output<br/>(Document.docx)"]
+    
+    A -->|load & merge| B
+    C1 -->|scan files| C2
+    C2 -->|extract versions| D
+    B -->|provide config| D
+    D -->|serialize| E
+    E -->|output XML| F
+    F -->|parse & render| G
+    G -->|build document| H
+    H -->|save| I
     
     style A fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     style B fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style D fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style E fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style F fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    style G fill:#ffe0b2,stroke:#e65100,stroke-width:2px
+    style C1 fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style C2 fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style D fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style E fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style F fill:#ffe0b2,stroke:#e65100,stroke-width:2px
+    style G fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
     style H fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
     style I fill:#e0e0e0,stroke:#616161,stroke-width:2px
 ```
-
-| Layer | Responsibility |
-|---|---|
-| `configs` | Load and merge user JSON + static defaults |
-| `data_reader` | Scan source trees, extract version info |
-| `model` | Domain objects: `File`, `Task`, `FileCollection`, `TaskList` |
-| `serializer` | Serialise model objects to structured XML |
-| `document_builder` | Parse XML and render to Word via `python-docx` |
