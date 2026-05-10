@@ -24,13 +24,12 @@ class FileVersioningRenderer(Renderer):
 
     def __init__(self, xml_path: str | Path, config: FileVersioningConfig):
         """
-        Parameters
-        ----------
-        xml_path : str | Path
-            Path to the file-versioning XML file to render.
-        config : FileVersioningConfig
-            Configuration object that provides tag constants
-            (``config.tags``) and column headers (``config.columns_name``).
+        Args:
+            xml_path (str | Path): Path to the file-versioning XML file
+                to render.
+            config (FileVersioningConfig): Configuration object that provides
+                tag constants (``config.tags``) and column headers
+                (``config.columns_name``).
         """
         super().__init__(xml_path)
         self.config = config
@@ -49,15 +48,13 @@ class FileVersioningRenderer(Renderer):
            ``<table>`` child is present, a formatted Word table via
            :meth:`~Renderer.render_table`.
 
-        Parameters
-        ----------
-        document : Document
-            The ``python-docx`` document to append content to.
+        Args:
+            document (Document): The ``python-docx`` document to append
+                content to.
 
-        Raises
-        ------
-        ValueError
-            If the XML root does not contain a ``<paragraph>`` element.
+        Raises:
+            ValueError: If the XML root does not contain a ``<paragraph>``
+                element.
         """
         #Parse XML
         #paragraph

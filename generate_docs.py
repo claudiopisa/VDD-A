@@ -38,7 +38,7 @@ def main():
 
     base_cmd = [
         sys.executable, "-m", "pdoc",
-        "--docformat", "restructuredtext",
+        "--docformat", "google",
     ]
 
     if live:

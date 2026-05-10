@@ -23,13 +23,12 @@ class TaskVersioningRenderer(Renderer):
 
     def __init__(self, xml_path: str | Path, config: TaskVersioningConfig):
         """
-        Parameters
-        ----------
-        xml_path : str | Path
-            Path to the task-versioning XML file to render.
-        config : TaskVersioningConfig
-            Configuration object that provides tag constants
-            (``config.tags``) and column headers (``config.columns_name``).
+        Args:
+            xml_path (str | Path): Path to the task-versioning XML file
+                to render.
+            config (TaskVersioningConfig): Configuration object that provides
+                tag constants (``config.tags``) and column headers
+                (``config.columns_name``).
         """
         super().__init__(xml_path)
         self.config = config

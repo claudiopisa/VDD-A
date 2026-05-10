@@ -17,9 +17,7 @@ class DocumentBuilder:
     then call :meth:`save`.  The underlying ``Document`` object is always
     accessible via ``self.document`` for any additional manual customisation.
 
-    Example
-    -------
-    ::
+    Example::
 
         builder = DocumentBuilder(template="template.docx", output_path="out/report.docx")
         builder.add_section(FileVersioningRenderer(xml, config)) \\
@@ -29,16 +27,15 @@ class DocumentBuilder:
 
     def __init__(self, template: str | IO[bytes] | None = None, output_path: str | Path | None = None):
         """
-        Parameters
-        ----------
-        template : str | IO[bytes] | None
-            Path to a ``.docx`` template file, or a file-like object opened
-            in binary mode.  When ``None`` a blank document is created.
-        output_path : str | Path | None
-            Destination path for :meth:`save`.  The parent directory is
-            created automatically if it does not exist.  When ``None`` the
-            document is saved in the current working directory with an
-            auto-generated timestamped filename.
+        Args:
+            template (str | IO[bytes] | None): Path to a ``.docx`` template
+                file, or a file-like object opened in binary mode. When
+                ``None`` a blank document is created.
+            output_path (str | Path | None): Destination path for
+                :meth:`save`. The parent directory is created automatically
+                if it does not exist. When ``None`` the document is saved in
+                the current working directory with an auto-generated
+                timestamped filename.
         """
         self.document = Document(template) # Note: `Document` can accept `None` as a template, in which case it creates a blank document.
 
@@ -52,20 +49,16 @@ class DocumentBuilder:
         """
         Attach a renderer to this builder.
 
-        .. note::
+        Note:
             Prefer :meth:`add_section` for direct section generation.
             This method exists for cases where the renderer needs to be
             stored and invoked separately.
 
-        Parameters
-        ----------
-        renderer : Renderer
-            Any concrete :class:`Renderer` subclass.
+        Args:
+            renderer (Renderer): Any concrete :class:`Renderer` subclass.
 
-        Returns
-        -------
-        DocumentBuilder
-            ``self``, to allow method chaining.
+        Returns:
+            DocumentBuilder: ``self``, to allow method chaining.
         """
         self.renderer = renderer
         return self
@@ -78,17 +71,13 @@ class DocumentBuilder:
         tables directly into ``self.document``.  Multiple calls are allowed;
         each section is appended after the previous one.
 
-        Parameters
-        ----------
-        renderer : Renderer
-            Any concrete :class:`Renderer` subclass (e.g.
-            :class:`FileVersioningRenderer`,
-            :class:`TaskVersioningRenderer`).
+        Args:
+            renderer (Renderer): Any concrete :class:`Renderer` subclass
+                (e.g. :class:`FileVersioningRenderer`,
+                :class:`TaskVersioningRenderer`).
 
-        Returns
-        -------
-        DocumentBuilder
-            ``self``, to allow method chaining.
+        Returns:
+            DocumentBuilder: ``self``, to allow method chaining.
         """
         renderer.render_section(self.document)
 
@@ -103,25 +92,24 @@ class DocumentBuilder:
         """
         Save the document to :attr:`output_path` and return the final path.
 
-        Parameters
-        ----------
-        overwrite : bool
-            * ``True``  — write directly to :attr:`output_path`, replacing
-              any existing file.
-            * ``False`` (default) — append a ``_YYYYMMDD_HHMMSS`` timestamp
-              suffix to the stem so existing files are never clobbered.
+        Args:
+            overwrite (bool):
+                - ``True`` — write directly to :attr:`output_path`, replacing
+                  any existing file.
+                  
+                - ``False`` (default) — append a ``_YYYYMMDD_HHMMSS``
+                  timestamp suffix to the stem so existing files are never
+                  clobbered.
 
-        Returns
-        -------
-        Path
-            The actual path the file was written to (useful when
+        Returns:
+            Path: The actual path the file was written to (useful when
             ``overwrite=False`` and the name was modified).
 
-        Notes
-        -----
-        If :attr:`output_path` is ``None`` the document is saved in the
-        current working directory as ``Document_YYYYMMDD_HHMMSS.docx``.
-        The parent directory is created automatically if it does not exist.
+        Note:
+            If :attr:`output_path` is ``None`` the document is saved in the
+            current working directory as ``Document_YYYYMMDD_HHMMSS.docx``.
+            The parent directory is created automatically if it does not
+            exist.
         """
         if self.output_path is None:
             # if output_path not defined, save in current directory

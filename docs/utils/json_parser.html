@@ -339,12 +339,15 @@
             <div class="docstring"><p>A dict that supports both dict['key'] and dict.key access.
 Automatically converts nested dicts into JsonParser objects.</p>
 
-<p>Example:
-    data = JsonParser({'name': 'Mario', 'metadata': {'doc': 'VDD'}})
-    data.name                  # 'Mario'
-    data['name']               # 'Mario'
-    data.metadata.doc          # 'VDD'  (metadata is JsonParser, not dict)
-    print(data)                # {'name': 'Mario', ...}</p>
+<h6 id="example">Example:</h6>
+
+<blockquote>
+  <p>data = JsonParser({'name': 'Mario', 'metadata': {'doc': 'VDD'}})
+  data.name                  # 'Mario'
+  data['name']               # 'Mario'
+  data.metadata.doc          # 'VDD'  (metadata is JsonParser, not dict)
+  print(data)                # {'name': 'Mario', ...}</p>
+</blockquote>
 </div>
 
 

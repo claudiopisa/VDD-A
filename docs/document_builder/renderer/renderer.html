@@ -106,123 +106,121 @@
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">        Parameters</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">        ----------</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">        xml_path : str | Path</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">            Path to the versioning XML file.  Parsed once at construction</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">            time; the root element is stored in ``self.root``.</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>            <span class="n">xml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">xml_path</span><span class="p">)</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span> <span class="o">=</span> <span class="n">xml_path</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_table</span><span class="p">(</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>        <span class="n">table_elem</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="n">headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="n">tags</span><span class="p">:</span> <span class="n">XMLTag</span><span class="p">,</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="n">table_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Table Grid&quot;</span><span class="p">,</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="n">header_to_attr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">        Render an XML table element into a Word document table.</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        Reads row elements from ``table_elem``, creates a Word table with a</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">        bold header row, and fills one data row per XML element found.</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        Parameters</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        ----------</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        document : Document</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">            The ``python-docx`` :class:`Document` object to append the table</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">            to. The table is added at the current end of the document.</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        table_elem : ET.Element</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">            The XML element whose **direct children** matching ``tags.ROW``</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">            are treated as data rows (e.g. the ``&lt;table&gt;`` element parsed from</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">            the versioning XML). If no children are found the method logs a</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">            warning and returns without adding anything to the document.</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">        headers : Sequence[str]</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">            Ordered list of column labels written into the **first (header)</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">            row** of the Word table. Each label is rendered in **bold**.</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">            The number of columns in the table equals ``len(headers)``.</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        tags : XMLTag</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">            Dataclass holding XML tag name constants. Only ``tags.ROW`` is</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">            used here — it identifies which child tag name to look for inside</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">            ``table_elem`` (e.g. ``&quot;file&quot;`` for file-versioning or ``&quot;task&quot;``</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">            for task-versioning).</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">        table_style : str</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">            Name of a built-in Word table style applied to the whole table</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">            (default: ``&quot;Table Grid&quot;``). Any style available in the target</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">            ``.docx`` template is accepted, e.g. ``&quot;Light Grid Accent 1&quot;``.</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        header_to_attr : Callable[[str], str] | None</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">            A function that converts a header label into the corresponding</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">            XML attribute name to read from each row element.</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">        Args:</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">            xml_path (str | Path): Path to the versioning XML file. Parsed</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">                once at construction time; the root element is stored in</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">                ``self.root``.</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>            <span class="n">xml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">xml_path</span><span class="p">)</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>        
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span> <span class="o">=</span> <span class="n">xml_path</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_table</span><span class="p">(</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>        <span class="n">table_elem</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>        <span class="n">headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="n">tags</span><span class="p">:</span> <span class="n">XMLTag</span><span class="p">,</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="n">table_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Table Grid&quot;</span><span class="p">,</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="n">header_to_attr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">        Render an XML table element into a Word document table.</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">        Reads row elements from ``table_elem``, creates a Word table with a</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        bold header row, and fills one data row per XML element found.</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        Args:</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">            document (Document): The ``python-docx`` :class:`Document` object</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">                to append the table to. The table is added at the current end</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">                of the document.</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">            table_elem (ET.Element): The XML element whose **direct children**</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">                matching ``tags.ROW`` are treated as data rows (e.g. the</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">                ``&lt;table&gt;`` element parsed from the versioning XML). If no</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">                children are found the method logs a warning and returns</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">                without adding anything to the document.</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">            headers (Sequence[str]): Ordered list of column labels written</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">                into the **first (header) row** of the Word table. Each label</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">                is rendered in **bold**. The number of columns in the table</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">                equals ``len(headers)``.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">            tags (XMLTag): Dataclass holding XML tag name constants. Only</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">                ``tags.ROW`` is used here — it identifies which child tag name</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">                to look for inside ``table_elem`` (e.g. ``&quot;file&quot;`` for</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">                file-versioning or ``&quot;task&quot;`` for task-versioning).</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">            table_style (str): Name of a built-in Word table style applied to</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">                the whole table (default: ``&quot;Table Grid&quot;``). Any style</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">                available in the target ``.docx`` template is accepted, e.g.</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">                ``&quot;Light Grid Accent 1&quot;``.</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">            header_to_attr (Callable[[str], str] | None): A function that</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">                converts a header label into the corresponding XML attribute</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">                name to read from each row element.</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">                Use this when the column label shown in the document does</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">                **not** match the XML attribute name 1-to-1. For example::</span>
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">            Use this when the column label shown in the document does **not**</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">            match the XML attribute name 1-to-1. For example::</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">                # Column &quot;Task Name&quot;  →  XML attribute &quot;name&quot;</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">                # Column &quot;Last Modified&quot;  →  XML attribute &quot;modified&quot;</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">                render_table(</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">                    ...,</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">                    headers=[&quot;Task Name&quot;, &quot;Last Modified&quot;],</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">                    header_to_attr=lambda h: {&quot;Task Name&quot;: &quot;name&quot;,</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">                                              &quot;Last Modified&quot;: &quot;modified&quot;}[h],</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">                )</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">            .. note::</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">                When ``None`` (default), the mapping is derived automatically:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">                strip whitespace, lowercase, replace spaces with underscores.</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">                This works whenever the header already matches the attribute</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">                name after that transformation (e.g. ``&quot;Version&quot;`` → ``&quot;version&quot;``</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">                or ``&quot;Task Type&quot;`` → ``&quot;task_type&quot;``).</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">table_elem</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="p">)</span> <span class="c1"># list of file elements, i.e. rows of the table</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> elements found in the XML. The table will be empty.&quot;</span><span class="p">)</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>            <span class="k">return</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="k">if</span> <span class="n">header_to_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>            <span class="n">header_to_attr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">header</span><span class="p">:</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="c1"># Add table with headers</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="n">table</span> <span class="o">=</span>  <span class="n">document</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="n">table</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">table_style</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="c1"># Set header row</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="n">header_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the first row (header row)</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>            <span class="n">header_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">header</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="c1"># Make header row font bold</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">header_cells</span><span class="p">:</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>            <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>                    <span class="n">run</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="c1"># Add data rows</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>            <span class="n">row_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the new row</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">header_to_attr</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>                <span class="n">cell_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>                <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> element is missing </span><span class="si">{</span><span class="n">attr_name</span><span class="si">!r}</span><span class="s2"> attribute for header </span><span class="si">{</span><span class="n">header</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>                        <span class="s2">&quot;Using empty string as placeholder.&quot;</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>                    <span class="p">)</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>                    <span class="n">cell_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>                    
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>                <span class="n">row_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">cell_value</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>            
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>        
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">):</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>        <span class="k">pass</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">                    # Column &quot;Task Name&quot;  →  XML attribute &quot;name&quot;</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">                    # Column &quot;Last Modified&quot;  →  XML attribute &quot;modified&quot;</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">                    render_table(</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">                        ...,</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">                        headers=[&quot;Task Name&quot;, &quot;Last Modified&quot;],</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">                        header_to_attr=lambda h: {&quot;Task Name&quot;: &quot;name&quot;,</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">                                                  &quot;Last Modified&quot;: &quot;modified&quot;}[h],</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">                    )</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">                Note:</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">                    When ``None`` (default), the mapping is derived</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">                    automatically: strip whitespace, lowercase, replace spaces</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">                    with underscores. This works whenever the header already</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">                    matches the attribute name after that transformation (e.g.</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">                    ``&quot;Version&quot;`` → ``&quot;version&quot;`` or ``&quot;Task Type&quot;`` →</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">                    ``&quot;task_type&quot;``).</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">table_elem</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="p">)</span> <span class="c1"># list of file elements, i.e. rows of the table</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> elements found in the XML. The table will be empty.&quot;</span><span class="p">)</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>            <span class="k">return</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="k">if</span> <span class="n">header_to_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>            <span class="n">header_to_attr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">header</span><span class="p">:</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="c1"># Add table with headers</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="n">table</span> <span class="o">=</span>  <span class="n">document</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="n">table</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">table_style</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="c1"># Set header row</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="n">header_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the first row (header row)</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>            <span class="n">header_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">header</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="c1"># Make header row font bold</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">header_cells</span><span class="p">:</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>            <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>                    <span class="n">run</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="c1"># Add data rows</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>            <span class="n">row_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the new row</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">header_to_attr</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>                <span class="n">cell_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>                <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> element is missing </span><span class="si">{</span><span class="n">attr_name</span><span class="si">!r}</span><span class="s2"> attribute for header </span><span class="si">{</span><span class="n">header</span><span class="si">!r}</span><span class="s2">. &quot;</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>                        <span class="s2">&quot;Using empty string as placeholder.&quot;</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>                    <span class="p">)</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>                    <span class="n">cell_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>                    
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>                <span class="n">row_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">cell_value</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>            
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">):</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="k">pass</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    
 </span></pre></div>
 
 
@@ -269,122 +267,120 @@
 </span><span id="Renderer-30"><a href="#Renderer-30"><span class="linenos"> 30</span></a>
 </span><span id="Renderer-31"><a href="#Renderer-31"><span class="linenos"> 31</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
 </span><span id="Renderer-32"><a href="#Renderer-32"><span class="linenos"> 32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Renderer-33"><a href="#Renderer-33"><span class="linenos"> 33</span></a><span class="sd">        Parameters</span>
-</span><span id="Renderer-34"><a href="#Renderer-34"><span class="linenos"> 34</span></a><span class="sd">        ----------</span>
-</span><span id="Renderer-35"><a href="#Renderer-35"><span class="linenos"> 35</span></a><span class="sd">        xml_path : str | Path</span>
-</span><span id="Renderer-36"><a href="#Renderer-36"><span class="linenos"> 36</span></a><span class="sd">            Path to the versioning XML file.  Parsed once at construction</span>
-</span><span id="Renderer-37"><a href="#Renderer-37"><span class="linenos"> 37</span></a><span class="sd">            time; the root element is stored in ``self.root``.</span>
-</span><span id="Renderer-38"><a href="#Renderer-38"><span class="linenos"> 38</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Renderer-39"><a href="#Renderer-39"><span class="linenos"> 39</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="Renderer-40"><a href="#Renderer-40"><span class="linenos"> 40</span></a>            <span class="n">xml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">xml_path</span><span class="p">)</span>
-</span><span id="Renderer-41"><a href="#Renderer-41"><span class="linenos"> 41</span></a>        
-</span><span id="Renderer-42"><a href="#Renderer-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span> <span class="o">=</span> <span class="n">xml_path</span>
-</span><span id="Renderer-43"><a href="#Renderer-43"><span class="linenos"> 43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
-</span><span id="Renderer-44"><a href="#Renderer-44"><span class="linenos"> 44</span></a>
-</span><span id="Renderer-45"><a href="#Renderer-45"><span class="linenos"> 45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_table</span><span class="p">(</span>
-</span><span id="Renderer-46"><a href="#Renderer-46"><span class="linenos"> 46</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="Renderer-47"><a href="#Renderer-47"><span class="linenos"> 47</span></a>        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
-</span><span id="Renderer-48"><a href="#Renderer-48"><span class="linenos"> 48</span></a>        <span class="n">table_elem</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
-</span><span id="Renderer-49"><a href="#Renderer-49"><span class="linenos"> 49</span></a>        <span class="n">headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="Renderer-50"><a href="#Renderer-50"><span class="linenos"> 50</span></a>        <span class="n">tags</span><span class="p">:</span> <span class="n">XMLTag</span><span class="p">,</span>
-</span><span id="Renderer-51"><a href="#Renderer-51"><span class="linenos"> 51</span></a>        <span class="n">table_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Table Grid&quot;</span><span class="p">,</span>
-</span><span id="Renderer-52"><a href="#Renderer-52"><span class="linenos"> 52</span></a>        <span class="n">header_to_attr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="Renderer-53"><a href="#Renderer-53"><span class="linenos"> 53</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Renderer-54"><a href="#Renderer-54"><span class="linenos"> 54</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Renderer-55"><a href="#Renderer-55"><span class="linenos"> 55</span></a><span class="sd">        Render an XML table element into a Word document table.</span>
-</span><span id="Renderer-56"><a href="#Renderer-56"><span class="linenos"> 56</span></a>
-</span><span id="Renderer-57"><a href="#Renderer-57"><span class="linenos"> 57</span></a><span class="sd">        Reads row elements from ``table_elem``, creates a Word table with a</span>
-</span><span id="Renderer-58"><a href="#Renderer-58"><span class="linenos"> 58</span></a><span class="sd">        bold header row, and fills one data row per XML element found.</span>
-</span><span id="Renderer-59"><a href="#Renderer-59"><span class="linenos"> 59</span></a>
-</span><span id="Renderer-60"><a href="#Renderer-60"><span class="linenos"> 60</span></a><span class="sd">        Parameters</span>
-</span><span id="Renderer-61"><a href="#Renderer-61"><span class="linenos"> 61</span></a><span class="sd">        ----------</span>
-</span><span id="Renderer-62"><a href="#Renderer-62"><span class="linenos"> 62</span></a><span class="sd">        document : Document</span>
-</span><span id="Renderer-63"><a href="#Renderer-63"><span class="linenos"> 63</span></a><span class="sd">            The ``python-docx`` :class:`Document` object to append the table</span>
-</span><span id="Renderer-64"><a href="#Renderer-64"><span class="linenos"> 64</span></a><span class="sd">            to. The table is added at the current end of the document.</span>
-</span><span id="Renderer-65"><a href="#Renderer-65"><span class="linenos"> 65</span></a><span class="sd">        table_elem : ET.Element</span>
-</span><span id="Renderer-66"><a href="#Renderer-66"><span class="linenos"> 66</span></a><span class="sd">            The XML element whose **direct children** matching ``tags.ROW``</span>
-</span><span id="Renderer-67"><a href="#Renderer-67"><span class="linenos"> 67</span></a><span class="sd">            are treated as data rows (e.g. the ``&lt;table&gt;`` element parsed from</span>
-</span><span id="Renderer-68"><a href="#Renderer-68"><span class="linenos"> 68</span></a><span class="sd">            the versioning XML). If no children are found the method logs a</span>
-</span><span id="Renderer-69"><a href="#Renderer-69"><span class="linenos"> 69</span></a><span class="sd">            warning and returns without adding anything to the document.</span>
-</span><span id="Renderer-70"><a href="#Renderer-70"><span class="linenos"> 70</span></a><span class="sd">        headers : Sequence[str]</span>
-</span><span id="Renderer-71"><a href="#Renderer-71"><span class="linenos"> 71</span></a><span class="sd">            Ordered list of column labels written into the **first (header)</span>
-</span><span id="Renderer-72"><a href="#Renderer-72"><span class="linenos"> 72</span></a><span class="sd">            row** of the Word table. Each label is rendered in **bold**.</span>
-</span><span id="Renderer-73"><a href="#Renderer-73"><span class="linenos"> 73</span></a><span class="sd">            The number of columns in the table equals ``len(headers)``.</span>
-</span><span id="Renderer-74"><a href="#Renderer-74"><span class="linenos"> 74</span></a><span class="sd">        tags : XMLTag</span>
-</span><span id="Renderer-75"><a href="#Renderer-75"><span class="linenos"> 75</span></a><span class="sd">            Dataclass holding XML tag name constants. Only ``tags.ROW`` is</span>
-</span><span id="Renderer-76"><a href="#Renderer-76"><span class="linenos"> 76</span></a><span class="sd">            used here — it identifies which child tag name to look for inside</span>
-</span><span id="Renderer-77"><a href="#Renderer-77"><span class="linenos"> 77</span></a><span class="sd">            ``table_elem`` (e.g. ``&quot;file&quot;`` for file-versioning or ``&quot;task&quot;``</span>
-</span><span id="Renderer-78"><a href="#Renderer-78"><span class="linenos"> 78</span></a><span class="sd">            for task-versioning).</span>
-</span><span id="Renderer-79"><a href="#Renderer-79"><span class="linenos"> 79</span></a><span class="sd">        table_style : str</span>
-</span><span id="Renderer-80"><a href="#Renderer-80"><span class="linenos"> 80</span></a><span class="sd">            Name of a built-in Word table style applied to the whole table</span>
-</span><span id="Renderer-81"><a href="#Renderer-81"><span class="linenos"> 81</span></a><span class="sd">            (default: ``&quot;Table Grid&quot;``). Any style available in the target</span>
-</span><span id="Renderer-82"><a href="#Renderer-82"><span class="linenos"> 82</span></a><span class="sd">            ``.docx`` template is accepted, e.g. ``&quot;Light Grid Accent 1&quot;``.</span>
-</span><span id="Renderer-83"><a href="#Renderer-83"><span class="linenos"> 83</span></a><span class="sd">        header_to_attr : Callable[[str], str] | None</span>
-</span><span id="Renderer-84"><a href="#Renderer-84"><span class="linenos"> 84</span></a><span class="sd">            A function that converts a header label into the corresponding</span>
-</span><span id="Renderer-85"><a href="#Renderer-85"><span class="linenos"> 85</span></a><span class="sd">            XML attribute name to read from each row element.</span>
+</span><span id="Renderer-33"><a href="#Renderer-33"><span class="linenos"> 33</span></a><span class="sd">        Args:</span>
+</span><span id="Renderer-34"><a href="#Renderer-34"><span class="linenos"> 34</span></a><span class="sd">            xml_path (str | Path): Path to the versioning XML file. Parsed</span>
+</span><span id="Renderer-35"><a href="#Renderer-35"><span class="linenos"> 35</span></a><span class="sd">                once at construction time; the root element is stored in</span>
+</span><span id="Renderer-36"><a href="#Renderer-36"><span class="linenos"> 36</span></a><span class="sd">                ``self.root``.</span>
+</span><span id="Renderer-37"><a href="#Renderer-37"><span class="linenos"> 37</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Renderer-38"><a href="#Renderer-38"><span class="linenos"> 38</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+</span><span id="Renderer-39"><a href="#Renderer-39"><span class="linenos"> 39</span></a>            <span class="n">xml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">xml_path</span><span class="p">)</span>
+</span><span id="Renderer-40"><a href="#Renderer-40"><span class="linenos"> 40</span></a>        
+</span><span id="Renderer-41"><a href="#Renderer-41"><span class="linenos"> 41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span> <span class="o">=</span> <span class="n">xml_path</span>
+</span><span id="Renderer-42"><a href="#Renderer-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+</span><span id="Renderer-43"><a href="#Renderer-43"><span class="linenos"> 43</span></a>
+</span><span id="Renderer-44"><a href="#Renderer-44"><span class="linenos"> 44</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_table</span><span class="p">(</span>
+</span><span id="Renderer-45"><a href="#Renderer-45"><span class="linenos"> 45</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="Renderer-46"><a href="#Renderer-46"><span class="linenos"> 46</span></a>        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
+</span><span id="Renderer-47"><a href="#Renderer-47"><span class="linenos"> 47</span></a>        <span class="n">table_elem</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
+</span><span id="Renderer-48"><a href="#Renderer-48"><span class="linenos"> 48</span></a>        <span class="n">headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="Renderer-49"><a href="#Renderer-49"><span class="linenos"> 49</span></a>        <span class="n">tags</span><span class="p">:</span> <span class="n">XMLTag</span><span class="p">,</span>
+</span><span id="Renderer-50"><a href="#Renderer-50"><span class="linenos"> 50</span></a>        <span class="n">table_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Table Grid&quot;</span><span class="p">,</span>
+</span><span id="Renderer-51"><a href="#Renderer-51"><span class="linenos"> 51</span></a>        <span class="n">header_to_attr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="Renderer-52"><a href="#Renderer-52"><span class="linenos"> 52</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Renderer-53"><a href="#Renderer-53"><span class="linenos"> 53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Renderer-54"><a href="#Renderer-54"><span class="linenos"> 54</span></a><span class="sd">        Render an XML table element into a Word document table.</span>
+</span><span id="Renderer-55"><a href="#Renderer-55"><span class="linenos"> 55</span></a>
+</span><span id="Renderer-56"><a href="#Renderer-56"><span class="linenos"> 56</span></a><span class="sd">        Reads row elements from ``table_elem``, creates a Word table with a</span>
+</span><span id="Renderer-57"><a href="#Renderer-57"><span class="linenos"> 57</span></a><span class="sd">        bold header row, and fills one data row per XML element found.</span>
+</span><span id="Renderer-58"><a href="#Renderer-58"><span class="linenos"> 58</span></a>
+</span><span id="Renderer-59"><a href="#Renderer-59"><span class="linenos"> 59</span></a><span class="sd">        Args:</span>
+</span><span id="Renderer-60"><a href="#Renderer-60"><span class="linenos"> 60</span></a><span class="sd">            document (Document): The ``python-docx`` :class:`Document` object</span>
+</span><span id="Renderer-61"><a href="#Renderer-61"><span class="linenos"> 61</span></a><span class="sd">                to append the table to. The table is added at the current end</span>
+</span><span id="Renderer-62"><a href="#Renderer-62"><span class="linenos"> 62</span></a><span class="sd">                of the document.</span>
+</span><span id="Renderer-63"><a href="#Renderer-63"><span class="linenos"> 63</span></a><span class="sd">            table_elem (ET.Element): The XML element whose **direct children**</span>
+</span><span id="Renderer-64"><a href="#Renderer-64"><span class="linenos"> 64</span></a><span class="sd">                matching ``tags.ROW`` are treated as data rows (e.g. the</span>
+</span><span id="Renderer-65"><a href="#Renderer-65"><span class="linenos"> 65</span></a><span class="sd">                ``&lt;table&gt;`` element parsed from the versioning XML). If no</span>
+</span><span id="Renderer-66"><a href="#Renderer-66"><span class="linenos"> 66</span></a><span class="sd">                children are found the method logs a warning and returns</span>
+</span><span id="Renderer-67"><a href="#Renderer-67"><span class="linenos"> 67</span></a><span class="sd">                without adding anything to the document.</span>
+</span><span id="Renderer-68"><a href="#Renderer-68"><span class="linenos"> 68</span></a><span class="sd">            headers (Sequence[str]): Ordered list of column labels written</span>
+</span><span id="Renderer-69"><a href="#Renderer-69"><span class="linenos"> 69</span></a><span class="sd">                into the **first (header) row** of the Word table. Each label</span>
+</span><span id="Renderer-70"><a href="#Renderer-70"><span class="linenos"> 70</span></a><span class="sd">                is rendered in **bold**. The number of columns in the table</span>
+</span><span id="Renderer-71"><a href="#Renderer-71"><span class="linenos"> 71</span></a><span class="sd">                equals ``len(headers)``.</span>
+</span><span id="Renderer-72"><a href="#Renderer-72"><span class="linenos"> 72</span></a><span class="sd">            tags (XMLTag): Dataclass holding XML tag name constants. Only</span>
+</span><span id="Renderer-73"><a href="#Renderer-73"><span class="linenos"> 73</span></a><span class="sd">                ``tags.ROW`` is used here — it identifies which child tag name</span>
+</span><span id="Renderer-74"><a href="#Renderer-74"><span class="linenos"> 74</span></a><span class="sd">                to look for inside ``table_elem`` (e.g. ``&quot;file&quot;`` for</span>
+</span><span id="Renderer-75"><a href="#Renderer-75"><span class="linenos"> 75</span></a><span class="sd">                file-versioning or ``&quot;task&quot;`` for task-versioning).</span>
+</span><span id="Renderer-76"><a href="#Renderer-76"><span class="linenos"> 76</span></a><span class="sd">            table_style (str): Name of a built-in Word table style applied to</span>
+</span><span id="Renderer-77"><a href="#Renderer-77"><span class="linenos"> 77</span></a><span class="sd">                the whole table (default: ``&quot;Table Grid&quot;``). Any style</span>
+</span><span id="Renderer-78"><a href="#Renderer-78"><span class="linenos"> 78</span></a><span class="sd">                available in the target ``.docx`` template is accepted, e.g.</span>
+</span><span id="Renderer-79"><a href="#Renderer-79"><span class="linenos"> 79</span></a><span class="sd">                ``&quot;Light Grid Accent 1&quot;``.</span>
+</span><span id="Renderer-80"><a href="#Renderer-80"><span class="linenos"> 80</span></a><span class="sd">            header_to_attr (Callable[[str], str] | None): A function that</span>
+</span><span id="Renderer-81"><a href="#Renderer-81"><span class="linenos"> 81</span></a><span class="sd">                converts a header label into the corresponding XML attribute</span>
+</span><span id="Renderer-82"><a href="#Renderer-82"><span class="linenos"> 82</span></a><span class="sd">                name to read from each row element.</span>
+</span><span id="Renderer-83"><a href="#Renderer-83"><span class="linenos"> 83</span></a>
+</span><span id="Renderer-84"><a href="#Renderer-84"><span class="linenos"> 84</span></a><span class="sd">                Use this when the column label shown in the document does</span>
+</span><span id="Renderer-85"><a href="#Renderer-85"><span class="linenos"> 85</span></a><span class="sd">                **not** match the XML attribute name 1-to-1. For example::</span>
 </span><span id="Renderer-86"><a href="#Renderer-86"><span class="linenos"> 86</span></a>
-</span><span id="Renderer-87"><a href="#Renderer-87"><span class="linenos"> 87</span></a><span class="sd">            Use this when the column label shown in the document does **not**</span>
-</span><span id="Renderer-88"><a href="#Renderer-88"><span class="linenos"> 88</span></a><span class="sd">            match the XML attribute name 1-to-1. For example::</span>
-</span><span id="Renderer-89"><a href="#Renderer-89"><span class="linenos"> 89</span></a>
-</span><span id="Renderer-90"><a href="#Renderer-90"><span class="linenos"> 90</span></a><span class="sd">                # Column &quot;Task Name&quot;  →  XML attribute &quot;name&quot;</span>
-</span><span id="Renderer-91"><a href="#Renderer-91"><span class="linenos"> 91</span></a><span class="sd">                # Column &quot;Last Modified&quot;  →  XML attribute &quot;modified&quot;</span>
-</span><span id="Renderer-92"><a href="#Renderer-92"><span class="linenos"> 92</span></a><span class="sd">                render_table(</span>
-</span><span id="Renderer-93"><a href="#Renderer-93"><span class="linenos"> 93</span></a><span class="sd">                    ...,</span>
-</span><span id="Renderer-94"><a href="#Renderer-94"><span class="linenos"> 94</span></a><span class="sd">                    headers=[&quot;Task Name&quot;, &quot;Last Modified&quot;],</span>
-</span><span id="Renderer-95"><a href="#Renderer-95"><span class="linenos"> 95</span></a><span class="sd">                    header_to_attr=lambda h: {&quot;Task Name&quot;: &quot;name&quot;,</span>
-</span><span id="Renderer-96"><a href="#Renderer-96"><span class="linenos"> 96</span></a><span class="sd">                                              &quot;Last Modified&quot;: &quot;modified&quot;}[h],</span>
-</span><span id="Renderer-97"><a href="#Renderer-97"><span class="linenos"> 97</span></a><span class="sd">                )</span>
-</span><span id="Renderer-98"><a href="#Renderer-98"><span class="linenos"> 98</span></a>
-</span><span id="Renderer-99"><a href="#Renderer-99"><span class="linenos"> 99</span></a><span class="sd">            .. note::</span>
-</span><span id="Renderer-100"><a href="#Renderer-100"><span class="linenos">100</span></a><span class="sd">                When ``None`` (default), the mapping is derived automatically:</span>
-</span><span id="Renderer-101"><a href="#Renderer-101"><span class="linenos">101</span></a><span class="sd">                strip whitespace, lowercase, replace spaces with underscores.</span>
-</span><span id="Renderer-102"><a href="#Renderer-102"><span class="linenos">102</span></a><span class="sd">                This works whenever the header already matches the attribute</span>
-</span><span id="Renderer-103"><a href="#Renderer-103"><span class="linenos">103</span></a><span class="sd">                name after that transformation (e.g. ``&quot;Version&quot;`` → ``&quot;version&quot;``</span>
-</span><span id="Renderer-104"><a href="#Renderer-104"><span class="linenos">104</span></a><span class="sd">                or ``&quot;Task Type&quot;`` → ``&quot;task_type&quot;``).</span>
-</span><span id="Renderer-105"><a href="#Renderer-105"><span class="linenos">105</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Renderer-106"><a href="#Renderer-106"><span class="linenos">106</span></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">table_elem</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="p">)</span> <span class="c1"># list of file elements, i.e. rows of the table</span>
-</span><span id="Renderer-107"><a href="#Renderer-107"><span class="linenos">107</span></a>
-</span><span id="Renderer-108"><a href="#Renderer-108"><span class="linenos">108</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="Renderer-109"><a href="#Renderer-109"><span class="linenos">109</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> elements found in the XML. The table will be empty.&quot;</span><span class="p">)</span>
-</span><span id="Renderer-110"><a href="#Renderer-110"><span class="linenos">110</span></a>            <span class="k">return</span>
-</span><span id="Renderer-111"><a href="#Renderer-111"><span class="linenos">111</span></a>
-</span><span id="Renderer-112"><a href="#Renderer-112"><span class="linenos">112</span></a>        <span class="k">if</span> <span class="n">header_to_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Renderer-113"><a href="#Renderer-113"><span class="linenos">113</span></a>            <span class="n">header_to_attr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">header</span><span class="p">:</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-</span><span id="Renderer-114"><a href="#Renderer-114"><span class="linenos">114</span></a>        
-</span><span id="Renderer-115"><a href="#Renderer-115"><span class="linenos">115</span></a>        <span class="c1"># Add table with headers</span>
-</span><span id="Renderer-116"><a href="#Renderer-116"><span class="linenos">116</span></a>        <span class="n">table</span> <span class="o">=</span>  <span class="n">document</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
-</span><span id="Renderer-117"><a href="#Renderer-117"><span class="linenos">117</span></a>        <span class="n">table</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">table_style</span>
-</span><span id="Renderer-118"><a href="#Renderer-118"><span class="linenos">118</span></a>
-</span><span id="Renderer-119"><a href="#Renderer-119"><span class="linenos">119</span></a>        <span class="c1"># Set header row</span>
-</span><span id="Renderer-120"><a href="#Renderer-120"><span class="linenos">120</span></a>        <span class="n">header_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the first row (header row)</span>
-</span><span id="Renderer-121"><a href="#Renderer-121"><span class="linenos">121</span></a>        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
-</span><span id="Renderer-122"><a href="#Renderer-122"><span class="linenos">122</span></a>            <span class="n">header_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">header</span>
-</span><span id="Renderer-123"><a href="#Renderer-123"><span class="linenos">123</span></a>
-</span><span id="Renderer-124"><a href="#Renderer-124"><span class="linenos">124</span></a>        <span class="c1"># Make header row font bold</span>
-</span><span id="Renderer-125"><a href="#Renderer-125"><span class="linenos">125</span></a>        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">header_cells</span><span class="p">:</span>
-</span><span id="Renderer-126"><a href="#Renderer-126"><span class="linenos">126</span></a>            <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
-</span><span id="Renderer-127"><a href="#Renderer-127"><span class="linenos">127</span></a>                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
-</span><span id="Renderer-128"><a href="#Renderer-128"><span class="linenos">128</span></a>                    <span class="n">run</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="Renderer-129"><a href="#Renderer-129"><span class="linenos">129</span></a>
-</span><span id="Renderer-130"><a href="#Renderer-130"><span class="linenos">130</span></a>        <span class="c1"># Add data rows</span>
-</span><span id="Renderer-131"><a href="#Renderer-131"><span class="linenos">131</span></a>        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-</span><span id="Renderer-132"><a href="#Renderer-132"><span class="linenos">132</span></a>            <span class="n">row_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the new row</span>
-</span><span id="Renderer-133"><a href="#Renderer-133"><span class="linenos">133</span></a>            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
-</span><span id="Renderer-134"><a href="#Renderer-134"><span class="linenos">134</span></a>                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">header_to_attr</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-</span><span id="Renderer-135"><a href="#Renderer-135"><span class="linenos">135</span></a>                <span class="n">cell_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="Renderer-136"><a href="#Renderer-136"><span class="linenos">136</span></a>                <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Renderer-137"><a href="#Renderer-137"><span class="linenos">137</span></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-</span><span id="Renderer-138"><a href="#Renderer-138"><span class="linenos">138</span></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> element is missing </span><span class="si">{</span><span class="n">attr_name</span><span class="si">!r}</span><span class="s2"> attribute for header </span><span class="si">{</span><span class="n">header</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-</span><span id="Renderer-139"><a href="#Renderer-139"><span class="linenos">139</span></a>                        <span class="s2">&quot;Using empty string as placeholder.&quot;</span>
-</span><span id="Renderer-140"><a href="#Renderer-140"><span class="linenos">140</span></a>                    <span class="p">)</span>
-</span><span id="Renderer-141"><a href="#Renderer-141"><span class="linenos">141</span></a>                    <span class="n">cell_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="Renderer-142"><a href="#Renderer-142"><span class="linenos">142</span></a>                    
-</span><span id="Renderer-143"><a href="#Renderer-143"><span class="linenos">143</span></a>                <span class="n">row_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">cell_value</span>
-</span><span id="Renderer-144"><a href="#Renderer-144"><span class="linenos">144</span></a>            
-</span><span id="Renderer-145"><a href="#Renderer-145"><span class="linenos">145</span></a>        
-</span><span id="Renderer-146"><a href="#Renderer-146"><span class="linenos">146</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Renderer-147"><a href="#Renderer-147"><span class="linenos">147</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">):</span>
-</span><span id="Renderer-148"><a href="#Renderer-148"><span class="linenos">148</span></a>        <span class="k">pass</span>
+</span><span id="Renderer-87"><a href="#Renderer-87"><span class="linenos"> 87</span></a><span class="sd">                    # Column &quot;Task Name&quot;  →  XML attribute &quot;name&quot;</span>
+</span><span id="Renderer-88"><a href="#Renderer-88"><span class="linenos"> 88</span></a><span class="sd">                    # Column &quot;Last Modified&quot;  →  XML attribute &quot;modified&quot;</span>
+</span><span id="Renderer-89"><a href="#Renderer-89"><span class="linenos"> 89</span></a><span class="sd">                    render_table(</span>
+</span><span id="Renderer-90"><a href="#Renderer-90"><span class="linenos"> 90</span></a><span class="sd">                        ...,</span>
+</span><span id="Renderer-91"><a href="#Renderer-91"><span class="linenos"> 91</span></a><span class="sd">                        headers=[&quot;Task Name&quot;, &quot;Last Modified&quot;],</span>
+</span><span id="Renderer-92"><a href="#Renderer-92"><span class="linenos"> 92</span></a><span class="sd">                        header_to_attr=lambda h: {&quot;Task Name&quot;: &quot;name&quot;,</span>
+</span><span id="Renderer-93"><a href="#Renderer-93"><span class="linenos"> 93</span></a><span class="sd">                                                  &quot;Last Modified&quot;: &quot;modified&quot;}[h],</span>
+</span><span id="Renderer-94"><a href="#Renderer-94"><span class="linenos"> 94</span></a><span class="sd">                    )</span>
+</span><span id="Renderer-95"><a href="#Renderer-95"><span class="linenos"> 95</span></a>
+</span><span id="Renderer-96"><a href="#Renderer-96"><span class="linenos"> 96</span></a><span class="sd">                Note:</span>
+</span><span id="Renderer-97"><a href="#Renderer-97"><span class="linenos"> 97</span></a><span class="sd">                    When ``None`` (default), the mapping is derived</span>
+</span><span id="Renderer-98"><a href="#Renderer-98"><span class="linenos"> 98</span></a><span class="sd">                    automatically: strip whitespace, lowercase, replace spaces</span>
+</span><span id="Renderer-99"><a href="#Renderer-99"><span class="linenos"> 99</span></a><span class="sd">                    with underscores. This works whenever the header already</span>
+</span><span id="Renderer-100"><a href="#Renderer-100"><span class="linenos">100</span></a><span class="sd">                    matches the attribute name after that transformation (e.g.</span>
+</span><span id="Renderer-101"><a href="#Renderer-101"><span class="linenos">101</span></a><span class="sd">                    ``&quot;Version&quot;`` → ``&quot;version&quot;`` or ``&quot;Task Type&quot;`` →</span>
+</span><span id="Renderer-102"><a href="#Renderer-102"><span class="linenos">102</span></a><span class="sd">                    ``&quot;task_type&quot;``).</span>
+</span><span id="Renderer-103"><a href="#Renderer-103"><span class="linenos">103</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Renderer-104"><a href="#Renderer-104"><span class="linenos">104</span></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">table_elem</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="p">)</span> <span class="c1"># list of file elements, i.e. rows of the table</span>
+</span><span id="Renderer-105"><a href="#Renderer-105"><span class="linenos">105</span></a>
+</span><span id="Renderer-106"><a href="#Renderer-106"><span class="linenos">106</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="Renderer-107"><a href="#Renderer-107"><span class="linenos">107</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> elements found in the XML. The table will be empty.&quot;</span><span class="p">)</span>
+</span><span id="Renderer-108"><a href="#Renderer-108"><span class="linenos">108</span></a>            <span class="k">return</span>
+</span><span id="Renderer-109"><a href="#Renderer-109"><span class="linenos">109</span></a>
+</span><span id="Renderer-110"><a href="#Renderer-110"><span class="linenos">110</span></a>        <span class="k">if</span> <span class="n">header_to_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Renderer-111"><a href="#Renderer-111"><span class="linenos">111</span></a>            <span class="n">header_to_attr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">header</span><span class="p">:</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+</span><span id="Renderer-112"><a href="#Renderer-112"><span class="linenos">112</span></a>        
+</span><span id="Renderer-113"><a href="#Renderer-113"><span class="linenos">113</span></a>        <span class="c1"># Add table with headers</span>
+</span><span id="Renderer-114"><a href="#Renderer-114"><span class="linenos">114</span></a>        <span class="n">table</span> <span class="o">=</span>  <span class="n">document</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
+</span><span id="Renderer-115"><a href="#Renderer-115"><span class="linenos">115</span></a>        <span class="n">table</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">table_style</span>
+</span><span id="Renderer-116"><a href="#Renderer-116"><span class="linenos">116</span></a>
+</span><span id="Renderer-117"><a href="#Renderer-117"><span class="linenos">117</span></a>        <span class="c1"># Set header row</span>
+</span><span id="Renderer-118"><a href="#Renderer-118"><span class="linenos">118</span></a>        <span class="n">header_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the first row (header row)</span>
+</span><span id="Renderer-119"><a href="#Renderer-119"><span class="linenos">119</span></a>        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span id="Renderer-120"><a href="#Renderer-120"><span class="linenos">120</span></a>            <span class="n">header_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">header</span>
+</span><span id="Renderer-121"><a href="#Renderer-121"><span class="linenos">121</span></a>
+</span><span id="Renderer-122"><a href="#Renderer-122"><span class="linenos">122</span></a>        <span class="c1"># Make header row font bold</span>
+</span><span id="Renderer-123"><a href="#Renderer-123"><span class="linenos">123</span></a>        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">header_cells</span><span class="p">:</span>
+</span><span id="Renderer-124"><a href="#Renderer-124"><span class="linenos">124</span></a>            <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+</span><span id="Renderer-125"><a href="#Renderer-125"><span class="linenos">125</span></a>                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
+</span><span id="Renderer-126"><a href="#Renderer-126"><span class="linenos">126</span></a>                    <span class="n">run</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="Renderer-127"><a href="#Renderer-127"><span class="linenos">127</span></a>
+</span><span id="Renderer-128"><a href="#Renderer-128"><span class="linenos">128</span></a>        <span class="c1"># Add data rows</span>
+</span><span id="Renderer-129"><a href="#Renderer-129"><span class="linenos">129</span></a>        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+</span><span id="Renderer-130"><a href="#Renderer-130"><span class="linenos">130</span></a>            <span class="n">row_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the new row</span>
+</span><span id="Renderer-131"><a href="#Renderer-131"><span class="linenos">131</span></a>            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span id="Renderer-132"><a href="#Renderer-132"><span class="linenos">132</span></a>                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">header_to_attr</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+</span><span id="Renderer-133"><a href="#Renderer-133"><span class="linenos">133</span></a>                <span class="n">cell_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="Renderer-134"><a href="#Renderer-134"><span class="linenos">134</span></a>                <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Renderer-135"><a href="#Renderer-135"><span class="linenos">135</span></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+</span><span id="Renderer-136"><a href="#Renderer-136"><span class="linenos">136</span></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> element is missing </span><span class="si">{</span><span class="n">attr_name</span><span class="si">!r}</span><span class="s2"> attribute for header </span><span class="si">{</span><span class="n">header</span><span class="si">!r}</span><span class="s2">. &quot;</span>
+</span><span id="Renderer-137"><a href="#Renderer-137"><span class="linenos">137</span></a>                        <span class="s2">&quot;Using empty string as placeholder.&quot;</span>
+</span><span id="Renderer-138"><a href="#Renderer-138"><span class="linenos">138</span></a>                    <span class="p">)</span>
+</span><span id="Renderer-139"><a href="#Renderer-139"><span class="linenos">139</span></a>                    <span class="n">cell_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="Renderer-140"><a href="#Renderer-140"><span class="linenos">140</span></a>                    
+</span><span id="Renderer-141"><a href="#Renderer-141"><span class="linenos">141</span></a>                <span class="n">row_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">cell_value</span>
+</span><span id="Renderer-142"><a href="#Renderer-142"><span class="linenos">142</span></a>            
+</span><span id="Renderer-143"><a href="#Renderer-143"><span class="linenos">143</span></a>        
+</span><span id="Renderer-144"><a href="#Renderer-144"><span class="linenos">144</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Renderer-145"><a href="#Renderer-145"><span class="linenos">145</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">):</span>
+</span><span id="Renderer-146"><a href="#Renderer-146"><span class="linenos">146</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -417,25 +413,26 @@ builder.add_section(FileVersioningRenderer("versioning.xml", config))
     <a class="headerlink" href="#Renderer.__init__"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Renderer.__init__-31"><a href="#Renderer.__init__-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
 </span><span id="Renderer.__init__-32"><a href="#Renderer.__init__-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Renderer.__init__-33"><a href="#Renderer.__init__-33"><span class="linenos">33</span></a><span class="sd">        Parameters</span>
-</span><span id="Renderer.__init__-34"><a href="#Renderer.__init__-34"><span class="linenos">34</span></a><span class="sd">        ----------</span>
-</span><span id="Renderer.__init__-35"><a href="#Renderer.__init__-35"><span class="linenos">35</span></a><span class="sd">        xml_path : str | Path</span>
-</span><span id="Renderer.__init__-36"><a href="#Renderer.__init__-36"><span class="linenos">36</span></a><span class="sd">            Path to the versioning XML file.  Parsed once at construction</span>
-</span><span id="Renderer.__init__-37"><a href="#Renderer.__init__-37"><span class="linenos">37</span></a><span class="sd">            time; the root element is stored in ``self.root``.</span>
-</span><span id="Renderer.__init__-38"><a href="#Renderer.__init__-38"><span class="linenos">38</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Renderer.__init__-39"><a href="#Renderer.__init__-39"><span class="linenos">39</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="Renderer.__init__-40"><a href="#Renderer.__init__-40"><span class="linenos">40</span></a>            <span class="n">xml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">xml_path</span><span class="p">)</span>
-</span><span id="Renderer.__init__-41"><a href="#Renderer.__init__-41"><span class="linenos">41</span></a>        
-</span><span id="Renderer.__init__-42"><a href="#Renderer.__init__-42"><span class="linenos">42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span> <span class="o">=</span> <span class="n">xml_path</span>
-</span><span id="Renderer.__init__-43"><a href="#Renderer.__init__-43"><span class="linenos">43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+</span><span id="Renderer.__init__-33"><a href="#Renderer.__init__-33"><span class="linenos">33</span></a><span class="sd">        Args:</span>
+</span><span id="Renderer.__init__-34"><a href="#Renderer.__init__-34"><span class="linenos">34</span></a><span class="sd">            xml_path (str | Path): Path to the versioning XML file. Parsed</span>
+</span><span id="Renderer.__init__-35"><a href="#Renderer.__init__-35"><span class="linenos">35</span></a><span class="sd">                once at construction time; the root element is stored in</span>
+</span><span id="Renderer.__init__-36"><a href="#Renderer.__init__-36"><span class="linenos">36</span></a><span class="sd">                ``self.root``.</span>
+</span><span id="Renderer.__init__-37"><a href="#Renderer.__init__-37"><span class="linenos">37</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Renderer.__init__-38"><a href="#Renderer.__init__-38"><span class="linenos">38</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+</span><span id="Renderer.__init__-39"><a href="#Renderer.__init__-39"><span class="linenos">39</span></a>            <span class="n">xml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">xml_path</span><span class="p">)</span>
+</span><span id="Renderer.__init__-40"><a href="#Renderer.__init__-40"><span class="linenos">40</span></a>        
+</span><span id="Renderer.__init__-41"><a href="#Renderer.__init__-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span> <span class="o">=</span> <span class="n">xml_path</span>
+</span><span id="Renderer.__init__-42"><a href="#Renderer.__init__-42"><span class="linenos">42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_path</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
 </span></pre></div>
 
 
-            <div class="docstring"><h2 id="parameters">Parameters</h2>
+            <div class="docstring"><h6 id="arguments">Arguments:</h6>
 
-<p>xml_path : str | Path
-    Path to the versioning XML file.  Parsed once at construction
-    time; the root element is stored in <code>self.root</code>.</p>
+<ul>
+<li><strong>xml_path (str | Path):</strong>  Path to the versioning XML file. Parsed
+once at construction time; the root element is stored in
+<code>self.root</code>.</li>
+</ul>
 </div>
 
 
@@ -473,105 +470,104 @@ builder.add_section(FileVersioningRenderer("versioning.xml", config))
 
     </div>
     <a class="headerlink" href="#Renderer.render_table"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Renderer.render_table-45"><a href="#Renderer.render_table-45"><span class="linenos"> 45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_table</span><span class="p">(</span>
-</span><span id="Renderer.render_table-46"><a href="#Renderer.render_table-46"><span class="linenos"> 46</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="Renderer.render_table-47"><a href="#Renderer.render_table-47"><span class="linenos"> 47</span></a>        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
-</span><span id="Renderer.render_table-48"><a href="#Renderer.render_table-48"><span class="linenos"> 48</span></a>        <span class="n">table_elem</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
-</span><span id="Renderer.render_table-49"><a href="#Renderer.render_table-49"><span class="linenos"> 49</span></a>        <span class="n">headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="Renderer.render_table-50"><a href="#Renderer.render_table-50"><span class="linenos"> 50</span></a>        <span class="n">tags</span><span class="p">:</span> <span class="n">XMLTag</span><span class="p">,</span>
-</span><span id="Renderer.render_table-51"><a href="#Renderer.render_table-51"><span class="linenos"> 51</span></a>        <span class="n">table_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Table Grid&quot;</span><span class="p">,</span>
-</span><span id="Renderer.render_table-52"><a href="#Renderer.render_table-52"><span class="linenos"> 52</span></a>        <span class="n">header_to_attr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="Renderer.render_table-53"><a href="#Renderer.render_table-53"><span class="linenos"> 53</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Renderer.render_table-54"><a href="#Renderer.render_table-54"><span class="linenos"> 54</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Renderer.render_table-55"><a href="#Renderer.render_table-55"><span class="linenos"> 55</span></a><span class="sd">        Render an XML table element into a Word document table.</span>
-</span><span id="Renderer.render_table-56"><a href="#Renderer.render_table-56"><span class="linenos"> 56</span></a>
-</span><span id="Renderer.render_table-57"><a href="#Renderer.render_table-57"><span class="linenos"> 57</span></a><span class="sd">        Reads row elements from ``table_elem``, creates a Word table with a</span>
-</span><span id="Renderer.render_table-58"><a href="#Renderer.render_table-58"><span class="linenos"> 58</span></a><span class="sd">        bold header row, and fills one data row per XML element found.</span>
-</span><span id="Renderer.render_table-59"><a href="#Renderer.render_table-59"><span class="linenos"> 59</span></a>
-</span><span id="Renderer.render_table-60"><a href="#Renderer.render_table-60"><span class="linenos"> 60</span></a><span class="sd">        Parameters</span>
-</span><span id="Renderer.render_table-61"><a href="#Renderer.render_table-61"><span class="linenos"> 61</span></a><span class="sd">        ----------</span>
-</span><span id="Renderer.render_table-62"><a href="#Renderer.render_table-62"><span class="linenos"> 62</span></a><span class="sd">        document : Document</span>
-</span><span id="Renderer.render_table-63"><a href="#Renderer.render_table-63"><span class="linenos"> 63</span></a><span class="sd">            The ``python-docx`` :class:`Document` object to append the table</span>
-</span><span id="Renderer.render_table-64"><a href="#Renderer.render_table-64"><span class="linenos"> 64</span></a><span class="sd">            to. The table is added at the current end of the document.</span>
-</span><span id="Renderer.render_table-65"><a href="#Renderer.render_table-65"><span class="linenos"> 65</span></a><span class="sd">        table_elem : ET.Element</span>
-</span><span id="Renderer.render_table-66"><a href="#Renderer.render_table-66"><span class="linenos"> 66</span></a><span class="sd">            The XML element whose **direct children** matching ``tags.ROW``</span>
-</span><span id="Renderer.render_table-67"><a href="#Renderer.render_table-67"><span class="linenos"> 67</span></a><span class="sd">            are treated as data rows (e.g. the ``&lt;table&gt;`` element parsed from</span>
-</span><span id="Renderer.render_table-68"><a href="#Renderer.render_table-68"><span class="linenos"> 68</span></a><span class="sd">            the versioning XML). If no children are found the method logs a</span>
-</span><span id="Renderer.render_table-69"><a href="#Renderer.render_table-69"><span class="linenos"> 69</span></a><span class="sd">            warning and returns without adding anything to the document.</span>
-</span><span id="Renderer.render_table-70"><a href="#Renderer.render_table-70"><span class="linenos"> 70</span></a><span class="sd">        headers : Sequence[str]</span>
-</span><span id="Renderer.render_table-71"><a href="#Renderer.render_table-71"><span class="linenos"> 71</span></a><span class="sd">            Ordered list of column labels written into the **first (header)</span>
-</span><span id="Renderer.render_table-72"><a href="#Renderer.render_table-72"><span class="linenos"> 72</span></a><span class="sd">            row** of the Word table. Each label is rendered in **bold**.</span>
-</span><span id="Renderer.render_table-73"><a href="#Renderer.render_table-73"><span class="linenos"> 73</span></a><span class="sd">            The number of columns in the table equals ``len(headers)``.</span>
-</span><span id="Renderer.render_table-74"><a href="#Renderer.render_table-74"><span class="linenos"> 74</span></a><span class="sd">        tags : XMLTag</span>
-</span><span id="Renderer.render_table-75"><a href="#Renderer.render_table-75"><span class="linenos"> 75</span></a><span class="sd">            Dataclass holding XML tag name constants. Only ``tags.ROW`` is</span>
-</span><span id="Renderer.render_table-76"><a href="#Renderer.render_table-76"><span class="linenos"> 76</span></a><span class="sd">            used here — it identifies which child tag name to look for inside</span>
-</span><span id="Renderer.render_table-77"><a href="#Renderer.render_table-77"><span class="linenos"> 77</span></a><span class="sd">            ``table_elem`` (e.g. ``&quot;file&quot;`` for file-versioning or ``&quot;task&quot;``</span>
-</span><span id="Renderer.render_table-78"><a href="#Renderer.render_table-78"><span class="linenos"> 78</span></a><span class="sd">            for task-versioning).</span>
-</span><span id="Renderer.render_table-79"><a href="#Renderer.render_table-79"><span class="linenos"> 79</span></a><span class="sd">        table_style : str</span>
-</span><span id="Renderer.render_table-80"><a href="#Renderer.render_table-80"><span class="linenos"> 80</span></a><span class="sd">            Name of a built-in Word table style applied to the whole table</span>
-</span><span id="Renderer.render_table-81"><a href="#Renderer.render_table-81"><span class="linenos"> 81</span></a><span class="sd">            (default: ``&quot;Table Grid&quot;``). Any style available in the target</span>
-</span><span id="Renderer.render_table-82"><a href="#Renderer.render_table-82"><span class="linenos"> 82</span></a><span class="sd">            ``.docx`` template is accepted, e.g. ``&quot;Light Grid Accent 1&quot;``.</span>
-</span><span id="Renderer.render_table-83"><a href="#Renderer.render_table-83"><span class="linenos"> 83</span></a><span class="sd">        header_to_attr : Callable[[str], str] | None</span>
-</span><span id="Renderer.render_table-84"><a href="#Renderer.render_table-84"><span class="linenos"> 84</span></a><span class="sd">            A function that converts a header label into the corresponding</span>
-</span><span id="Renderer.render_table-85"><a href="#Renderer.render_table-85"><span class="linenos"> 85</span></a><span class="sd">            XML attribute name to read from each row element.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Renderer.render_table-44"><a href="#Renderer.render_table-44"><span class="linenos"> 44</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_table</span><span class="p">(</span>
+</span><span id="Renderer.render_table-45"><a href="#Renderer.render_table-45"><span class="linenos"> 45</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="Renderer.render_table-46"><a href="#Renderer.render_table-46"><span class="linenos"> 46</span></a>        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
+</span><span id="Renderer.render_table-47"><a href="#Renderer.render_table-47"><span class="linenos"> 47</span></a>        <span class="n">table_elem</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
+</span><span id="Renderer.render_table-48"><a href="#Renderer.render_table-48"><span class="linenos"> 48</span></a>        <span class="n">headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="Renderer.render_table-49"><a href="#Renderer.render_table-49"><span class="linenos"> 49</span></a>        <span class="n">tags</span><span class="p">:</span> <span class="n">XMLTag</span><span class="p">,</span>
+</span><span id="Renderer.render_table-50"><a href="#Renderer.render_table-50"><span class="linenos"> 50</span></a>        <span class="n">table_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Table Grid&quot;</span><span class="p">,</span>
+</span><span id="Renderer.render_table-51"><a href="#Renderer.render_table-51"><span class="linenos"> 51</span></a>        <span class="n">header_to_attr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="Renderer.render_table-52"><a href="#Renderer.render_table-52"><span class="linenos"> 52</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Renderer.render_table-53"><a href="#Renderer.render_table-53"><span class="linenos"> 53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Renderer.render_table-54"><a href="#Renderer.render_table-54"><span class="linenos"> 54</span></a><span class="sd">        Render an XML table element into a Word document table.</span>
+</span><span id="Renderer.render_table-55"><a href="#Renderer.render_table-55"><span class="linenos"> 55</span></a>
+</span><span id="Renderer.render_table-56"><a href="#Renderer.render_table-56"><span class="linenos"> 56</span></a><span class="sd">        Reads row elements from ``table_elem``, creates a Word table with a</span>
+</span><span id="Renderer.render_table-57"><a href="#Renderer.render_table-57"><span class="linenos"> 57</span></a><span class="sd">        bold header row, and fills one data row per XML element found.</span>
+</span><span id="Renderer.render_table-58"><a href="#Renderer.render_table-58"><span class="linenos"> 58</span></a>
+</span><span id="Renderer.render_table-59"><a href="#Renderer.render_table-59"><span class="linenos"> 59</span></a><span class="sd">        Args:</span>
+</span><span id="Renderer.render_table-60"><a href="#Renderer.render_table-60"><span class="linenos"> 60</span></a><span class="sd">            document (Document): The ``python-docx`` :class:`Document` object</span>
+</span><span id="Renderer.render_table-61"><a href="#Renderer.render_table-61"><span class="linenos"> 61</span></a><span class="sd">                to append the table to. The table is added at the current end</span>
+</span><span id="Renderer.render_table-62"><a href="#Renderer.render_table-62"><span class="linenos"> 62</span></a><span class="sd">                of the document.</span>
+</span><span id="Renderer.render_table-63"><a href="#Renderer.render_table-63"><span class="linenos"> 63</span></a><span class="sd">            table_elem (ET.Element): The XML element whose **direct children**</span>
+</span><span id="Renderer.render_table-64"><a href="#Renderer.render_table-64"><span class="linenos"> 64</span></a><span class="sd">                matching ``tags.ROW`` are treated as data rows (e.g. the</span>
+</span><span id="Renderer.render_table-65"><a href="#Renderer.render_table-65"><span class="linenos"> 65</span></a><span class="sd">                ``&lt;table&gt;`` element parsed from the versioning XML). If no</span>
+</span><span id="Renderer.render_table-66"><a href="#Renderer.render_table-66"><span class="linenos"> 66</span></a><span class="sd">                children are found the method logs a warning and returns</span>
+</span><span id="Renderer.render_table-67"><a href="#Renderer.render_table-67"><span class="linenos"> 67</span></a><span class="sd">                without adding anything to the document.</span>
+</span><span id="Renderer.render_table-68"><a href="#Renderer.render_table-68"><span class="linenos"> 68</span></a><span class="sd">            headers (Sequence[str]): Ordered list of column labels written</span>
+</span><span id="Renderer.render_table-69"><a href="#Renderer.render_table-69"><span class="linenos"> 69</span></a><span class="sd">                into the **first (header) row** of the Word table. Each label</span>
+</span><span id="Renderer.render_table-70"><a href="#Renderer.render_table-70"><span class="linenos"> 70</span></a><span class="sd">                is rendered in **bold**. The number of columns in the table</span>
+</span><span id="Renderer.render_table-71"><a href="#Renderer.render_table-71"><span class="linenos"> 71</span></a><span class="sd">                equals ``len(headers)``.</span>
+</span><span id="Renderer.render_table-72"><a href="#Renderer.render_table-72"><span class="linenos"> 72</span></a><span class="sd">            tags (XMLTag): Dataclass holding XML tag name constants. Only</span>
+</span><span id="Renderer.render_table-73"><a href="#Renderer.render_table-73"><span class="linenos"> 73</span></a><span class="sd">                ``tags.ROW`` is used here — it identifies which child tag name</span>
+</span><span id="Renderer.render_table-74"><a href="#Renderer.render_table-74"><span class="linenos"> 74</span></a><span class="sd">                to look for inside ``table_elem`` (e.g. ``&quot;file&quot;`` for</span>
+</span><span id="Renderer.render_table-75"><a href="#Renderer.render_table-75"><span class="linenos"> 75</span></a><span class="sd">                file-versioning or ``&quot;task&quot;`` for task-versioning).</span>
+</span><span id="Renderer.render_table-76"><a href="#Renderer.render_table-76"><span class="linenos"> 76</span></a><span class="sd">            table_style (str): Name of a built-in Word table style applied to</span>
+</span><span id="Renderer.render_table-77"><a href="#Renderer.render_table-77"><span class="linenos"> 77</span></a><span class="sd">                the whole table (default: ``&quot;Table Grid&quot;``). Any style</span>
+</span><span id="Renderer.render_table-78"><a href="#Renderer.render_table-78"><span class="linenos"> 78</span></a><span class="sd">                available in the target ``.docx`` template is accepted, e.g.</span>
+</span><span id="Renderer.render_table-79"><a href="#Renderer.render_table-79"><span class="linenos"> 79</span></a><span class="sd">                ``&quot;Light Grid Accent 1&quot;``.</span>
+</span><span id="Renderer.render_table-80"><a href="#Renderer.render_table-80"><span class="linenos"> 80</span></a><span class="sd">            header_to_attr (Callable[[str], str] | None): A function that</span>
+</span><span id="Renderer.render_table-81"><a href="#Renderer.render_table-81"><span class="linenos"> 81</span></a><span class="sd">                converts a header label into the corresponding XML attribute</span>
+</span><span id="Renderer.render_table-82"><a href="#Renderer.render_table-82"><span class="linenos"> 82</span></a><span class="sd">                name to read from each row element.</span>
+</span><span id="Renderer.render_table-83"><a href="#Renderer.render_table-83"><span class="linenos"> 83</span></a>
+</span><span id="Renderer.render_table-84"><a href="#Renderer.render_table-84"><span class="linenos"> 84</span></a><span class="sd">                Use this when the column label shown in the document does</span>
+</span><span id="Renderer.render_table-85"><a href="#Renderer.render_table-85"><span class="linenos"> 85</span></a><span class="sd">                **not** match the XML attribute name 1-to-1. For example::</span>
 </span><span id="Renderer.render_table-86"><a href="#Renderer.render_table-86"><span class="linenos"> 86</span></a>
-</span><span id="Renderer.render_table-87"><a href="#Renderer.render_table-87"><span class="linenos"> 87</span></a><span class="sd">            Use this when the column label shown in the document does **not**</span>
-</span><span id="Renderer.render_table-88"><a href="#Renderer.render_table-88"><span class="linenos"> 88</span></a><span class="sd">            match the XML attribute name 1-to-1. For example::</span>
-</span><span id="Renderer.render_table-89"><a href="#Renderer.render_table-89"><span class="linenos"> 89</span></a>
-</span><span id="Renderer.render_table-90"><a href="#Renderer.render_table-90"><span class="linenos"> 90</span></a><span class="sd">                # Column &quot;Task Name&quot;  →  XML attribute &quot;name&quot;</span>
-</span><span id="Renderer.render_table-91"><a href="#Renderer.render_table-91"><span class="linenos"> 91</span></a><span class="sd">                # Column &quot;Last Modified&quot;  →  XML attribute &quot;modified&quot;</span>
-</span><span id="Renderer.render_table-92"><a href="#Renderer.render_table-92"><span class="linenos"> 92</span></a><span class="sd">                render_table(</span>
-</span><span id="Renderer.render_table-93"><a href="#Renderer.render_table-93"><span class="linenos"> 93</span></a><span class="sd">                    ...,</span>
-</span><span id="Renderer.render_table-94"><a href="#Renderer.render_table-94"><span class="linenos"> 94</span></a><span class="sd">                    headers=[&quot;Task Name&quot;, &quot;Last Modified&quot;],</span>
-</span><span id="Renderer.render_table-95"><a href="#Renderer.render_table-95"><span class="linenos"> 95</span></a><span class="sd">                    header_to_attr=lambda h: {&quot;Task Name&quot;: &quot;name&quot;,</span>
-</span><span id="Renderer.render_table-96"><a href="#Renderer.render_table-96"><span class="linenos"> 96</span></a><span class="sd">                                              &quot;Last Modified&quot;: &quot;modified&quot;}[h],</span>
-</span><span id="Renderer.render_table-97"><a href="#Renderer.render_table-97"><span class="linenos"> 97</span></a><span class="sd">                )</span>
-</span><span id="Renderer.render_table-98"><a href="#Renderer.render_table-98"><span class="linenos"> 98</span></a>
-</span><span id="Renderer.render_table-99"><a href="#Renderer.render_table-99"><span class="linenos"> 99</span></a><span class="sd">            .. note::</span>
-</span><span id="Renderer.render_table-100"><a href="#Renderer.render_table-100"><span class="linenos">100</span></a><span class="sd">                When ``None`` (default), the mapping is derived automatically:</span>
-</span><span id="Renderer.render_table-101"><a href="#Renderer.render_table-101"><span class="linenos">101</span></a><span class="sd">                strip whitespace, lowercase, replace spaces with underscores.</span>
-</span><span id="Renderer.render_table-102"><a href="#Renderer.render_table-102"><span class="linenos">102</span></a><span class="sd">                This works whenever the header already matches the attribute</span>
-</span><span id="Renderer.render_table-103"><a href="#Renderer.render_table-103"><span class="linenos">103</span></a><span class="sd">                name after that transformation (e.g. ``&quot;Version&quot;`` → ``&quot;version&quot;``</span>
-</span><span id="Renderer.render_table-104"><a href="#Renderer.render_table-104"><span class="linenos">104</span></a><span class="sd">                or ``&quot;Task Type&quot;`` → ``&quot;task_type&quot;``).</span>
-</span><span id="Renderer.render_table-105"><a href="#Renderer.render_table-105"><span class="linenos">105</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Renderer.render_table-106"><a href="#Renderer.render_table-106"><span class="linenos">106</span></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">table_elem</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="p">)</span> <span class="c1"># list of file elements, i.e. rows of the table</span>
-</span><span id="Renderer.render_table-107"><a href="#Renderer.render_table-107"><span class="linenos">107</span></a>
-</span><span id="Renderer.render_table-108"><a href="#Renderer.render_table-108"><span class="linenos">108</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="Renderer.render_table-109"><a href="#Renderer.render_table-109"><span class="linenos">109</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> elements found in the XML. The table will be empty.&quot;</span><span class="p">)</span>
-</span><span id="Renderer.render_table-110"><a href="#Renderer.render_table-110"><span class="linenos">110</span></a>            <span class="k">return</span>
-</span><span id="Renderer.render_table-111"><a href="#Renderer.render_table-111"><span class="linenos">111</span></a>
-</span><span id="Renderer.render_table-112"><a href="#Renderer.render_table-112"><span class="linenos">112</span></a>        <span class="k">if</span> <span class="n">header_to_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Renderer.render_table-113"><a href="#Renderer.render_table-113"><span class="linenos">113</span></a>            <span class="n">header_to_attr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">header</span><span class="p">:</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-</span><span id="Renderer.render_table-114"><a href="#Renderer.render_table-114"><span class="linenos">114</span></a>        
-</span><span id="Renderer.render_table-115"><a href="#Renderer.render_table-115"><span class="linenos">115</span></a>        <span class="c1"># Add table with headers</span>
-</span><span id="Renderer.render_table-116"><a href="#Renderer.render_table-116"><span class="linenos">116</span></a>        <span class="n">table</span> <span class="o">=</span>  <span class="n">document</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
-</span><span id="Renderer.render_table-117"><a href="#Renderer.render_table-117"><span class="linenos">117</span></a>        <span class="n">table</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">table_style</span>
-</span><span id="Renderer.render_table-118"><a href="#Renderer.render_table-118"><span class="linenos">118</span></a>
-</span><span id="Renderer.render_table-119"><a href="#Renderer.render_table-119"><span class="linenos">119</span></a>        <span class="c1"># Set header row</span>
-</span><span id="Renderer.render_table-120"><a href="#Renderer.render_table-120"><span class="linenos">120</span></a>        <span class="n">header_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the first row (header row)</span>
-</span><span id="Renderer.render_table-121"><a href="#Renderer.render_table-121"><span class="linenos">121</span></a>        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
-</span><span id="Renderer.render_table-122"><a href="#Renderer.render_table-122"><span class="linenos">122</span></a>            <span class="n">header_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">header</span>
-</span><span id="Renderer.render_table-123"><a href="#Renderer.render_table-123"><span class="linenos">123</span></a>
-</span><span id="Renderer.render_table-124"><a href="#Renderer.render_table-124"><span class="linenos">124</span></a>        <span class="c1"># Make header row font bold</span>
-</span><span id="Renderer.render_table-125"><a href="#Renderer.render_table-125"><span class="linenos">125</span></a>        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">header_cells</span><span class="p">:</span>
-</span><span id="Renderer.render_table-126"><a href="#Renderer.render_table-126"><span class="linenos">126</span></a>            <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
-</span><span id="Renderer.render_table-127"><a href="#Renderer.render_table-127"><span class="linenos">127</span></a>                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
-</span><span id="Renderer.render_table-128"><a href="#Renderer.render_table-128"><span class="linenos">128</span></a>                    <span class="n">run</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="Renderer.render_table-129"><a href="#Renderer.render_table-129"><span class="linenos">129</span></a>
-</span><span id="Renderer.render_table-130"><a href="#Renderer.render_table-130"><span class="linenos">130</span></a>        <span class="c1"># Add data rows</span>
-</span><span id="Renderer.render_table-131"><a href="#Renderer.render_table-131"><span class="linenos">131</span></a>        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-</span><span id="Renderer.render_table-132"><a href="#Renderer.render_table-132"><span class="linenos">132</span></a>            <span class="n">row_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the new row</span>
-</span><span id="Renderer.render_table-133"><a href="#Renderer.render_table-133"><span class="linenos">133</span></a>            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
-</span><span id="Renderer.render_table-134"><a href="#Renderer.render_table-134"><span class="linenos">134</span></a>                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">header_to_attr</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-</span><span id="Renderer.render_table-135"><a href="#Renderer.render_table-135"><span class="linenos">135</span></a>                <span class="n">cell_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="Renderer.render_table-136"><a href="#Renderer.render_table-136"><span class="linenos">136</span></a>                <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Renderer.render_table-137"><a href="#Renderer.render_table-137"><span class="linenos">137</span></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-</span><span id="Renderer.render_table-138"><a href="#Renderer.render_table-138"><span class="linenos">138</span></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> element is missing </span><span class="si">{</span><span class="n">attr_name</span><span class="si">!r}</span><span class="s2"> attribute for header </span><span class="si">{</span><span class="n">header</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-</span><span id="Renderer.render_table-139"><a href="#Renderer.render_table-139"><span class="linenos">139</span></a>                        <span class="s2">&quot;Using empty string as placeholder.&quot;</span>
-</span><span id="Renderer.render_table-140"><a href="#Renderer.render_table-140"><span class="linenos">140</span></a>                    <span class="p">)</span>
-</span><span id="Renderer.render_table-141"><a href="#Renderer.render_table-141"><span class="linenos">141</span></a>                    <span class="n">cell_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="Renderer.render_table-142"><a href="#Renderer.render_table-142"><span class="linenos">142</span></a>                    
-</span><span id="Renderer.render_table-143"><a href="#Renderer.render_table-143"><span class="linenos">143</span></a>                <span class="n">row_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">cell_value</span>
+</span><span id="Renderer.render_table-87"><a href="#Renderer.render_table-87"><span class="linenos"> 87</span></a><span class="sd">                    # Column &quot;Task Name&quot;  →  XML attribute &quot;name&quot;</span>
+</span><span id="Renderer.render_table-88"><a href="#Renderer.render_table-88"><span class="linenos"> 88</span></a><span class="sd">                    # Column &quot;Last Modified&quot;  →  XML attribute &quot;modified&quot;</span>
+</span><span id="Renderer.render_table-89"><a href="#Renderer.render_table-89"><span class="linenos"> 89</span></a><span class="sd">                    render_table(</span>
+</span><span id="Renderer.render_table-90"><a href="#Renderer.render_table-90"><span class="linenos"> 90</span></a><span class="sd">                        ...,</span>
+</span><span id="Renderer.render_table-91"><a href="#Renderer.render_table-91"><span class="linenos"> 91</span></a><span class="sd">                        headers=[&quot;Task Name&quot;, &quot;Last Modified&quot;],</span>
+</span><span id="Renderer.render_table-92"><a href="#Renderer.render_table-92"><span class="linenos"> 92</span></a><span class="sd">                        header_to_attr=lambda h: {&quot;Task Name&quot;: &quot;name&quot;,</span>
+</span><span id="Renderer.render_table-93"><a href="#Renderer.render_table-93"><span class="linenos"> 93</span></a><span class="sd">                                                  &quot;Last Modified&quot;: &quot;modified&quot;}[h],</span>
+</span><span id="Renderer.render_table-94"><a href="#Renderer.render_table-94"><span class="linenos"> 94</span></a><span class="sd">                    )</span>
+</span><span id="Renderer.render_table-95"><a href="#Renderer.render_table-95"><span class="linenos"> 95</span></a>
+</span><span id="Renderer.render_table-96"><a href="#Renderer.render_table-96"><span class="linenos"> 96</span></a><span class="sd">                Note:</span>
+</span><span id="Renderer.render_table-97"><a href="#Renderer.render_table-97"><span class="linenos"> 97</span></a><span class="sd">                    When ``None`` (default), the mapping is derived</span>
+</span><span id="Renderer.render_table-98"><a href="#Renderer.render_table-98"><span class="linenos"> 98</span></a><span class="sd">                    automatically: strip whitespace, lowercase, replace spaces</span>
+</span><span id="Renderer.render_table-99"><a href="#Renderer.render_table-99"><span class="linenos"> 99</span></a><span class="sd">                    with underscores. This works whenever the header already</span>
+</span><span id="Renderer.render_table-100"><a href="#Renderer.render_table-100"><span class="linenos">100</span></a><span class="sd">                    matches the attribute name after that transformation (e.g.</span>
+</span><span id="Renderer.render_table-101"><a href="#Renderer.render_table-101"><span class="linenos">101</span></a><span class="sd">                    ``&quot;Version&quot;`` → ``&quot;version&quot;`` or ``&quot;Task Type&quot;`` →</span>
+</span><span id="Renderer.render_table-102"><a href="#Renderer.render_table-102"><span class="linenos">102</span></a><span class="sd">                    ``&quot;task_type&quot;``).</span>
+</span><span id="Renderer.render_table-103"><a href="#Renderer.render_table-103"><span class="linenos">103</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Renderer.render_table-104"><a href="#Renderer.render_table-104"><span class="linenos">104</span></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">table_elem</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="p">)</span> <span class="c1"># list of file elements, i.e. rows of the table</span>
+</span><span id="Renderer.render_table-105"><a href="#Renderer.render_table-105"><span class="linenos">105</span></a>
+</span><span id="Renderer.render_table-106"><a href="#Renderer.render_table-106"><span class="linenos">106</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="Renderer.render_table-107"><a href="#Renderer.render_table-107"><span class="linenos">107</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> elements found in the XML. The table will be empty.&quot;</span><span class="p">)</span>
+</span><span id="Renderer.render_table-108"><a href="#Renderer.render_table-108"><span class="linenos">108</span></a>            <span class="k">return</span>
+</span><span id="Renderer.render_table-109"><a href="#Renderer.render_table-109"><span class="linenos">109</span></a>
+</span><span id="Renderer.render_table-110"><a href="#Renderer.render_table-110"><span class="linenos">110</span></a>        <span class="k">if</span> <span class="n">header_to_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Renderer.render_table-111"><a href="#Renderer.render_table-111"><span class="linenos">111</span></a>            <span class="n">header_to_attr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">header</span><span class="p">:</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+</span><span id="Renderer.render_table-112"><a href="#Renderer.render_table-112"><span class="linenos">112</span></a>        
+</span><span id="Renderer.render_table-113"><a href="#Renderer.render_table-113"><span class="linenos">113</span></a>        <span class="c1"># Add table with headers</span>
+</span><span id="Renderer.render_table-114"><a href="#Renderer.render_table-114"><span class="linenos">114</span></a>        <span class="n">table</span> <span class="o">=</span>  <span class="n">document</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
+</span><span id="Renderer.render_table-115"><a href="#Renderer.render_table-115"><span class="linenos">115</span></a>        <span class="n">table</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">table_style</span>
+</span><span id="Renderer.render_table-116"><a href="#Renderer.render_table-116"><span class="linenos">116</span></a>
+</span><span id="Renderer.render_table-117"><a href="#Renderer.render_table-117"><span class="linenos">117</span></a>        <span class="c1"># Set header row</span>
+</span><span id="Renderer.render_table-118"><a href="#Renderer.render_table-118"><span class="linenos">118</span></a>        <span class="n">header_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the first row (header row)</span>
+</span><span id="Renderer.render_table-119"><a href="#Renderer.render_table-119"><span class="linenos">119</span></a>        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span id="Renderer.render_table-120"><a href="#Renderer.render_table-120"><span class="linenos">120</span></a>            <span class="n">header_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">header</span>
+</span><span id="Renderer.render_table-121"><a href="#Renderer.render_table-121"><span class="linenos">121</span></a>
+</span><span id="Renderer.render_table-122"><a href="#Renderer.render_table-122"><span class="linenos">122</span></a>        <span class="c1"># Make header row font bold</span>
+</span><span id="Renderer.render_table-123"><a href="#Renderer.render_table-123"><span class="linenos">123</span></a>        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">header_cells</span><span class="p">:</span>
+</span><span id="Renderer.render_table-124"><a href="#Renderer.render_table-124"><span class="linenos">124</span></a>            <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+</span><span id="Renderer.render_table-125"><a href="#Renderer.render_table-125"><span class="linenos">125</span></a>                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
+</span><span id="Renderer.render_table-126"><a href="#Renderer.render_table-126"><span class="linenos">126</span></a>                    <span class="n">run</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="Renderer.render_table-127"><a href="#Renderer.render_table-127"><span class="linenos">127</span></a>
+</span><span id="Renderer.render_table-128"><a href="#Renderer.render_table-128"><span class="linenos">128</span></a>        <span class="c1"># Add data rows</span>
+</span><span id="Renderer.render_table-129"><a href="#Renderer.render_table-129"><span class="linenos">129</span></a>        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+</span><span id="Renderer.render_table-130"><a href="#Renderer.render_table-130"><span class="linenos">130</span></a>            <span class="n">row_cells</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span><span class="o">.</span><span class="n">cells</span> <span class="c1"># list of cells in the new row</span>
+</span><span id="Renderer.render_table-131"><a href="#Renderer.render_table-131"><span class="linenos">131</span></a>            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span id="Renderer.render_table-132"><a href="#Renderer.render_table-132"><span class="linenos">132</span></a>                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">header_to_attr</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+</span><span id="Renderer.render_table-133"><a href="#Renderer.render_table-133"><span class="linenos">133</span></a>                <span class="n">cell_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="Renderer.render_table-134"><a href="#Renderer.render_table-134"><span class="linenos">134</span></a>                <span class="k">if</span> <span class="n">cell_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Renderer.render_table-135"><a href="#Renderer.render_table-135"><span class="linenos">135</span></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+</span><span id="Renderer.render_table-136"><a href="#Renderer.render_table-136"><span class="linenos">136</span></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tags</span><span class="o">.</span><span class="n">ROW</span><span class="si">!r}</span><span class="s2"> element is missing </span><span class="si">{</span><span class="n">attr_name</span><span class="si">!r}</span><span class="s2"> attribute for header </span><span class="si">{</span><span class="n">header</span><span class="si">!r}</span><span class="s2">. &quot;</span>
+</span><span id="Renderer.render_table-137"><a href="#Renderer.render_table-137"><span class="linenos">137</span></a>                        <span class="s2">&quot;Using empty string as placeholder.&quot;</span>
+</span><span id="Renderer.render_table-138"><a href="#Renderer.render_table-138"><span class="linenos">138</span></a>                    <span class="p">)</span>
+</span><span id="Renderer.render_table-139"><a href="#Renderer.render_table-139"><span class="linenos">139</span></a>                    <span class="n">cell_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="Renderer.render_table-140"><a href="#Renderer.render_table-140"><span class="linenos">140</span></a>                    
+</span><span id="Renderer.render_table-141"><a href="#Renderer.render_table-141"><span class="linenos">141</span></a>                <span class="n">row_cells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">cell_value</span>
 </span></pre></div>
 
 
@@ -580,57 +576,54 @@ builder.add_section(FileVersioningRenderer("versioning.xml", config))
 <p>Reads row elements from <code>table_elem</code>, creates a Word table with a
 bold header row, and fills one data row per XML element found.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="arguments">Arguments:</h6>
 
-<p>document : Document
-    The <code>python-docx</code> <code>Document</code> object to append the table
-    to. The table is added at the current end of the document.
-table_elem : ET.Element
-    The XML element whose <strong>direct children</strong> matching <code>tags.ROW</code>
-    are treated as data rows (e.g. the <code>&lt;table&gt;</code> element parsed from
-    the versioning XML). If no children are found the method logs a
-    warning and returns without adding anything to the document.
-headers : Sequence[str]
-    Ordered list of column labels written into the <strong>first (header)
-    row</strong> of the Word table. Each label is rendered in <strong>bold</strong>.
-    The number of columns in the table equals <code>len(headers)</code>.
-tags : XMLTag
-    Dataclass holding XML tag name constants. Only <code>tags.ROW</code> is
-    used here — it identifies which child tag name to look for inside
-    <code>table_elem</code> (e.g. <code>"file"</code> for file-versioning or <code>"task"</code>
-    for task-versioning).
-table_style : str
-    Name of a built-in Word table style applied to the whole table
-    (default: <code>"Table Grid"</code>). Any style available in the target
-    <code>.docx</code> template is accepted, e.g. <code>"Light Grid Accent 1"</code>.
-header_to_attr : Callable[[str], str] | None
-    A function that converts a header label into the corresponding
-    XML attribute name to read from each row element.</p>
+<ul>
+<li><strong>document (Document):</strong>  The <code>python-docx</code> <code>Document</code> object
+to append the table to. The table is added at the current end
+of the document.</li>
+<li><strong>table_elem (ET.Element):</strong>  The XML element whose <strong>direct children</strong>
+matching <code>tags.ROW</code> are treated as data rows (e.g. the
+<code>&lt;table&gt;</code> element parsed from the versioning XML). If no
+children are found the method logs a warning and returns
+without adding anything to the document.</li>
+<li><strong>headers (Sequence[str]):</strong>  Ordered list of column labels written
+into the <strong>first (header) row</strong> of the Word table. Each label
+is rendered in <strong>bold</strong>. The number of columns in the table
+equals <code>len(headers)</code>.</li>
+<li><strong>tags (XMLTag):</strong>  Dataclass holding XML tag name constants. Only
+<code>tags.ROW</code> is used here — it identifies which child tag name
+to look for inside <code>table_elem</code> (e.g. <code>"file"</code> for
+file-versioning or <code>"task"</code> for task-versioning).</li>
+<li><strong>table_style (str):</strong>  Name of a built-in Word table style applied to
+the whole table (default: <code>"Table Grid"</code>). Any style
+available in the target <code>.docx</code> template is accepted, e.g.
+<code>"Light Grid Accent 1"</code>.</li>
+<li><p><strong>header_to_attr (Callable[[str], str] | None):</strong>  A function that
+converts a header label into the corresponding XML attribute
+name to read from each row element.</p>
 
-<pre><code>Use this when the column label shown in the document does **not**
-match the XML attribute name 1-to-1. For example::
+<p>Use this when the column label shown in the document does
+<strong>not</strong> match the XML attribute name 1-to-1. For example::</p>
 
-    # Column "Task Name"  →  XML attribute "name"
-    # Column "Last Modified"  →  XML attribute "modified"
-    render_table(
-        ...,
-        headers=["Task Name", "Last Modified"],
-        header_to_attr=lambda h: {"Task Name": "name",
-                                  "Last Modified": "modified"}[h],
-    )
-
-
-
-<div class="alert note">
-
-When ``None`` (default), the mapping is derived automatically:
-strip whitespace, lowercase, replace spaces with underscores.
-This works whenever the header already matches the attribute
-name after that transformation (e.g. ``"Version"`` → ``"version"``
-or ``"Task Type"`` → ``"task_type"``).
-
-</div>
+<pre><code># Column "Task Name"  →  XML attribute "name"
+# Column "Last Modified"  →  XML attribute "modified"
+render_table(
+    ...,
+    headers=["Task Name", "Last Modified"],
+    header_to_attr=lambda h: {"Task Name": "name",
+                              "Last Modified": "modified"}[h],
+)
 </code></pre>
+
+<p>Note:
+    When <code>None</code> (default), the mapping is derived
+    automatically: strip whitespace, lowercase, replace spaces
+    with underscores. This works whenever the header already
+    matches the attribute name after that transformation (e.g.
+    <code>"Version"</code> → <code>"version"</code> or <code>"Task Type"</code> →
+    <code>"task_type"</code>).</p></li>
+</ul>
 </div>
 
 
@@ -647,9 +640,9 @@ or ``"Task Type"`` → ``"task_type"``).
 
     </div>
     <a class="headerlink" href="#Renderer.render_section"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Renderer.render_section-146"><a href="#Renderer.render_section-146"><span class="linenos">146</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Renderer.render_section-147"><a href="#Renderer.render_section-147"><span class="linenos">147</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">):</span>
-</span><span id="Renderer.render_section-148"><a href="#Renderer.render_section-148"><span class="linenos">148</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Renderer.render_section-144"><a href="#Renderer.render_section-144"><span class="linenos">144</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Renderer.render_section-145"><a href="#Renderer.render_section-145"><span class="linenos">145</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">):</span>
+</span><span id="Renderer.render_section-146"><a href="#Renderer.render_section-146"><span class="linenos">146</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 

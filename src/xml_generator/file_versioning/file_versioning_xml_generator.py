@@ -42,34 +42,29 @@ class FileVersioningXMLGenerator(XMLGenerator):
                  config: FileVersioningConfig,
         ):
         """
-        Parameters
-        ----------
-        root_name : str
-            Tag name of the XML root element (e.g. ``"FileVersioning"``).
-        identation : bool
-            Whether to pretty-print the output (default: ``True``).
-        indent_space : str
-            String used for each indentation level (default: two spaces).
-        encoding : str
-            File encoding (default: ``"utf-8"``).
-        xml_declaration : bool
-            Whether to include the XML declaration header (default: ``True``).
-        paragraph_title : str
-            Value of the ``title`` attribute on the ``<paragraph>`` element.
-        paragraph_number : int | str
-            Value of the ``number`` attribute on the ``<paragraph>`` element
-            (default: ``"2"``).
-        attribute_names : list[str]
-            Names of the XML attributes written on each ``<file>`` row
-            element.  Must match attributes present on
-            :class:`~model.file.file.File` objects
-            (default: ``["name", "version"]``).
-        file_collection : FileCollection | None
-            The file data to serialise.  When provided, :meth:`generate` is
-            called immediately during construction.
-        config : FileVersioningConfig
-            Configuration object that provides XML tag constants via
-            ``config.tags``.
+        Args:
+            root_name (str): Tag name of the XML root element (e.g.
+                ``"FileVersioning"``).
+            identation (bool): Whether to pretty-print the output
+                (default: ``True``).
+            indent_space (str): String used for each indentation level
+                (default: two spaces).
+            encoding (str): File encoding (default: ``"utf-8"``).
+            xml_declaration (bool): Whether to include the XML declaration
+                header (default: ``True``).
+            paragraph_title (str): Value of the ``title`` attribute on the
+                ``<paragraph>`` element.
+            paragraph_number (int | str): Value of the ``number`` attribute
+                on the ``<paragraph>`` element (default: ``"2"``).
+            attribute_names (list[str]): Names of the XML attributes written
+                on each ``<file>`` row element. Must match attributes present
+                on :class:`~model.file.file.File` objects
+                (default: ``["name", "version"]``).
+            file_collection (FileCollection | None): The file data to
+                serialise. When provided, :meth:`generate` is called
+                immediately during construction.
+            config (FileVersioningConfig): Configuration object that provides
+                XML tag constants via ``config.tags``.
         """
         super().__init__(root_name, identation, indent_space, encoding, xml_declaration)
         self.paragraph_title = paragraph_title
@@ -94,11 +89,9 @@ class FileVersioningXMLGenerator(XMLGenerator):
         """
         Set the file collection after construction.
 
-        Parameters
-        ----------
-        file_collection : FileCollection
-            The file data to serialise.  Call :meth:`generate` afterwards
-            to populate the XML tree.
+        Args:
+            file_collection (FileCollection): The file data to serialise.
+                Call :meth:`generate` afterwards to populate the XML tree.
         """
         self.file_collection = file_collection
 
@@ -114,7 +107,7 @@ class FileVersioningXMLGenerator(XMLGenerator):
 
         Each ``<file>`` element carries the attributes listed in
         ``self.attributes`` (derived from ``attribute_names`` passed at
-        construction time).  Values are read from the corresponding
+        construction time). Values are read from the corresponding
         properties of each :class:`~model.file.file.File` object via
         :func:`getattr`.
         """

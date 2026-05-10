@@ -1,4 +1,4 @@
-# VDD-A — Version Difference Document Automation
+# VDD-Automation
 
 Automated generation of **Version Difference Document (VDD)** reports in Word (`.docx`) format from XML versioning data.
 

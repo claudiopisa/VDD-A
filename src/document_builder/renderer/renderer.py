@@ -29,11 +29,10 @@ class Renderer(ABC):
 
     def __init__(self, xml_path: str | Path):
         """
-        Parameters
-        ----------
-        xml_path : str | Path
-            Path to the versioning XML file.  Parsed once at construction
-            time; the root element is stored in ``self.root``.
+        Args:
+            xml_path (str | Path): Path to the versioning XML file. Parsed
+                once at construction time; the root element is stored in
+                ``self.root``.
         """
         if not isinstance(xml_path, Path):
             xml_path = Path(xml_path)
@@ -56,51 +55,50 @@ class Renderer(ABC):
         Reads row elements from ``table_elem``, creates a Word table with a
         bold header row, and fills one data row per XML element found.
 
-        Parameters
-        ----------
-        document : Document
-            The ``python-docx`` :class:`Document` object to append the table
-            to. The table is added at the current end of the document.
-        table_elem : ET.Element
-            The XML element whose **direct children** matching ``tags.ROW``
-            are treated as data rows (e.g. the ``<table>`` element parsed from
-            the versioning XML). If no children are found the method logs a
-            warning and returns without adding anything to the document.
-        headers : Sequence[str]
-            Ordered list of column labels written into the **first (header)
-            row** of the Word table. Each label is rendered in **bold**.
-            The number of columns in the table equals ``len(headers)``.
-        tags : XMLTag
-            Dataclass holding XML tag name constants. Only ``tags.ROW`` is
-            used here — it identifies which child tag name to look for inside
-            ``table_elem`` (e.g. ``"file"`` for file-versioning or ``"task"``
-            for task-versioning).
-        table_style : str
-            Name of a built-in Word table style applied to the whole table
-            (default: ``"Table Grid"``). Any style available in the target
-            ``.docx`` template is accepted, e.g. ``"Light Grid Accent 1"``.
-        header_to_attr : Callable[[str], str] | None
-            A function that converts a header label into the corresponding
-            XML attribute name to read from each row element.
+        Args:
+            document (Document): The ``python-docx`` :class:`Document` object
+                to append the table to. The table is added at the current end
+                of the document.
+            table_elem (ET.Element): The XML element whose **direct children**
+                matching ``tags.ROW`` are treated as data rows (e.g. the
+                ``<table>`` element parsed from the versioning XML). If no
+                children are found the method logs a warning and returns
+                without adding anything to the document.
+            headers (Sequence[str]): Ordered list of column labels written
+                into the **first (header) row** of the Word table. Each label
+                is rendered in **bold**. The number of columns in the table
+                equals ``len(headers)``.
+            tags (XMLTag): Dataclass holding XML tag name constants. Only
+                ``tags.ROW`` is used here — it identifies which child tag name
+                to look for inside ``table_elem`` (e.g. ``"file"`` for
+                file-versioning or ``"task"`` for task-versioning).
+            table_style (str): Name of a built-in Word table style applied to
+                the whole table (default: ``"Table Grid"``). Any style
+                available in the target ``.docx`` template is accepted, e.g.
+                ``"Light Grid Accent 1"``.
+            header_to_attr (Callable[[str], str] | None): A function that
+                converts a header label into the corresponding XML attribute
+                name to read from each row element.
 
-            Use this when the column label shown in the document does **not**
-            match the XML attribute name 1-to-1. For example::
+                Use this when the column label shown in the document does
+                **not** match the XML attribute name 1-to-1. For example::
 
-                # Column "Task Name"  →  XML attribute "name"
-                # Column "Last Modified"  →  XML attribute "modified"
-                render_table(
-                    ...,
-                    headers=["Task Name", "Last Modified"],
-                    header_to_attr=lambda h: {"Task Name": "name",
-                                              "Last Modified": "modified"}[h],
-                )
+                    # Column "Task Name"  →  XML attribute "name"
+                    # Column "Last Modified"  →  XML attribute "modified"
+                    render_table(
+                        ...,
+                        headers=["Task Name", "Last Modified"],
+                        header_to_attr=lambda h: {"Task Name": "name",
+                                                  "Last Modified": "modified"}[h],
+                    )
 
-            .. note::
-                When ``None`` (default), the mapping is derived automatically:
-                strip whitespace, lowercase, replace spaces with underscores.
-                This works whenever the header already matches the attribute
-                name after that transformation (e.g. ``"Version"`` → ``"version"``
-                or ``"Task Type"`` → ``"task_type"``).
+                Note:
+                    When ``None`` (default), the mapping is derived
+                    automatically: strip whitespace, lowercase, replace spaces
+                    with underscores. This works whenever the header already
+                    matches the attribute name after that transformation (e.g.
+                    ``"Version"`` → ``"version"`` or ``"Task Type"`` →
+                    ``"task_type"``).
         """
         rows = table_elem.findall(tags.ROW) # list of file elements, i.e. rows of the table
 

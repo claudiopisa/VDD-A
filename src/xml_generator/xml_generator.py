@@ -16,23 +16,20 @@ class XMLGenerator(ABC):
 
     def __init__(self, root_name: str, identation: bool = True, indent_space: str = "  ", encoding: str = "utf-8", xml_declaration: bool = True):
         """
-        Parameters
-        ----------
-        root_name : str
-            Tag name of the XML root element (e.g. ``"FileVersioning"``
-            or ``"TaskVersioning"``).
-        identation : bool
-            Whether to pretty-print the output with indentation
-            (default: ``True``).
-        indent_space : str
-            String used for each indentation level (default: two spaces).
-            Only relevant when ``identation=True``.
-        encoding : str
-            Character encoding written into the XML declaration and used
-            when saving the file (default: ``"utf-8"``).
-        xml_declaration : bool
-            Whether to prepend the ``<?xml version='1.0' encoding='...'?>``
-            declaration line (default: ``True``).
+        Args:
+            root_name (str): Tag name of the XML root element (e.g.
+                ``"FileVersioning"`` or ``"TaskVersioning"``).
+            identation (bool): Whether to pretty-print the output with
+                indentation (default: ``True``).
+            indent_space (str): String used for each indentation level
+                (default: two spaces). Only relevant when
+                ``identation=True``.
+            encoding (str): Character encoding written into the XML
+                declaration and used when saving the file
+                (default: ``"utf-8"``).
+            xml_declaration (bool): Whether to prepend the
+                ``<?xml version='1.0' encoding='...'?>`` declaration line
+                (default: ``True``).
         """
         self.root = ET.Element(root_name)
         self.tree = ET.ElementTree(self.root)
@@ -52,10 +49,9 @@ class XMLGenerator(ABC):
         Re-applies indentation before writing so the output is always
         formatted consistently regardless of when elements were added.
 
-        Parameters
-        ----------
-        file_path : str
-            Destination file path (e.g. ``"output/versioning.xml"``).
+        Args:
+            file_path (str): Destination file path (e.g.
+                ``"output/versioning.xml"``).
         """
         if self.identation:
             ET.indent(self.tree, space=self.indent_space)

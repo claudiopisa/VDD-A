@@ -42,35 +42,30 @@ class TaskVersioningXMLGenerator(XMLGenerator):
                  config: TaskVersioningConfig,
         ):
         """
-        Parameters
-        ----------
-        root_name : str
-            Tag name of the XML root element (e.g. ``"TaskVersioning"``).
-        identation : bool
-            Whether to pretty-print the output (default: ``True``).
-        indent_space : str
-            String used for each indentation level (default: two spaces).
-        encoding : str
-            File encoding (default: ``"utf-8"``).
-        xml_declaration : bool
-            Whether to include the XML declaration header (default: ``True``).
-        paragraph_title : str
-            Value of the ``title`` attribute on the ``<paragraph>`` element
-            (typically read from ``config.title``).
-        paragraph_number : int | str
-            Value of the ``number`` attribute on the ``<paragraph>`` element
-            (default: ``"3"``).
-        attribute_names : list[str]
-            Names of the XML attributes written on each ``<task>`` row
-            element.  Must match attributes present on
-            :class:`~model.task.task.Task` objects
-            (default: ``["name", "type", "version", "modified"]``).
-        tasks : TaskList | None
-            The task data to serialise.  When provided, :meth:`generate` is
-            called immediately during construction.
-        config : TaskVersioningConfig
-            Configuration object that provides XML tag constants via
-            ``config.tags``.
+        Args:
+            root_name (str): Tag name of the XML root element (e.g.
+                ``"TaskVersioning"``).
+            identation (bool): Whether to pretty-print the output
+                (default: ``True``).
+            indent_space (str): String used for each indentation level
+                (default: two spaces).
+            encoding (str): File encoding (default: ``"utf-8"``).
+            xml_declaration (bool): Whether to include the XML declaration
+                header (default: ``True``).
+            paragraph_title (str): Value of the ``title`` attribute on the
+                ``<paragraph>`` element (typically read from
+                ``config.title``).
+            paragraph_number (int | str): Value of the ``number`` attribute
+                on the ``<paragraph>`` element (default: ``"3"``).
+            attribute_names (list[str]): Names of the XML attributes written
+                on each ``<task>`` row element. Must match attributes present
+                on :class:`~model.task.task.Task` objects
+                (default: ``["name", "type", "version", "modified"]``).
+            tasks (TaskList | None): The task data to serialise. When
+                provided, :meth:`generate` is called immediately during
+                construction.
+            config (TaskVersioningConfig): Configuration object that provides
+                XML tag constants via ``config.tags``.
         """
         super().__init__(root_name, identation, indent_space, encoding, xml_declaration)
         self.paragraph_title = paragraph_title

@@ -552,17 +552,21 @@ configs    </h1>
 <li>self.default_config: Static structural defaults (CoreDefaultConfig dataclass)</li>
 </ul>
 
-<p>Example usage:
-    config = CoreConfig("config/core_config.json")</p>
+<h6 id="example-usage">Example usage:</h6>
 
-<pre><code># Access user configuration
-vdd_type = config.user_config.vdd_type
-stream_root = config.user_config.paths.stream_root
-
-# Access default configuration
-internal_roots = config.default_config.roots.internal
-components = config.default_config.components
-</code></pre>
+<blockquote>
+  <p>config = CoreConfig("config/core_config.json")</p>
+  
+  <h1 id="access-user-configuration">Access user configuration</h1>
+  
+  <p>vdd_type = config.user_config.vdd_type
+  stream_root = config.user_config.paths.stream_root</p>
+  
+  <h1 id="access-default-configuration">Access default configuration</h1>
+  
+  <p>internal_roots = config.default_config.roots.internal
+  components = config.default_config.components</p>
+</blockquote>
 </div>
 
 
@@ -1027,18 +1031,22 @@ components = config.default_config.components
 <li>self.default_config: Static structural defaults (FileVersioningDefaultConfig dataclass)</li>
 </ul>
 
-<p>Example usage:
-    config = FileVersioningConfig("config/file_versioning.json")</p>
+<h6 id="example-usage">Example usage:</h6>
 
-<pre><code># Access user configuration
-mode = config.user_config.mode
-pattern = config.user_config.version_extraction_criteria
-title = config.user_config.metadata.title
-
-# Access default configuration
-component_roots = config.default_config.component_roots
-extensions = config.default_config.allowed_extensions
-</code></pre>
+<blockquote>
+  <p>config = FileVersioningConfig("config/file_versioning.json")</p>
+  
+  <h1 id="access-user-configuration">Access user configuration</h1>
+  
+  <p>mode = config.user_config.mode
+  pattern = config.user_config.version_extraction_criteria
+  title = config.user_config.metadata.title</p>
+  
+  <h1 id="access-default-configuration">Access default configuration</h1>
+  
+  <p>component_roots = config.default_config.component_roots
+  extensions = config.default_config.allowed_extensions</p>
+</blockquote>
 </div>
 
 
@@ -1665,17 +1673,21 @@ extensions = config.default_config.allowed_extensions
 <li>self.default_config: Static structural defaults (TaskVersioningDefaultConfig dataclass)</li>
 </ul>
 
-<p>Example usage:
-    config = TaskVersioningConfig("config/task_versioning.json")</p>
+<h6 id="example-usage">Example usage:</h6>
 
-<pre><code># Access user configuration
-kernel_mode = config.user_config.kernel_mode
-prev_enabled = config.user_config.previous_release.enabled
-title = config.user_config.metadata.title
-
-# Access default configuration
-component_roots = config.default_config.component_roots
-</code></pre>
+<blockquote>
+  <p>config = TaskVersioningConfig("config/task_versioning.json")</p>
+  
+  <h1 id="access-user-configuration">Access user configuration</h1>
+  
+  <p>kernel_mode = config.user_config.kernel_mode
+  prev_enabled = config.user_config.previous_release.enabled
+  title = config.user_config.metadata.title</p>
+  
+  <h1 id="access-default-configuration">Access default configuration</h1>
+  
+  <p>component_roots = config.default_config.component_roots</p>
+</blockquote>
 </div>
 
 
@@ -2524,17 +2536,26 @@ Returns the loaded data as DotDict (dict with dot notation access).</p>
 
             <div class="docstring"><p>Load user configuration from a JSON file.</p>
 
-<p>Args:
-    path: Path to the JSON configuration file
-    return_dict: If True, returns a dict; if False, returns a JsonParser (dot notation access)</p>
+<h6 id="arguments">Arguments:</h6>
 
-<p>Returns:
-    Configuration data as Dict or DottedDict</p>
+<ul>
+<li><strong>path:</strong>  Path to the JSON configuration file</li>
+<li><strong>return_dict:</strong>  If True, returns a dict; if False, returns a JsonParser (dot notation access)</li>
+</ul>
 
-<p>Raises:
-    FileNotFoundError: If the file doesn't exist
-    ValueError: If the path is not a file
-    JSONDecodeError: If the JSON is invalid</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>Configuration data as Dict or DottedDict</p>
+</blockquote>
+
+<h6 id="raises">Raises:</h6>
+
+<ul>
+<li><strong>FileNotFoundError:</strong>  If the file doesn't exist</li>
+<li><strong>ValueError:</strong>  If the path is not a file</li>
+<li><strong>JSONDecodeError:</strong>  If the JSON is invalid</li>
+</ul>
 </div>
 
 
@@ -2703,9 +2724,12 @@ Returns the loaded data as DotDict (dict with dot notation access).</p>
 
             <div class="docstring"><p>Manually register a mapping between a config class and its default config.</p>
 
-<p>Args:
-    config_class_name: Name of the config class (e.g., 'CoreConfig')
-    default_config_class: The default config class to instantiate</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>config_class_name:</strong>  Name of the config class (e.g., 'CoreConfig')</li>
+<li><strong>default_config_class:</strong>  The default config class to instantiate</li>
+</ul>
 </div>
 
 
@@ -2751,15 +2775,24 @@ Returns the loaded data as DotDict (dict with dot notation access).</p>
 
             <div class="docstring"><p>Load and return the appropriate default config instance.</p>
 
-<p>Args:
-    config_instance: Instance of a Config subclass</p>
+<h6 id="arguments">Arguments:</h6>
 
-<p>Returns:
-    Instance of the corresponding default config class</p>
+<ul>
+<li><strong>config_instance:</strong>  Instance of a Config subclass</li>
+</ul>
 
-<p>Raises:
-    ImportError: If the default config class cannot be imported
-    ValueError: If no default config exists for the given class</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>Instance of the corresponding default config class</p>
+</blockquote>
+
+<h6 id="raises">Raises:</h6>
+
+<ul>
+<li><strong>ImportError:</strong>  If the default config class cannot be imported</li>
+<li><strong>ValueError:</strong>  If no default config exists for the given class</li>
+</ul>
 </div>
 
 
