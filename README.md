@@ -11,21 +11,54 @@ Given a source tree and configuration files, VDD-A:
 
 ## Project structure
 
-```
-VDD-A/
-├── config/                  # User configuration (JSON)
-│   ├── core_config.json
-│   ├── file_versioning.json
-│   └── task_versioning.json
-├── src/
-│   ├── configs/             # Config loaders (user + default)
-│   ├── data_reader/         # Source scanning (file/task versioning)
-│   ├── document_builder/    # Word document builder + renderers
-│   ├── model/               # Domain model (File, Task, …)
-│   ├── serializer/          # XML serialisation
-│   └── utils/               # Logger, JSON parser, …
-├── generate_docs.py         # Documentation generator (pdoc)
-└── requirements.txt
+```mermaid
+graph TD
+    ROOT["📁 VDD-A/"]
+    
+    CONFIG["📁 config/<br/>(User configuration - JSON)"]
+    CORE["core_config.json"]
+    FVER["file_versioning.json"]
+    TVER["task_versioning.json"]
+    
+    SRC["📁 src/"]
+    CONFIGS["configs/<br/>(Config loaders)"]
+    READER["data_reader/<br/>(Source scanning)"]
+    BUILDER["document_builder/<br/>(Word builder)"]
+    MODEL["model/<br/>(Domain model)"]
+    SERIAL["serializer/<br/>(XML serialization)"]
+    UTILS["utils/<br/>(Logger, parser)"]
+    
+    GENDOCS["generate_docs.py<br/>(Documentation generator)"]
+    REQ["requirements.txt"]
+    
+    ROOT --> CONFIG
+    ROOT --> SRC
+    ROOT --> GENDOCS
+    ROOT --> REQ
+    
+    CONFIG --> CORE
+    CONFIG --> FVER
+    CONFIG --> TVER
+    
+    SRC --> CONFIGS
+    SRC --> READER
+    SRC --> BUILDER
+    SRC --> MODEL
+    SRC --> SERIAL
+    SRC --> UTILS
+    
+    style ROOT fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style CONFIG fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style SRC fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style CONFIGS fill:#f3e5f5,stroke:#7b1fa2
+    style READER fill:#f3e5f5,stroke:#7b1fa2
+    style BUILDER fill:#f3e5f5,stroke:#7b1fa2
+    style MODEL fill:#f3e5f5,stroke:#7b1fa2
+    style SERIAL fill:#f3e5f5,stroke:#7b1fa2
+    style UTILS fill:#f3e5f5,stroke:#7b1fa2
+    style CORE fill:#fce4ec,stroke:#c2185b
+    style FVER fill:#fce4ec,stroke:#c2185b
+    style TVER fill:#fce4ec,stroke:#c2185b
 ```
 
 ---
