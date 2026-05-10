@@ -11,54 +11,21 @@ Given a source tree and configuration files, VDD-A:
 
 ## Project structure
 
-```mermaid
-graph TD
-    ROOT["📁 VDD-A/"]
-    
-    CONFIG["📁 config/<br/>(User configuration - JSON)"]
-    CORE["core_config.json"]
-    FVER["file_versioning.json"]
-    TVER["task_versioning.json"]
-    
-    SRC["📁 src/"]
-    CONFIGS["configs/<br/>(Config loaders)"]
-    READER["data_reader/<br/>(Source scanning)"]
-    BUILDER["document_builder/<br/>(Word builder)"]
-    MODEL["model/<br/>(Domain model)"]
-    SERIAL["serializer/<br/>(XML serialization)"]
-    UTILS["utils/<br/>(Logger, parser)"]
-    
-    GENDOCS["generate_docs.py<br/>(Documentation generator)"]
-    REQ["requirements.txt"]
-    
-    ROOT --> CONFIG
-    ROOT --> SRC
-    ROOT --> GENDOCS
-    ROOT --> REQ
-    
-    CONFIG --> CORE
-    CONFIG --> FVER
-    CONFIG --> TVER
-    
-    SRC --> CONFIGS
-    SRC --> READER
-    SRC --> BUILDER
-    SRC --> MODEL
-    SRC --> SERIAL
-    SRC --> UTILS
-    
-    style ROOT fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    style CONFIG fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style SRC fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style CONFIGS fill:#f3e5f5,stroke:#7b1fa2
-    style READER fill:#f3e5f5,stroke:#7b1fa2
-    style BUILDER fill:#f3e5f5,stroke:#7b1fa2
-    style MODEL fill:#f3e5f5,stroke:#7b1fa2
-    style SERIAL fill:#f3e5f5,stroke:#7b1fa2
-    style UTILS fill:#f3e5f5,stroke:#7b1fa2
-    style CORE fill:#fce4ec,stroke:#c2185b
-    style FVER fill:#fce4ec,stroke:#c2185b
-    style TVER fill:#fce4ec,stroke:#c2185b
+```
+VDD-A/
+├── 📁 config/                      # User configuration (JSON)
+│   ├── core_config.json
+│   ├── file_versioning.json
+│   └── task_versioning.json
+├── 📁 src/                         # Source code
+│   ├── 📁 configs/                 # Config loaders (user + default)
+│   ├── 📁 data_reader/             # Source scanning
+│   ├── 📁 document_builder/        # Word document builder
+│   ├── 📁 model/                   # Domain model
+│   ├── 📁 serializer/              # XML serialization
+│   └── 📁 utils/                   # Logger, JSON parser
+├── 📄 generate_docs.py             # Documentation generator (pdoc)
+└── 📄 requirements.txt
 ```
 
 ---
@@ -193,38 +160,34 @@ python generate_docs.py --live
 
 ```mermaid
 graph LR
-    J["JSON configs"]
-    C["Config objects"]
-    S["Source tree"]
-    DR["DataReader"]
-    M["Model<br/>FileCollection/TaskList"]
-    SER["Serializer"]
-    X["versioning.xml"]
-    R["Renderer"]
-    DB["DocumentBuilder"]
-    D[".docx"]
+    A["📄 JSON Configs"]
+    B["⚙️ Config Objects"]
+    C["🌳 Source Tree"]
+    D["📖 DataReader"]
+    E["🏗️ Model Objects"]
+    F["📦 Serializer"]
+    G["📋 XML"]
+    H["🎨 Renderer"]
+    I["📄 Word Doc"]
     
-    J -->|load & merge| C
-    S -->|scan| DR
-    DR -->|extract| M
-    M -->|serialize| SER
-    SER -->|output| X
-    X -->|render| R
-    R -->|build| DB
-    DB -->|output| D
+    A -->|merge| B
+    C -->|scan| D
+    D -->|extract| E
+    E -->|serialize| F
+    F -->|output| G
+    G -->|render| H
+    H -->|build| I
+    B -.->|config| E
     
-    C -.supports.-> M
-    
-    style J fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    style C fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style S fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style DR fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style M fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style SER fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    style X fill:#ffe0b2,stroke:#e65100,stroke-width:2px
-    style R fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
-    style DB fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
-    style D fill:#e0e0e0,stroke:#616161,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style B fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style D fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style E fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style F fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style G fill:#ffe0b2,stroke:#e65100,stroke-width:2px
+    style H fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style I fill:#e0e0e0,stroke:#616161,stroke-width:2px
 ```
 
 | Layer | Responsibility |
