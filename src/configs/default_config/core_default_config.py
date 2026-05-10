@@ -36,13 +36,13 @@ class SoftwareComponents:
         return f"Available components(NSPC='{self.SAFETY_NUCLEUS}', NS_KERNEL='{self.KERNEL}', SIMNS='{self.SIMULATOR}', SWNV='{self.NON_VITAL_ENV}', TOOLS='{self.NON_VITAL_TOOLS}').\n Usage example: config_object.components.SAFETY_NUCLEUS to access the string 'NSPC'."
 
 @dataclass(frozen=True)
-class XMLTag:
-    """Default XML tags used by rendered output.
+class Tag:
+    """Default tags used by rendered output.
 
     Attributes:
-        PARAGRAPH: XML tag name for paragraph nodes.
-        SUBPARAGRAPH: XML tag name for subparagraph nodes.
-        TABLE: XML tag name for table nodes.
+        PARAGRAPH: Tag name for paragraph nodes.
+        SUBPARAGRAPH: Tag name for subparagraph nodes.
+        TABLE: Tag name for table nodes.
     """
 
     PARAGRAPH: str = "paragraph"
@@ -50,7 +50,7 @@ class XMLTag:
     TABLE: str = "table"
 
 @dataclass(frozen=True)
-class XMLGeneratorConfig:
+class SerializerConfig:
     """Configuration defaults for XML generation.
 
     Attributes:
@@ -58,7 +58,7 @@ class XMLGeneratorConfig:
         INDENT_SPACE: Indentation token used when indentation is enabled.
         ENCODING: Output XML encoding.
         XML_DECLARATION: Whether to include XML declaration header.
-        TAGS: Default XML tags container.
+        TAGS: Default tags container.
     """
 
     #ROOT_NAME: str = "default_root"
@@ -66,7 +66,7 @@ class XMLGeneratorConfig:
     INDENT_SPACE: str = "  "
     ENCODING: str = "utf-8"
     XML_DECLARATION: bool = True
-    TAGS: XMLTag = field(default_factory=XMLTag)
+    TAGS: Tag = field(default_factory=Tag)
 
 @dataclass(frozen=True)
 class CoreDefaultConfig:
@@ -80,9 +80,9 @@ class CoreDefaultConfig:
     # Structural defaults
     #roots:      Roots       = field(default_factory=Roots)
     components: SoftwareComponents  = field(default_factory=SoftwareComponents)
-    xml_generator_config: XMLGeneratorConfig = field(default_factory=XMLGeneratorConfig)
+    serializer_config: SerializerConfig = field(default_factory=SerializerConfig)
     image_config_name: str = "Imgconf.ini"
-    
+
     def __repr__(self):
         """Return a concise debug representation for the core defaults.
 
@@ -90,9 +90,10 @@ class CoreDefaultConfig:
             str: String representation of core default settings.
         """
         return f"CoreDefaultConfig(components={asdict(self.components)}, image_config_name='{self.image_config_name}')"
-    
+
 # Singleton instance
 #CONFIG = CoreDefaultConfig()
+
 
 # Usage
 #print(CONFIG.roots.internal)  # ["NSPC"]

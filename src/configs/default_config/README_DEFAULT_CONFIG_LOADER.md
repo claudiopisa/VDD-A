@@ -1,6 +1,8 @@
 # DefaultConfigLoader — Technical Deep Dive
 
-> **Start here**: [CONFIGURATION.md](../../CONFIGURATION.md) for the complete guide on user vs default configuration.
+> **Architecture Guide**: [DEFAULT_CONFIG_ARCHITECTURE.md](DEFAULT_CONFIG_ARCHITECTURE.md) explains the overall structure, design rationale, and usage patterns of default configs.
+>
+> **Configuration Guide**: [CONFIGURATION.md](../../CONFIGURATION.md) for the complete guide on user vs default configuration.
 
 This document explains the **technical internals** of how default configurations are automatically resolved and loaded.
 
@@ -39,13 +41,21 @@ config = FileVersioningConfig("config/file_versioning.json")
 
 The loader uses a **predictable pattern** to resolve default configs:
 
-```
-Config Class Name          →  Default Config Class Name
-─────────────────────────────────────────────────────
-CoreConfig                 →  CoreDefaultConfig
-FileVersioningConfig       →  FileVersioningDefaultConfig
-TaskVersioningConfig       →  TaskVersioningDefaultConfig
-MyCustomFeatureConfig      →  MyCustomFeatureDefaultConfig
+```mermaid
+graph LR
+    A["CoreConfig"] --> B["CoreDefaultConfig"]
+    C["FileVersioningConfig"] --> D["FileVersioningDefaultConfig"]
+    E["TaskVersioningConfig"] --> F["TaskVersioningDefaultConfig"]
+    G["MyCustomFeatureConfig"] --> H["MyCustomFeatureDefaultConfig"]
+    
+    style A fill:#e8f5e9,stroke:#388e3c
+    style B fill:#fce4ec,stroke:#c2185b
+    style C fill:#e8f5e9,stroke:#388e3c
+    style D fill:#fce4ec,stroke:#c2185b
+    style E fill:#e8f5e9,stroke:#388e3c
+    style F fill:#fce4ec,stroke:#c2185b
+    style G fill:#fff3e0,stroke:#f57c00
+    style H fill:#fff3e0,stroke:#f57c00
 ```
 
 **Algorithm**:
@@ -229,32 +239,72 @@ def _auto_resolve(cls, config_class_name: str) -> Any:
 
 ## Benefits
 
-| Benefit | Why It Matters |
-|---|---|
-| **No Boilerplate** | Add new features without import bloat |
-| **Convention Over Configuration** | One naming pattern, automatic resolution |
-| **Type Safety** | Immutable dataclasses prevent configuration mistakes |
-| **Maintainability** | New default configs don't require loader changes |
-| **Clarity** | Naming convention makes relationships obvious at a glance |
-| **Extensibility** | Manual registry allows exceptions when needed |
+<table>
+  <thead>
+    <tr>
+      <th>Benefit</th>
+      <th>Why It Matters</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>No Boilerplate</strong></td>
+      <td>Add new features without import bloat</td>
+    </tr>
+    <tr>
+      <td><strong>Convention Over Configuration</strong></td>
+      <td>One naming pattern, automatic resolution</td>
+    </tr>
+    <tr>
+      <td><strong>Type Safety</strong></td>
+      <td>Immutable dataclasses prevent configuration mistakes</td>
+    </tr>
+    <tr>
+      <td><strong>Maintainability</strong></td>
+      <td>New default configs don't require loader changes</td>
+    </tr>
+    <tr>
+      <td><strong>Clarity</strong></td>
+      <td>Naming convention makes relationships obvious at a glance</td>
+    </tr>
+    <tr>
+      <td><strong>Extensibility</strong></td>
+      <td>Manual registry allows exceptions when needed</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
 ## File Structure
 
-```
-src/configs/
-├── config.py                           # Base Config class
-├── default_config_loader.py            # DefaultConfigLoader
-├── user_config.py                      # UserConfigLoader
-├── core_config.py                      # CoreConfig instance
-├── file_versioning_config.py           # FileVersioningConfig instance
-├── task_versioning_config.py           # TaskVersioningConfig instance
-└── default_config/
-    ├── __init__.py
-    ├── core_default_config.py          # CoreDefaultConfig dataclass
-    ├── file_versioning_default_config.py  # FileVersioningDefaultConfig dataclass
-    └── task_versioning_default_config.py  # TaskVersioningDefaultConfig dataclass
+```mermaid
+graph TD
+    SC["src/configs/"]
+    SC --> CP["config.py<br/>(Base Config class)"]
+    SC --> DCL["default_config_loader.py<br/>(DefaultConfigLoader)"]
+    SC --> UCL["user_config.py<br/>(UserConfigLoader)"]
+    SC --> CCP["core_config.py<br/>(CoreConfig instance)"]
+    SC --> FCP["file_versioning_config.py<br/>(FileVersioningConfig instance)"]
+    SC --> TCP["task_versioning_config.py<br/>(TaskVersioningConfig instance)"]
+    SC --> DC["📁 default_config/"]
+    
+    DC --> DCINIT["__init__.py"]
+    DC --> COREDC["core_default_config.py<br/>(CoreDefaultConfig dataclass)"]
+    DC --> FILEDC["file_versioning_default_config.py<br/>(FileVersioningDefaultConfig dataclass)"]
+    DC --> TASKDC["task_versioning_default_config.py<br/>(TaskVersioningDefaultConfig dataclass)"]
+    
+    style SC fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style DC fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style CP fill:#e8f5e9,stroke:#388e3c
+    style DCL fill:#e8f5e9,stroke:#388e3c
+    style UCL fill:#e8f5e9,stroke:#388e3c
+    style CCP fill:#f3e5f5,stroke:#7b1fa2
+    style FCP fill:#f3e5f5,stroke:#7b1fa2
+    style TCP fill:#f3e5f5,stroke:#7b1fa2
+    style COREDC fill:#fce4ec,stroke:#c2185b
+    style FILEDC fill:#fce4ec,stroke:#c2185b
+    style TASKDC fill:#fce4ec,stroke:#c2185b
 ```
 
 ---

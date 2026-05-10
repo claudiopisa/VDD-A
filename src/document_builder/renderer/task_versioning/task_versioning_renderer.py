@@ -12,7 +12,7 @@ class TaskVersioningRenderer(Renderer):
     Renderer for the **task-versioning** section of a VDD document.
 
     Reads a task-versioning XML produced by
-    :class:`~xml_generator.task_versioning.TaskVersioningXMLGenerator` and
+    :class:`~serializer.task_versioning.TaskVersioningSerializer` and
     writes the corresponding Word content into a ``python-docx``
     :class:`Document`:
 

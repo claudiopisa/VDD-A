@@ -2,11 +2,11 @@ import xml.etree.ElementTree as ET
 from model.task.task_list import TaskList
 from configs import TaskVersioningConfig
 from utils import get_logger
-from ..xml_generator import XMLGenerator
+from ..serializer import Serializer
 
 logger = get_logger(__name__)
 
-class TaskVersioningXMLGenerator(XMLGenerator):
+class TaskVersioningSerializer(Serializer):
     """
     XML generator for the **task-versioning** section of a VDD document.
 
@@ -21,7 +21,7 @@ class TaskVersioningXMLGenerator(XMLGenerator):
           </paragraph>
         </TaskVersioning>
 
-    Unlike :class:`FileVersioningXMLGenerator`, all tasks share a single
+    Unlike :class:`FileVersioningSerializer`, all tasks share a single
     flat ``<table>`` — there are no ``<subparagraph>`` elements.
 
     If a :class:`~model.task.task_list.TaskList` is supplied at construction

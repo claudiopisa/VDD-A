@@ -3,7 +3,7 @@
 from dataclasses import asdict, dataclass, field
 from typing import List, Tuple
 
-from .core_default_config import SoftwareComponents, XMLTag
+from .core_default_config import SoftwareComponents, Tag
 
 @dataclass(frozen=True)
 class AppTask:
@@ -40,11 +40,11 @@ class SysTask:
     KERNEL          : str = "V1_FileKernel"
     KERNEL_VERSION  : str = "RelKernel"
 
-# InclusionRules and ExclusionRules define here are the default rules for task versioning. 
+    # InclusionRule and ExclusionRule define here are the default rules for task versioning. 
 # They can be overridden by user-specific rules from JSON files, whereas these defaults provide a baseline 
 # for what to include or exclude when processing tasks.
 @dataclass(frozen=True)
-class InclusionRules:
+class InclusionRule:
     """Inclusion defaults for task versioning flows.
 
     Attributes:
@@ -56,7 +56,7 @@ class InclusionRules:
     external: Tuple[str, ...] = field(default_factory=lambda: ("ixl.ini", "srlw.ini")) 
 
 @dataclass(frozen=True)
-class ExclusionRules:
+class ExclusionRule:
     """Task types excluded from processing.
 
     Attributes:
@@ -112,7 +112,7 @@ class Roots:
     external: ExternalRoots = field(default_factory=ExternalRoots)
 
 @dataclass(frozen=True)
-class Rules:
+class Rule:
     """Container for task inclusion and exclusion rules.
 
     Attributes:
@@ -120,15 +120,15 @@ class Rules:
         exclusion: Exclusion rules.
     """
 
-    inclusion: InclusionRules = field(default_factory=InclusionRules)
-    exclusion: ExclusionRules = field(default_factory=ExclusionRules)
+    inclusion: InclusionRule = field(default_factory=InclusionRule)
+    exclusion: ExclusionRule = field(default_factory=ExclusionRule)
 
 @dataclass(frozen=True)
-class TaskVersioningTag(XMLTag):
-    """XML tags used by task versioning output.
+class TaskVersioningTag(Tag):
+    """Tags used by task versioning output.
 
     Attributes:
-        ROW: XML tag name used for each task row.
+        ROW: Tag name used for each task row.
     """
 
     ROW: str = "task"
@@ -154,7 +154,7 @@ class TaskVersioningDefaultConfig:
     sys_task: SysTask = field(default_factory=SysTask)
     # misc
     num_tasks: str = "NumTask"
-    rules: Rules = field(default_factory=Rules)
+    rules: Rule = field(default_factory=Rule)
     tags: TaskVersioningTag = field(default_factory=TaskVersioningTag)
 
     def __repr__(self):

@@ -22,8 +22,8 @@ VDD-A/
 │   ├── data_reader/         # Source scanning (file/task versioning)
 │   ├── document_builder/    # Word document builder + renderers
 │   ├── model/               # Domain model (File, Task, …)
-│   ├── utils/               # Logger, JSON parser, …
-│   └── xml_generator/       # XML serialisation
+│   ├── serializer/          # XML serialisation
+│   └── utils/               # Logger, JSON parser, …
 ├── generate_docs.py         # Documentation generator (pdoc)
 └── requirements.txt
 ```
@@ -52,6 +52,10 @@ VDD-A uses a **two-level configuration system**:
 2. **Default Config** (Python dataclasses in `src/configs/default_config/`): Static structural constants
    - File extensions to scan, directories to skip, INI field names
    - Immutable — only changed by developers when rules need updating
+
+The supported way to access configuration in code is through the feature-specific `Config` classes, such as `CoreConfig`, `FileVersioningConfig`, and `TaskVersioningConfig`. These classes act as the public interface for the project: they combine the user config and the default config and expose both through properties.
+
+If you add a new chapter or another processing flow, follow the same pattern by creating a new `Config` child, a matching default config dataclass, and the related reader/generator/renderer classes when needed.
 
 **👉 See [CONFIGURATION.md](CONFIGURATION.md) for the complete guide** with examples and design rationale.
 
@@ -154,14 +158,40 @@ python generate_docs.py --live
 
 ## Architecture overview
 
-```
-JSON configs ──► Config objects
-                      │
-Source tree ──► DataReader ──► Model (FileCollection / TaskList)
-                                     │
-                               XMLGenerator ──► versioning.xml
-                                                     │
-                                              Renderer ──► DocumentBuilder ──► .docx
+```mermaid
+graph LR
+    J["JSON configs"]
+    C["Config objects"]
+    S["Source tree"]
+    DR["DataReader"]
+    M["Model<br/>FileCollection/TaskList"]
+    SER["Serializer"]
+    X["versioning.xml"]
+    R["Renderer"]
+    DB["DocumentBuilder"]
+    D[".docx"]
+    
+    J -->|load & merge| C
+    S -->|scan| DR
+    DR -->|extract| M
+    M -->|serialize| SER
+    SER -->|output| X
+    X -->|render| R
+    R -->|build| DB
+    DB -->|output| D
+    
+    C -.supports.-> M
+    
+    style J fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style C fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style S fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style DR fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style M fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style SER fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style X fill:#ffe0b2,stroke:#e65100,stroke-width:2px
+    style R fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style DB fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style D fill:#e0e0e0,stroke:#616161,stroke-width:2px
 ```
 
 | Layer | Responsibility |
@@ -169,5 +199,5 @@ Source tree ──► DataReader ──► Model (FileCollection / TaskList)
 | `configs` | Load and merge user JSON + static defaults |
 | `data_reader` | Scan source trees, extract version info |
 | `model` | Domain objects: `File`, `Task`, `FileCollection`, `TaskList` |
-| `xml_generator` | Serialise model objects to structured XML |
+| `serializer` | Serialise model objects to structured XML |
 | `document_builder` | Parse XML and render to Word via `python-docx` |

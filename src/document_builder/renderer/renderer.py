@@ -5,7 +5,7 @@ from pathlib import Path
 from docx import Document
 import xml.etree.ElementTree as ET
 
-from configs.default_config.core_default_config import XMLTag
+from configs.default_config.core_default_config import Tag
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class Renderer(ABC):
         document: Document,
         table_elem: ET.Element,
         headers: Sequence[str],
-        tags: XMLTag,
+        tags: Tag,
         table_style: str = "Table Grid",
         header_to_attr: Callable[[str], str] | None = None,
     ) -> None:
@@ -68,7 +68,7 @@ class Renderer(ABC):
                 into the **first (header) row** of the Word table. Each label
                 is rendered in **bold**. The number of columns in the table
                 equals ``len(headers)``.
-            tags (XMLTag): Dataclass holding XML tag name constants. Only
+            tags (Tag): Dataclass holding tag name constants. Only
                 ``tags.ROW`` is used here — it identifies which child tag name
                 to look for inside ``table_elem`` (e.g. ``"file"`` for
                 file-versioning or ``"task"`` for task-versioning).

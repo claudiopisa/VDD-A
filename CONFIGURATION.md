@@ -7,39 +7,41 @@ VDD-A uses a **two-level configuration system** to separate what the user provid
 
 ## Overview
 
+```mermaid
+graph TD
+    A["📄 User Configuration<br/>JSON files<br/><br/>• core_config.json<br/>• file_versioning.json<br/>• task_versioning.json"]
+    
+    B["⚙️ XyzConfig Classes<br/>Runtime config objects<br/><br/>• CoreConfig<br/>• FileVersioningConfig<br/>• TaskVersioningConfig"]
+    
+    C["👤 User Config<br/>mutable<br/><br/>paths, metadata, modes"]
+    D["🔒 Default Config<br/>frozen dataclass<br/><br/>rules, constants"]
+    
+    E["🎯 Config Object API<br/>Exposes both layers<br/><br/>• user_config: JsonParser<br/>• default_config: Dataclass"]
+    
+    A -->|loaded by| B
+    B -->|contains| C
+    B -->|contains| D
+    C -->|properties| E
+    D -->|properties| E
+    
+    style A fill:#e8f4f8,stroke:#0277bd,stroke-width:2px
+    style B fill:#fff4e6,stroke:#f57c00,stroke-width:2px
+    style C fill:#f5f5f5,stroke:#616161,stroke-width:2px
+    style D fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style E fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
 ```
-┌─────────────────────────────────────────┐
-│     User Configuration (JSON files)     │  ← What the user provides
-│   config/core_config.json               │  ← Paths, metadata, modes
-│   config/file_versioning.json           │
-│   config/task_versioning.json           │
-└────────────────┬────────────────────────┘
-                 │ loaded by
-                 ↓
-┌─────────────────────────────────────────┐
-│   XyzConfig classes                     │  ← Runtime config objects
-│   CoreConfig                            │  ← Merge user + default
-│   FileVersioningConfig                  │  ← Provide accessors
-│   TaskVersioningConfig                  │
-└────────────────┬────────────────────────┘
-                 │ contains
-                 ↓
-         ┌───────────────┐
-         │               │
-    ┌────┴────┐    ┌─────┴──────┐
-    │          │    │            │
-User Config  Default Config   Defaults are immutable
-(mutable)    (frozen dataclass) structural constants
-    │          │    │            │
-    │          │    └─────┬──────┘
-    │          │          │
-    └────┬─────┴──────┬───┘
-         │ properties │
-         ↓            ↓
-    Config object exposes both
-    - user_config: JsonParser for user input
-    - default_config: Dataclass for static rules
-```
+
+## Why `Config` Matters
+
+`Config` is the **base interface** that every feature-specific configuration class must extend. The user should not work directly with raw JSON files or with the default dataclasses in isolation: the child `Config` class is the public entry point that combines both sources and exposes a stable API.
+
+In practice this means:
+
+- the **user config** provides document-specific values such as paths, metadata, modes, and release-specific options;
+- the **default config** provides static constants and rules such as allowed extensions, XML tags, INI field names, and exclusion lists;
+- the concrete `XyzConfig` class exposes both layers through properties and convenience accessors.
+
+For example, `CoreConfig`, `FileVersioningConfig`, and `TaskVersioningConfig` are the classes the rest of the codebase should use when it needs configuration.
 
 ## Layer 1: User Configuration (JSON Files)
 
@@ -73,15 +75,52 @@ Core settings shared across all versioning operations.
 }
 ```
 
-| Key | Values | Purpose |
-|---|---|---|
-| `vdd_type` | `"vital"` \| `"non_vital"` | Document classification |
-| `input_mode` | `"localSource"` | How source data is provided (future: could be remote) |
-| `kernel_mode` | `"internal"` \| `"external"` | Kernel architecture → affects task parsing paths |
-| `paths.stream_root` | Absolute path | Root of source tree to scan |
-| `paths.output_dir` | Absolute path | Where to write `.docx` output |
-| `paths.rtc_cache_dir` | Absolute path | Cache directory for optimizations |
-| `metadata.doc_name` | String | Human-readable document title |
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Values</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>vdd_type</code></td>
+      <td><code>"vital"</code> | <code>"non_vital"</code></td>
+      <td>Document classification</td>
+    </tr>
+    <tr>
+      <td><code>input_mode</code></td>
+      <td><code>"localSource"</code></td>
+      <td>How source data is provided (future: could be remote)</td>
+    </tr>
+    <tr>
+      <td><code>kernel_mode</code></td>
+      <td><code>"internal"</code> | <code>"external"</code></td>
+      <td>Kernel architecture → affects task parsing paths</td>
+    </tr>
+    <tr>
+      <td><code>paths.stream_root</code></td>
+      <td>Absolute path</td>
+      <td>Root of source tree to scan</td>
+    </tr>
+    <tr>
+      <td><code>paths.output_dir</code></td>
+      <td>Absolute path</td>
+      <td>Where to write <code>.docx</code> output</td>
+    </tr>
+    <tr>
+      <td><code>paths.rtc_cache_dir</code></td>
+      <td>Absolute path</td>
+      <td>Cache directory for optimizations</td>
+    </tr>
+    <tr>
+      <td><code>metadata.doc_name</code></td>
+      <td>String</td>
+      <td>Human-readable document title</td>
+    </tr>
+  </tbody>
+</table>
 
 ### `file_versioning.json`
 
@@ -98,12 +137,32 @@ Configuration for Chapter 2 (file versioning).
 }
 ```
 
-| Key | Purpose |
-|---|---|
-| `mode` | Version extraction method (`"version"` is the only supported mode) |
-| `version_extraction_criteria` | Regex pattern to extract version from source code comments |
-| `metadata.title` | Chapter title in the Word document |
-| `metadata.columns_name` | Column header names in the output table |
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>mode</code></td>
+      <td>Version extraction method (<code>"version"</code> is the only supported mode)</td>
+    </tr>
+    <tr>
+      <td><code>version_extraction_criteria</code></td>
+      <td>Regex pattern to extract version from source code comments</td>
+    </tr>
+    <tr>
+      <td><code>metadata.title</code></td>
+      <td>Chapter title in the Word document</td>
+    </tr>
+    <tr>
+      <td><code>metadata.columns_name</code></td>
+      <td>Column header names in the output table</td>
+    </tr>
+  </tbody>
+</table>
 
 ### `task_versioning.json`
 
@@ -124,14 +183,40 @@ Configuration for Chapter 3 (task versioning).
 }
 ```
 
-| Key | Purpose |
-|---|---|
-| `previous_release.enabled` | Whether to compare against a baseline release |
-| `previous_release.root` | Path to previous release stream root |
-| `previous_release.version` | Version label for the baseline |
-| `metadata.title` | Chapter title in the Word document |
-| `metadata.columns_name` | Column header names (typically includes "Modified" status) |
-| `app_tasks` | List of `.ini` files to parse for application tasks |
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>previous_release.enabled</code></td>
+      <td>Whether to compare against a baseline release</td>
+    </tr>
+    <tr>
+      <td><code>previous_release.root</code></td>
+      <td>Path to previous release stream root</td>
+    </tr>
+    <tr>
+      <td><code>previous_release.version</code></td>
+      <td>Version label for the baseline</td>
+    </tr>
+    <tr>
+      <td><code>metadata.title</code></td>
+      <td>Chapter title in the Word document</td>
+    </tr>
+    <tr>
+      <td><code>metadata.columns_name</code></td>
+      <td>Column header names (typically includes "Modified" status)</td>
+    </tr>
+    <tr>
+      <td><code>app_tasks</code></td>
+      <td>List of <code>.ini</code> files to parse for application tasks</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
@@ -147,6 +232,8 @@ Configuration for Chapter 3 (task versioning).
 - Shared across all users
 - Defines parsing rules, exclusion patterns, XML tag names, etc.
 
+> **Deep Dive**: For a comprehensive guide on how default configs are structured, why dataclasses are used, and how to avoid verbosity, see [DEFAULT_CONFIG_ARCHITECTURE.md](src/configs/default_config/DEFAULT_CONFIG_ARCHITECTURE.md). Also check [USAGE_EXAMPLES.md](src/configs/default_config/USAGE_EXAMPLES.md) for practical code examples.
+
 ### Default Config Classes
 
 #### `CoreDefaultConfig`
@@ -157,12 +244,12 @@ Static defaults for core document structure.
 @dataclass(frozen=True)
 class CoreDefaultConfig:
     components: SoftwareComponents = field(default_factory=SoftwareComponents)
-    xml_generator_config: XMLGeneratorConfig = field(default_factory=XMLGeneratorConfig)
+    serializer_config: SerializerConfig = field(default_factory=SerializerConfig)
     image_config_name: str = "Imgconf.ini"
 ```
 
 - **SoftwareComponents**: Maps component names like `NSPC` (Safety Nucleus), `NS_KERNEL`, `SIMNS`, etc.
-- **XMLGeneratorConfig**: Indentation style, encoding, XML declaration settings
+- **SerializerConfig**: Indentation style, encoding, XML declaration settings
 - **image_config_name**: Standard INI filename for kernel configuration
 
 #### `FileVersioningDefaultConfig`
@@ -268,6 +355,36 @@ print(tv_config.excluded_task_types)          # ("NO_SCHED", "RBC")
 
 ---
 
+## Adding a New Chapter or Feature
+
+This project is intentionally **scalable**: adding a new chapter or a new feature follows the same pattern everywhere.
+
+If you want to introduce a new chapter, you typically create:
+
+- a new `Config` child class to combine the user JSON and the static defaults;
+- a matching default config dataclass in `src/configs/default_config/`;
+- a new JSON file under `config/` for the user-provided settings;
+- a dedicated `DataReader` implementation if the chapter needs to read new sources;
+- a dedicated `Serializer` if the intermediate XML structure changes;
+- a dedicated `Renderer` and, if needed, a new `DocumentBuilder` section.
+
+The same pattern applies to the rest of the codebase: if you add a new kind of processing, you extend the appropriate layer with a new child class.
+
+### Practical Rule
+
+For a new chapter, the minimum reusable contract is usually:
+
+1. `Config` child class for public configuration access.
+2. Default config dataclass for constants and structural rules.
+3. User JSON file for editable input.
+4. A reader/generator/renderer pair if the chapter needs its own pipeline.
+
+This is the reason the project is structured around `DataReader`, `Config`, `Serializer`, and `Renderer` abstractions: each new chapter can plug into the same flow without rewriting the whole application.
+
+If you prefer to make the output format explicit, `XMLSerializer` is also a valid name: the intermediate artifact is always XML.
+
+---
+
 ## How Automatic Default Loading Works
 
 When you create a config object, the `DefaultConfigLoader` automatically loads the matching default config:
@@ -359,14 +476,55 @@ fv_config.default_config.my_new_constant
 
 ## Summary Table
 
-| Aspect | User Config | Default Config |
-|---|---|---|
-| **Location** | `config/*.json` | `src/configs/default_config/*.py` |
-| **Mutability** | Mutable | Immutable (frozen) |
-| **Format** | JSON | Python dataclass |
-| **Scope** | Per-document | Global/application-wide |
-| **Examples** | Paths, metadata, modes | Rules, tag names, constants |
-| **Changed by** | End user | Developers |
-| **Access** | `config.user_config.*` | `config.default_config.*` |
-| **Validation** | Path existence checks | Type hints + frozen dataclass |
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>User Config</th>
+      <th>Default Config</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Location</strong></td>
+      <td><code>config/*.json</code></td>
+      <td><code>src/configs/default_config/*.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Mutability</strong></td>
+      <td>Mutable</td>
+      <td>Immutable (frozen)</td>
+    </tr>
+    <tr>
+      <td><strong>Format</strong></td>
+      <td>JSON</td>
+      <td>Python dataclass</td>
+    </tr>
+    <tr>
+      <td><strong>Scope</strong></td>
+      <td>Per-document</td>
+      <td>Global/application-wide</td>
+    </tr>
+    <tr>
+      <td><strong>Examples</strong></td>
+      <td>Paths, metadata, modes</td>
+      <td>Rules, tag names, constants</td>
+    </tr>
+    <tr>
+      <td><strong>Changed by</strong></td>
+      <td>End user</td>
+      <td>Developers</td>
+    </tr>
+    <tr>
+      <td><strong>Access</strong></td>
+      <td><code>config.user_config.*</code></td>
+      <td><code>config.default_config.*</code></td>
+    </tr>
+    <tr>
+      <td><strong>Validation</strong></td>
+      <td>Path existence checks</td>
+      <td>Type hints + frozen dataclass</td>
+    </tr>
+  </tbody>
+</table>
 

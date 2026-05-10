@@ -4,7 +4,7 @@ from pathlib import Path
 from data_reader import FileVersioning
 from configs import CoreConfig, FileVersioningConfig
 from utils import set_logger, get_logger
-from xml_generator import FileVersioningXMLGenerator
+from serializer import FileVersioningSerializer
 
 set_logger(level = "DEBUG")
 logger = get_logger(__name__)
@@ -18,7 +18,7 @@ out = reader.scan_files() # output is FileCollection object
 
 print(out)
 
-xml_gen = FileVersioningXMLGenerator(
+xml_gen = FileVersioningSerializer(
     root_name="FileVersioning",
     paragraph_title=fv_conf.title,
     paragraph_number=2,

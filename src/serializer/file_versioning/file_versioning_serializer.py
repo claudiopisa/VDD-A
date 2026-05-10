@@ -2,11 +2,11 @@ import xml.etree.ElementTree as ET
 from model.file.file_collection import FileCollection
 from configs import FileVersioningConfig
 from utils import get_logger
-from ..xml_generator import XMLGenerator
+from ..serializer import Serializer
 
 logger = get_logger(__name__)
 
-class FileVersioningXMLGenerator(XMLGenerator):
+class FileVersioningSerializer(Serializer):
     """
     XML generator for the **file-versioning** section of a VDD document.
 
@@ -129,5 +129,5 @@ class FileVersioningXMLGenerator(XMLGenerator):
                     self.tags.ROW,
                     **self.attributes,
                 ) 
-
         
+

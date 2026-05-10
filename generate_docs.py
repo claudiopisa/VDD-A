@@ -21,7 +21,7 @@ MODULES = [
     "!document_builder.doc_ch3_render",   # legacy — broken @deprecated usage
     "!document_builder.doc_gen_old",       # legacy — broken @deprecated usage
     "!document_builder.doc_gen3",          # legacy — broken @deprecated usage
-    "xml_generator",
+    "serializer",
     "configs",
     "model",
     "!model.file.file_list",               # legacy — broken @deprecated usage

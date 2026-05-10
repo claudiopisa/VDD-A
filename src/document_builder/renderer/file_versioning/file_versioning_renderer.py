@@ -12,7 +12,7 @@ class FileVersioningRenderer(Renderer):
     Renderer for the **file-versioning** section of a VDD document.
 
     Reads a file-versioning XML produced by
-    :class:`~xml_generator.file_versioning.FileVersioningXMLGenerator` and
+    :class:`~serializer.file_versioning.FileVersioningSerializer` and
     writes the corresponding Word content into a ``python-docx``
     :class:`Document`:
 

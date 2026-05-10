@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from abc import ABC, abstractmethod 
 
-class XMLGenerator(ABC):
+class Serializer(ABC):
     """
     Abstract base class for XML document generators.
 

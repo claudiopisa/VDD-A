@@ -3,7 +3,7 @@
 from pathlib import Path
 from .config import Config
 from .core_config import CoreConfig
-from .default_config.file_versioning_default_config import Rules, ExclusionRules, InclusionRules
+from .default_config.file_versioning_default_config import Rule, ExclusionRule, InclusionRule
 
 
 class FileVersioningConfig(Config):
@@ -134,12 +134,12 @@ class FileVersioningConfig(Config):
         pretty_print_str_default = "\nFile Versioning Default Configuration:\n"
         
         for key, value in self.default_config.__dict__.items():
-            if isinstance(value, Rules):
+            if isinstance(value, Rule):
                 pretty_print_str_default += f"{key}:\n"
 
                 for sub_key, sub_value in value.__dict__.items():
 
-                    if isinstance(sub_value, ExclusionRules) or isinstance(sub_value, InclusionRules):
+                    if isinstance(sub_value, ExclusionRule) or isinstance(sub_value, InclusionRule):
                         pretty_print_str_default += f"\t{sub_key}:\n"
 
                         for sub_sub_key, sub_sub_value in sub_value.__dict__.items():

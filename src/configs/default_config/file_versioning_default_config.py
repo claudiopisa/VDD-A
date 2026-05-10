@@ -2,10 +2,10 @@
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
-from .core_default_config import SoftwareComponents, XMLTag
+from .core_default_config import SoftwareComponents, Tag
 
 @dataclass(frozen=True)  # frozen=True makes the instance immutable
-class ExclusionRules:
+class ExclusionRule:
     """Rules that exclude directories/files from file version scanning.
 
     Attributes:
@@ -31,7 +31,7 @@ class ExclusionRules:
     ])
 
 @dataclass(frozen=True)
-class InclusionRules:
+class InclusionRule:
     """Rules that define which extensions are included in scanning.
 
     Attributes:
@@ -43,7 +43,7 @@ class InclusionRules:
     ])
 
 @dataclass(frozen=True)
-class Rules:
+class Rule:
     """Container for inclusion and exclusion rule sets.
 
     Attributes:
@@ -51,15 +51,15 @@ class Rules:
         inclusion: Inclusion rule set.
     """
 
-    exclusion: ExclusionRules = field(default_factory=ExclusionRules)
-    inclusion: InclusionRules = field(default_factory=InclusionRules)
+    exclusion: ExclusionRule = field(default_factory=ExclusionRule)
+    inclusion: InclusionRule = field(default_factory=InclusionRule)
 
 @dataclass(frozen=True)
-class FileVersioningTag(XMLTag):
-    """XML tags used by file versioning output.
+class FileVersioningTag(Tag):
+    """Tags used by file versioning output.
 
     Attributes:
-        ROW: XML tag name used for each file row.
+        ROW: Tag name used for each file row.
     """
 
     ROW: str = "file"
@@ -77,7 +77,7 @@ class FileVersioningDefaultConfig:
     #root: List[str] = field(default_factory=lambda: ["NSPC"])
     root: str = SoftwareComponents.SAFETY_NUCLEUS
     version_extraction_criteria: str = r"(?:\\\\*|//|--|;|#).*Versione\s*:?\\s*(\d+\.\d+)" 
-    rules: Rules = field(default_factory=Rules)
+    rules: Rule = field(default_factory=Rule)
     tags: FileVersioningTag = field(default_factory=FileVersioningTag)
 
 

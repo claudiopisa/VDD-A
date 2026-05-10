@@ -1,7 +1,7 @@
 from data_reader import TaskVersioningInternal
 from configs import CoreConfig, TaskVersioningConfig
 from utils import set_logger, get_logger
-from xml_generator import TaskVersioningXMLGenerator
+from serializer import TaskVersioningSerializer
 
 set_logger(level="DEBUG")
 logger = get_logger(__name__)
@@ -17,7 +17,7 @@ task_list = reader.scan_files()
 
 print(task_list)
 
-xml_gen = TaskVersioningXMLGenerator(
+xml_gen = TaskVersioningSerializer(
     root_name="TaskVersioning",
     paragraph_title=tv_conf.title,
     paragraph_number=3,
