@@ -1,9 +1,8 @@
 from data_reader import FileVersioning
 from configs import CoreConfig, FileVersioningConfig
-from parsers import generate_file_versioning_xml
-from utils import setup_logging, get_logger
+from utils import set_logger, get_logger
 
-setup_logging(level = "DEBUG")
+set_logger(level = "DEBUG")
 logger = get_logger(__name__)
 
 core_conf = CoreConfig(user_config_path="config/core_config.json")

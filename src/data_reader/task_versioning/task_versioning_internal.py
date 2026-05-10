@@ -116,3 +116,4 @@ class TaskVersioningInternal(TaskVersioning):
         self._read_app_tasks(app_section, is_prev=False)
 
         logger.debug("Internal task scan completed: %d tasks loaded", len(self.tasks))
+        return self.tasks

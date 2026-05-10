@@ -1,4 +1,9 @@
-import json
+"""Default core configuration values used by config classes.
+
+This module contains immutable dataclasses that define structural defaults
+shared across document-generation flows.
+"""
+
 from dataclasses import asdict, dataclass, field
 from typing import Tuple, Dict, Any
 
@@ -6,6 +11,16 @@ from typing import Tuple, Dict, Any
 
 @dataclass(frozen=True)
 class SoftwareComponents:
+    """Canonical software component identifiers.
+
+    Attributes:
+        SAFETY_NUCLEUS: Identifier for the safety nucleus component.
+        KERNEL: Identifier for the kernel component.
+        SIMULATOR: Identifier for the simulator component.
+        NON_VITAL_ENV: Identifier for the non-vital environment component.
+        NON_VITAL_TOOLS: Identifier for the non-vital tools component.
+    """
+
     SAFETY_NUCLEUS:     str = "NSPC"
     KERNEL:             str = "NS_KERNEL"
     SIMULATOR:          str = "SIMNS"
@@ -13,16 +28,39 @@ class SoftwareComponents:
     NON_VITAL_TOOLS:    str = "NS_TOOLS"
 
     def __repr__(self):
+        """Return a human-readable representation with usage example.
+
+        Returns:
+            str: Readable summary of available components.
+        """
         return f"Available components(NSPC='{self.SAFETY_NUCLEUS}', NS_KERNEL='{self.KERNEL}', SIMNS='{self.SIMULATOR}', SWNV='{self.NON_VITAL_ENV}', TOOLS='{self.NON_VITAL_TOOLS}').\n Usage example: config_object.components.SAFETY_NUCLEUS to access the string 'NSPC'."
 
 @dataclass(frozen=True)
 class XMLTag:
+    """Default XML tags used by rendered output.
+
+    Attributes:
+        PARAGRAPH: XML tag name for paragraph nodes.
+        SUBPARAGRAPH: XML tag name for subparagraph nodes.
+        TABLE: XML tag name for table nodes.
+    """
+
     PARAGRAPH: str = "paragraph"
     SUBPARAGRAPH: str = "subparagraph"
     TABLE: str = "table"
 
 @dataclass(frozen=True)
 class XMLGeneratorConfig:
+    """Configuration defaults for XML generation.
+
+    Attributes:
+        IDENTATION: Whether indentation is enabled in generated XML.
+        INDENT_SPACE: Indentation token used when indentation is enabled.
+        ENCODING: Output XML encoding.
+        XML_DECLARATION: Whether to include XML declaration header.
+        TAGS: Default XML tags container.
+    """
+
     #ROOT_NAME: str = "default_root"
     IDENTATION: bool = True
     INDENT_SPACE: str = "  "
@@ -46,6 +84,11 @@ class CoreDefaultConfig:
     image_config_name: str = "Imgconf.ini"
     
     def __repr__(self):
+        """Return a concise debug representation for the core defaults.
+
+        Returns:
+            str: String representation of core default settings.
+        """
         return f"CoreDefaultConfig(components={asdict(self.components)}, image_config_name='{self.image_config_name}')"
     
 # Singleton instance

@@ -32,7 +32,7 @@ VDD-A/
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.12+
 - Dependencies listed in `requirements.txt`
 
 ```bash
@@ -43,37 +43,62 @@ pip install -r requirements.txt
 
 ## Configuration
 
-All configuration lives in `config/`. Copy and edit the JSON files to match your environment.
+VDD-A uses a **two-level configuration system**:
 
-### `core_config.json`
+1. **User Config** (JSON files in `config/`): What you customize per document
+   - Paths, metadata, modes, regex patterns
+   - Mutable — edit before each VDD generation
 
-| Key | Description |
-|---|---|
-| `vdd_type` | Document type: `"vital"` or `"non_vital"` |
-| `input_mode` | Source input mode: `"localSource"` |
-| `kernel_mode` | Kernel type: `"internal"` or `"external"` |
-| `paths.stream_root` | Root directory of the source tree |
-| `paths.output_dir` | Directory where the `.docx` is written |
-| `metadata.doc_name` | Name shown in the document |
+2. **Default Config** (Python dataclasses in `src/configs/default_config/`): Static structural constants
+   - File extensions to scan, directories to skip, INI field names
+   - Immutable — only changed by developers when rules need updating
 
-### `file_versioning.json`
+**👉 See [CONFIGURATION.md](CONFIGURATION.md) for the complete guide** with examples and design rationale.
 
-| Key | Description |
-|---|---|
-| `mode` | Version extraction mode: `"version"` |
-| `version_extraction_criteria` | Regex pattern to extract version strings from source files |
-| `metadata.title` | Chapter title in the Word document |
-| `metadata.columns_name` | Column headers for the file table (e.g. `["Name", "Version"]`) |
+### Quick Reference: User Config Files
 
-### `task_versioning.json`
+**`config/core_config.json`** — Core document settings
 
-| Key | Description |
-|---|---|
-| `previous_release.enabled` | Whether to compare against a previous release |
-| `previous_release.root` | Path to the previous release source tree |
-| `metadata.title` | Chapter title in the Word document |
-| `metadata.columns_name` | Column headers for the task table (e.g. `["Name", "Type", "Version", "Modified"]`) |
-| `app_tasks` | List of `.ini` task configuration files to include |
+```json
+{
+    "vdd_type": "vital",
+    "kernel_mode": "internal",
+    "paths": {
+        "stream_root": "C:\\path\\to\\source",
+        "output_dir": "C:\\path\\to\\output"
+    },
+    "metadata": {"doc_name": "VDD Document"}
+}
+```
+
+**`config/file_versioning.json`** — Chapter 2 (file list)
+
+```json
+{
+    "mode": "version",
+    "version_extraction_criteria": "Versione:\\s*(\\d+\\.\\d+)",
+    "metadata": {
+        "title": "LIST OF WSPHS+ SW FILES AND RELEVANT VERSIONS",
+        "columns_name": ["Name", "Version"]
+    }
+}
+```
+
+**`config/task_versioning.json`** — Chapter 3 (task list)
+
+```json
+{
+    "previous_release": {
+        "enabled": true,
+        "root": "C:\\path\\to\\previous\\release"
+    },
+    "metadata": {
+        "title": "TASK LIST",
+        "columns_name": ["Name", "Type", "Version", "Modified"]
+    },
+    "app_tasks": ["ixl.ini", "srlw.ini"]
+}
+```
 
 ---
 

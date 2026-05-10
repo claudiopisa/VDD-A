@@ -1,7 +1,4 @@
-"""
-DefaultConfigLoader - Automatically loads the correct default configuration
-based on the config class type.
-"""
+"""Utilities to resolve and instantiate default configuration classes."""
 
 from typing import Type, Dict, Any
 import re
@@ -17,7 +14,7 @@ class DefaultConfigLoader:
     - TaskVersioningConfig -> TaskVersioningDefaultConfig
     """
     
-    # Registry to store manual mappings if needed
+    # Registry for mappings.
     _registry: Dict[str, Type] = {}
     
     @classmethod
@@ -28,6 +25,9 @@ class DefaultConfigLoader:
         Args:
             config_class_name: Name of the config class (e.g., 'CoreConfig')
             default_config_class: The default config class to instantiate
+
+        Returns:
+            None
         """
         cls._registry[config_class_name] = default_config_class
     

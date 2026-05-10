@@ -241,5 +241,4 @@ class TaskVersioningExternal(TaskVersioning):
         self._read_app_tasks(curr_ordered_names, curr_catalog, is_prev=False)
 
         logger.info("External task scan completed: %d tasks loaded", len(self.tasks))
-
-        #return self.tasks
+        return self.tasks
